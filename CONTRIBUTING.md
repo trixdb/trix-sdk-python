@@ -1,6 +1,6 @@
-# Contributing to TrixDB Python SDK
+# Contributing to Trix Python SDK
 
-Thank you for your interest in contributing to the TrixDB Python SDK! This document provides guidelines and instructions for contributing.
+Thank you for your interest in contributing to the Trix Python SDK! This document provides guidelines and instructions for contributing.
 
 ## Development Setup
 
@@ -108,7 +108,7 @@ def create_memory(
 pytest
 
 # Run with coverage
-pytest --cov=trixdb --cov-report=html
+pytest --cov=trix --cov-report=html
 
 # Run specific test file
 pytest tests/test_memories.py
@@ -184,7 +184,7 @@ def test_create_memory(sync_client, mock_memory_response, respx_mock):
 
 When adding new API endpoints or features:
 
-1. **Add Type Models** to `src/trixdb/types.py`:
+1. **Add Type Models** to `src/trix/types.py`:
    ```python
    class NewFeature(BaseResponse):
        """Description of the feature."""
@@ -193,7 +193,7 @@ When adding new API endpoints or features:
        created_at: datetime
    ```
 
-2. **Create Resource Class** in `src/trixdb/resources/`:
+2. **Create Resource Class** in `src/trix/resources/`:
    ```python
    class NewFeatureResource:
        """Resource for managing new features."""
@@ -203,7 +203,7 @@ When adding new API endpoints or features:
            ...
    ```
 
-3. **Add to Client** in `src/trixdb/client.py`:
+3. **Add to Client** in `src/trix/client.py`:
    ```python
    self.new_feature = NewFeatureResource(self)
    ```
@@ -212,7 +212,7 @@ When adding new API endpoints or features:
 
 5. **Update Documentation** in README.md
 
-6. **Export Types** in `src/trixdb/__init__.py`
+6. **Export Types** in `src/trix/__init__.py`
 
 ## Reporting Issues
 
@@ -240,4 +240,4 @@ If you have questions, feel free to:
 - Email us at support@trixdb.com
 - Check the documentation at https://docs.trixdb.com
 
-Thank you for contributing to TrixDB Python SDK!
+Thank you for contributing to Trix Python SDK!

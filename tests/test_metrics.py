@@ -1,10 +1,10 @@
-"""Tests for TrixDB metrics and observability utilities."""
+"""Tests for Trix metrics and observability utilities."""
 
 import time
 
 import pytest
 
-from trixdb.utils.metrics import (
+from trix.utils.metrics import (
     CallbackCollector,
     CompositeCollector,
     InMemoryCollector,

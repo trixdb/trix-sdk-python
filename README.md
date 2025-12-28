@@ -1,9 +1,9 @@
-# TrixDB Python SDK
+# Trix Python SDK
 
-Official Python SDK for [TrixDB](https://trixdb.com) - A powerful memory and knowledge management API.
+Official Python SDK for [Trix](https://trixdb.com) - A powerful memory and knowledge management API.
 
-[![PyPI version](https://badge.fury.io/py/trixdb.svg)](https://badge.fury.io/py/trixdb)
-[![Python Support](https://img.shields.io/pypi/pyversions/trixdb.svg)](https://pypi.org/project/trixdb/)
+[![PyPI version](https://badge.fury.io/py/trix.svg)](https://badge.fury.io/py/trix)
+[![Python Support](https://img.shields.io/pypi/pyversions/trix.svg)](https://pypi.org/project/trix/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -14,18 +14,18 @@ Official Python SDK for [TrixDB](https://trixdb.com) - A powerful memory and kno
 - **Pagination helpers** for iterating through large datasets
 - **Context managers** for proper resource cleanup
 - **Comprehensive error handling** with custom exceptions
-- **Full API coverage** for all TrixDB endpoints
+- **Full API coverage** for all Trix endpoints
 
 ## Installation
 
 ```bash
-pip install trixdb
+pip install trix
 ```
 
 For development:
 
 ```bash
-pip install trixdb[dev]
+pip install trix[dev]
 ```
 
 ## Quick Start
@@ -33,10 +33,10 @@ pip install trixdb[dev]
 ### Synchronous Usage
 
 ```python
-from trixdb import TrixDB
+from trix import Trix
 
 # Initialize client
-client = TrixDB(api_key="your_api_key")
+client = Trix(api_key="your_api_key")
 
 # Create a memory
 memory = client.memories.create(
@@ -73,11 +73,11 @@ client.close()
 
 ```python
 import asyncio
-from trixdb import AsyncTrixDB
+from trix import AsyncTrix
 
 async def main():
     # Use async context manager
-    async with AsyncTrixDB(api_key="your_api_key") as client:
+    async with AsyncTrix(api_key="your_api_key") as client:
         # Create memory
         memory = await client.memories.create(
             content="Async memory creation",
@@ -95,39 +95,39 @@ asyncio.run(main())
 
 ```python
 # Sync context manager
-with TrixDB(api_key="your_api_key") as client:
-    memory = client.memories.create(content="Hello, TrixDB!")
+with Trix(api_key="your_api_key") as client:
+    memory = client.memories.create(content="Hello, Trix!")
 
 # Async context manager
-async with AsyncTrixDB(api_key="your_api_key") as client:
-    memory = await client.memories.create(content="Hello, TrixDB!")
+async with AsyncTrix(api_key="your_api_key") as client:
+    memory = await client.memories.create(content="Hello, Trix!")
 ```
 
 ## Authentication
 
-TrixDB supports two authentication methods:
+Trix supports two authentication methods:
 
 ### API Key Authentication
 
 ```python
-from trixdb import TrixDB
+from trix import Trix
 
-client = TrixDB(api_key="your_api_key")
+client = Trix(api_key="your_api_key")
 ```
 
 ### JWT Token Authentication
 
 ```python
-from trixdb import TrixDB
+from trix import Trix
 
-client = TrixDB(jwt_token="your_jwt_token")
+client = Trix(jwt_token="your_jwt_token")
 ```
 
 ## Core Resources
 
 ### Memories
 
-Manage memories - the core unit of knowledge in TrixDB.
+Manage memories - the core unit of knowledge in Trix.
 
 ```python
 # Create a memory
@@ -180,7 +180,7 @@ audio_data = client.memories.stream_audio("mem_audio_123")
 Create and manage relationships between memories.
 
 ```python
-from trixdb import RelationshipType
+from trix import RelationshipType
 
 # Create a relationship
 rel = client.relationships.create(
@@ -281,7 +281,7 @@ client.spaces.delete("space_123")
 Traverse and analyze the memory graph.
 
 ```python
-from trixdb import Direction, RelationshipType
+from trix import Direction, RelationshipType
 
 # Traverse the graph
 result = client.graph.traverse(
@@ -345,7 +345,7 @@ print(f"Max limit: {config.max_limit}")
 Set up webhooks for event notifications.
 
 ```python
-from trixdb import WebhookEvent
+from trix import WebhookEvent
 
 # Create a webhook
 webhook = client.webhooks.create(
@@ -386,7 +386,7 @@ client.webhooks.delete("webhook_123")
 Manage conversational agent sessions.
 
 ```python
-from trixdb import ConsolidationStrategy
+from trix import ConsolidationStrategy
 
 # Create an agent session
 session = client.agent.create_session(
@@ -434,7 +434,7 @@ print(f"Would consolidate {result.consolidated_count} memories")
 Improve search results with feedback.
 
 ```python
-from trixdb import FeedbackResult
+from trix import FeedbackResult
 
 # Submit detailed feedback
 response = client.feedback.submit(
@@ -468,7 +468,7 @@ print(f"Created {response.relationships_created} relationships")
 Highlight important parts of memories.
 
 ```python
-from trixdb import ExtractionType
+from trix import ExtractionType
 
 # Create a highlight
 highlight = client.highlights.create(
@@ -514,7 +514,7 @@ for extraction in extractions:
 Monitor and manage background jobs.
 
 ```python
-from trixdb import JobStatus
+from trix import JobStatus
 
 # Get job statistics
 stats = client.jobs.get_stats()
@@ -563,7 +563,7 @@ fact = client.facts.create(
 
 # Create a fact with source attribution
 fact = client.facts.create(
-    subject="TrixDB",
+    subject="Trix",
     predicate="is_a",
     obj="memory database",
     confidence=1.0,
@@ -675,16 +675,16 @@ client.entities.delete("ent_123")
 The SDK provides comprehensive error handling with custom exceptions:
 
 ```python
-from trixdb import (
-    TrixDB,
-    TrixDBError,
+from trix import (
+    Trix,
+    TrixError,
     AuthenticationError,
     NotFoundError,
     RateLimitError,
     ValidationError,
 )
 
-client = TrixDB(api_key="your_api_key")
+client = Trix(api_key="your_api_key")
 
 try:
     memory = client.memories.get("invalid_id")
@@ -696,14 +696,14 @@ except RateLimitError as e:
     print(f"Rate limited. Retry after {e.retry_after} seconds")
 except ValidationError as e:
     print(f"Validation error: {e}")
-except TrixDBError as e:
-    # Catch all TrixDB errors
+except TrixError as e:
+    # Catch all Trix errors
     print(f"API error: {e}")
 ```
 
 ### Exception Hierarchy
 
-- `TrixDBError` - Base exception for all errors
+- `TrixError` - Base exception for all errors
   - `APIError` - General API errors
   - `AuthenticationError` - 401 authentication failures
   - `PermissionError` - 403 permission denied
@@ -748,8 +748,8 @@ while True:
 Customize retry behavior for failed requests:
 
 ```python
-from trixdb import TrixDB
-from trixdb.utils import RetryConfig
+from trix import Trix
+from trix.utils import RetryConfig
 
 # Custom retry configuration
 retry_config = RetryConfig(
@@ -760,7 +760,7 @@ retry_config = RetryConfig(
     jitter=True
 )
 
-client = TrixDB(
+client = Trix(
     api_key="your_api_key",
     retry_config=retry_config
 )
@@ -771,9 +771,9 @@ client = TrixDB(
 ### Client Options
 
 ```python
-from trixdb import TrixDB
+from trix import Trix
 
-client = TrixDB(
+client = Trix(
     api_key="your_api_key",
     base_url="https://api.trixdb.com",  # Custom API endpoint
     timeout=60.0,                        # Request timeout in seconds
@@ -786,7 +786,7 @@ client = TrixDB(
 All request and response objects are fully typed with Pydantic models:
 
 ```python
-from trixdb import MemoryCreate, MemoryType
+from trix import MemoryCreate, MemoryType
 
 # Type-safe memory creation
 memory_data = MemoryCreate(
@@ -811,7 +811,7 @@ print(memory.metadata)    # Dict[str, Any]
 
 ```bash
 # Clone repository
-git clone https://github.com/trixdb/trix-python-sdk.git
+git clone https://github.com/trix/trix-python-sdk.git
 cd trix-python-sdk
 
 # Create virtual environment
@@ -829,7 +829,7 @@ pip install -e ".[dev]"
 pytest
 
 # Run with coverage
-pytest --cov=trixdb --cov-report=html
+pytest --cov=trix --cov-report=html
 
 # Run specific test file
 pytest tests/test_memories.py
@@ -872,7 +872,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - Documentation: [https://docs.trixdb.com](https://docs.trixdb.com)
-- Issues: [https://github.com/trixdb/trix-python-sdk/issues](https://github.com/trixdb/trix-python-sdk/issues)
+- Issues: [https://github.com/trix/trix-python-sdk/issues](https://github.com/trix/trix-python-sdk/issues)
 - Email: support@trixdb.com
 
 ## Changelog
@@ -880,7 +880,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ### 0.1.0 (2025-12-25)
 
 - Initial release
-- Full API coverage for TrixDB
+- Full API coverage for Trix
 - Sync and async support
 - Comprehensive type hints
 - Automatic retry with exponential backoff

@@ -1,13 +1,13 @@
-"""Tests for new TrixDB client features: connection pooling, timeouts, interceptors."""
+"""Tests for new Trix client features: connection pooling, timeouts, interceptors."""
 
 import io
 import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
 import httpx
 
-from trixdb import (
-    TrixDB,
-    AsyncTrixDB,
+from trix import (
+    Trix,
+    AsyncTrix,
     PoolConfig,
     RequestContext,
     ResponseContext,
@@ -15,7 +15,7 @@ from trixdb import (
     ResponseInterceptor,
     ErrorInterceptor,
 )
-from trixdb.exceptions import TimeoutError
+from trix.exceptions import TimeoutError
 
 
 class TestPoolConfig:
@@ -59,13 +59,13 @@ class TestClientPoolConfig:
     def test_sync_client_with_pool_config(self):
         """Test sync client accepts pool configuration."""
         pool_config = PoolConfig(max_connections=50)
-        client = TrixDB(api_key="test_key", pool_config=pool_config)
+        client = Trix(api_key="test_key", pool_config=pool_config)
         assert client._pool_config.max_connections == 50
         client.close()
 
     def test_sync_client_default_pool_config(self):
         """Test sync client has default pool configuration."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
         assert client._pool_config is not None
         assert client._pool_config.max_connections == 100
         client.close()
@@ -74,7 +74,7 @@ class TestClientPoolConfig:
     async def test_async_client_with_pool_config(self):
         """Test async client accepts pool configuration."""
         pool_config = PoolConfig(max_connections=75)
-        client = AsyncTrixDB(api_key="test_key", pool_config=pool_config)
+        client = AsyncTrix(api_key="test_key", pool_config=pool_config)
         assert client._pool_config.max_connections == 75
         await client.close()
 
@@ -128,7 +128,7 @@ class TestRequestInterceptors:
 
     def test_add_request_interceptor(self):
         """Test adding a request interceptor."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         interceptor_called = []
 
@@ -143,7 +143,7 @@ class TestRequestInterceptors:
 
     def test_remove_request_interceptor(self):
         """Test removing a request interceptor."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         def interceptor(ctx: RequestContext) -> RequestContext:
             return ctx
@@ -157,7 +157,7 @@ class TestRequestInterceptors:
 
     def test_multiple_request_interceptors(self):
         """Test multiple request interceptors run in order."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         call_order = []
 
@@ -180,7 +180,7 @@ class TestRequestInterceptors:
 
     def test_request_interceptor_modifies_context(self):
         """Test request interceptor can modify context."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         def add_header(ctx: RequestContext) -> RequestContext:
             ctx.headers["X-Custom"] = "value"
@@ -202,7 +202,7 @@ class TestRequestInterceptors:
             interceptor_called.append(True)
             return ctx
 
-        client = TrixDB(
+        client = Trix(
             api_key="test_key",
             request_interceptors=[interceptor],
         )
@@ -215,7 +215,7 @@ class TestResponseInterceptors:
 
     def test_add_response_interceptor(self):
         """Test adding a response interceptor."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         def interceptor(ctx: ResponseContext) -> ResponseContext:
             return ctx
@@ -227,7 +227,7 @@ class TestResponseInterceptors:
 
     def test_response_interceptor_modifies_context(self):
         """Test response interceptor can modify context."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         def transform_body(ctx: ResponseContext) -> ResponseContext:
             ctx.body["transformed"] = True
@@ -247,7 +247,7 @@ class TestErrorInterceptors:
 
     def test_add_error_interceptor(self):
         """Test adding an error interceptor."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         def interceptor(err: Exception, ctx: RequestContext) -> Exception:
             return err
@@ -259,7 +259,7 @@ class TestErrorInterceptors:
 
     def test_error_interceptor_transforms_error(self):
         """Test error interceptor can transform errors."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         class CustomError(Exception):
             pass
@@ -279,7 +279,7 @@ class TestErrorInterceptors:
 
     def test_error_interceptor_receives_request_context(self):
         """Test error interceptor receives request context."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         received_ctx = []
 
@@ -303,14 +303,14 @@ class TestPerRequestTimeout:
 
     def test_client_stores_default_timeout(self):
         """Test client stores default timeout."""
-        client = TrixDB(api_key="test_key", timeout=45.0)
+        client = Trix(api_key="test_key", timeout=45.0)
         assert client._timeout == 45.0
         client.close()
 
     @pytest.mark.asyncio
     async def test_async_client_stores_default_timeout(self):
         """Test async client stores default timeout."""
-        client = AsyncTrixDB(api_key="test_key", timeout=60.0)
+        client = AsyncTrix(api_key="test_key", timeout=60.0)
         assert client._timeout == 60.0
         await client.close()
 
@@ -320,7 +320,7 @@ class TestStreamingSupport:
 
     def test_client_has_request_stream_method(self):
         """Test sync client has _request_stream method."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
         assert hasattr(client, "_request_stream")
         assert callable(client._request_stream)
         client.close()
@@ -328,7 +328,7 @@ class TestStreamingSupport:
     @pytest.mark.asyncio
     async def test_async_client_has_request_stream_method(self):
         """Test async client has _request_stream method."""
-        client = AsyncTrixDB(api_key="test_key")
+        client = AsyncTrix(api_key="test_key")
         assert hasattr(client, "_request_stream")
         assert callable(client._request_stream)
         await client.close()
@@ -339,7 +339,7 @@ class TestMultipartSupport:
 
     def test_client_has_request_multipart_method(self):
         """Test sync client has _request_multipart method."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
         assert hasattr(client, "_request_multipart")
         assert callable(client._request_multipart)
         client.close()
@@ -347,7 +347,7 @@ class TestMultipartSupport:
     @pytest.mark.asyncio
     async def test_async_client_has_request_multipart_method(self):
         """Test async client has _request_multipart method."""
-        client = AsyncTrixDB(api_key="test_key")
+        client = AsyncTrix(api_key="test_key")
         assert hasattr(client, "_request_multipart")
         assert callable(client._request_multipart)
         await client.close()
@@ -358,7 +358,7 @@ class TestInterceptorIntegration:
 
     def test_interceptors_chain_correctly(self):
         """Test interceptors chain in correct order."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         execution_order = []
 
@@ -396,7 +396,7 @@ class TestInterceptorIntegration:
 
     def test_interceptor_returns_none_preserves_context(self):
         """Test interceptor returning None preserves previous context."""
-        client = TrixDB(api_key="test_key")
+        client = Trix(api_key="test_key")
 
         def observe_only(ctx: RequestContext):
             # Just observe, don't return anything

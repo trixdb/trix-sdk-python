@@ -1,12 +1,12 @@
-# TrixDB Python SDK Examples
+# Trix Python SDK Examples
 
-This directory contains example scripts demonstrating various features of the TrixDB Python SDK.
+This directory contains example scripts demonstrating various features of the Trix Python SDK.
 
 ## Available Examples
 
 ### 1. quickstart.py
 
-**Purpose**: Get started with TrixDB in under 5 minutes
+**Purpose**: Get started with Trix in under 5 minutes
 
 **What it demonstrates**:
 - Creating memories
@@ -77,7 +77,7 @@ python examples/async_usage.py
 ```
 
 **Key features**:
-- Uses `AsyncTrixDB` client
+- Uses `AsyncTrix` client
 - Shows how to use `async/await`
 - Demonstrates concurrent operations
 - Async pagination
@@ -107,7 +107,7 @@ python examples/error_handling.py
 - `AuthenticationError`
 - `RateLimitError`
 - `ServerError`
-- General `TrixDBError`
+- General `TrixError`
 
 ---
 
@@ -117,7 +117,7 @@ Before running any example:
 
 1. **Install the SDK**:
    ```bash
-   pip install trixdb
+   pip install trix
    ```
 
 2. **Get an API Key**:
@@ -126,7 +126,7 @@ Before running any example:
 
 3. **Set your API key** in the example:
    - Update `API_KEY = "your_api_key"` in the script, or
-   - Set environment variable: `export TRIXDB_API_KEY=your_key`
+   - Set environment variable: `export TRIX_API_KEY=your_key`
 
 ## Running Examples
 
@@ -137,13 +137,13 @@ python examples/quickstart.py
 
 ### Using environment variable:
 ```bash
-export TRIXDB_API_KEY="your_api_key"
+export TRIX_API_KEY="your_api_key"
 python examples/basic_usage.py
 ```
 
 ### With custom base URL:
 ```python
-client = TrixDB(
+client = Trix(
     api_key="your_api_key",
     base_url="https://custom.api.url"
 )
@@ -154,7 +154,7 @@ client = TrixDB(
 ### quickstart.py output:
 ```
 ============================================================
-TrixDB Python SDK - Quick Start
+Trix Python SDK - Quick Start
 ============================================================
 
 1. Creating memories...
@@ -178,18 +178,18 @@ TrixDB Python SDK - Quick Start
 
 ### Pattern 1: Context Manager (Recommended)
 ```python
-from trixdb import TrixDB
+from trix import Trix
 
-with TrixDB(api_key="your_api_key") as client:
+with Trix(api_key="your_api_key") as client:
     memory = client.memories.create(content="Hello")
     # Client automatically closed
 ```
 
 ### Pattern 2: Manual Cleanup
 ```python
-from trixdb import TrixDB
+from trix import Trix
 
-client = TrixDB(api_key="your_api_key")
+client = Trix(api_key="your_api_key")
 try:
     memory = client.memories.create(content="Hello")
 finally:
@@ -198,18 +198,18 @@ finally:
 
 ### Pattern 3: Async Context Manager
 ```python
-from trixdb import AsyncTrixDB
+from trix import AsyncTrix
 
-async with AsyncTrixDB(api_key="your_api_key") as client:
+async with AsyncTrix(api_key="your_api_key") as client:
     memory = await client.memories.create(content="Hello")
     # Client automatically closed
 ```
 
 ### Pattern 4: Error Handling
 ```python
-from trixdb import TrixDB, NotFoundError
+from trix import Trix, NotFoundError
 
-client = TrixDB(api_key="your_api_key")
+client = Trix(api_key="your_api_key")
 try:
     memory = client.memories.get("invalid_id")
 except NotFoundError:
@@ -222,13 +222,13 @@ Start with this template:
 
 ```python
 #!/usr/bin/env python3
-"""My TrixDB Example"""
+"""My Trix Example"""
 
-from trixdb import TrixDB
+from trix import Trix
 
 def main():
     # Initialize client
-    with TrixDB(api_key="your_api_key") as client:
+    with Trix(api_key="your_api_key") as client:
         # Your code here
         memory = client.memories.create(
             content="My first memory"
@@ -253,7 +253,7 @@ if __name__ == "__main__":
 - **Documentation**: See `../README.md`
 - **API Reference**: https://docs.trixdb.com
 - **Contributing**: See `../CONTRIBUTING.md`
-- **Issues**: https://github.com/trixdb/trix-python-sdk/issues
+- **Issues**: https://github.com/trix/trix-python-sdk/issues
 
 ## Need Help?
 
@@ -263,4 +263,4 @@ if __name__ == "__main__":
 
 ---
 
-Happy coding with TrixDB! 🚀
+Happy coding with Trix!

@@ -7,7 +7,7 @@
 Once published, install the latest stable version:
 
 ```bash
-pip install trixdb
+pip install trix
 ```
 
 ### From Source
@@ -15,7 +15,7 @@ pip install trixdb
 For the latest development version:
 
 ```bash
-git clone https://github.com/trixdb/trix-python-sdk.git
+git clone https://github.com/trix/trix-python-sdk.git
 cd trix-python-sdk
 pip install -e .
 ```
@@ -34,7 +34,7 @@ pip install -e .
 ### 1. Standard Installation
 
 ```bash
-pip install trixdb
+pip install trix
 ```
 
 ### 2. Development Installation
@@ -42,7 +42,7 @@ pip install trixdb
 For contributing or development:
 
 ```bash
-git clone https://github.com/trixdb/trix-python-sdk.git
+git clone https://github.com/trix/trix-python-sdk.git
 cd trix-python-sdk
 pip install -e ".[dev]"
 ```
@@ -70,37 +70,37 @@ source venv/bin/activate
 # Activate (Windows)
 venv\Scripts\activate
 
-# Install TrixDB
-pip install trixdb
+# Install Trix
+pip install trix
 ```
 
 #### Using conda
 
 ```bash
 # Create conda environment
-conda create -n trixdb python=3.11
+conda create -n trix python=3.11
 
 # Activate environment
-conda activate trixdb
+conda activate trix
 
-# Install TrixDB
-pip install trixdb
+# Install Trix
+pip install trix
 ```
 
 ### 4. Using pipx (Isolated Installation)
 
 ```bash
-pipx install trixdb
+pipx install trix
 ```
 
 ### 5. Using Poetry
 
 ```bash
 # Add to your project
-poetry add trixdb
+poetry add trix
 
 # Or for development
-poetry add --group dev trixdb
+poetry add --group dev trix
 ```
 
 ## Verify Installation
@@ -108,7 +108,7 @@ poetry add --group dev trixdb
 After installation, verify it works:
 
 ```python
-python -c "import trixdb; print(f'TrixDB SDK v{trixdb.__version__}')"
+python -c "import trix; print(f'Trix SDK v{trix.__version__}')"
 ```
 
 Or run the test suite:
@@ -125,7 +125,7 @@ pytest
 Standard pip installation should work:
 
 ```bash
-pip install trixdb
+pip install trix
 ```
 
 ### macOS
@@ -136,8 +136,8 @@ For best compatibility:
 # Update pip first
 pip install --upgrade pip
 
-# Install TrixDB
-pip install trixdb
+# Install Trix
+pip install trix
 ```
 
 ### Windows
@@ -148,19 +148,19 @@ Use PowerShell or Command Prompt:
 # Update pip
 python -m pip install --upgrade pip
 
-# Install TrixDB
-pip install trixdb
+# Install Trix
+pip install trix
 ```
 
 ## Troubleshooting
 
-### Issue: "No module named 'trixdb'"
+### Issue: "No module named 'trix'"
 
 **Solution**: Make sure you've activated your virtual environment and installed the package:
 
 ```bash
 source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install trixdb
+pip install trix
 ```
 
 ### Issue: "ImportError: cannot import name..."
@@ -168,7 +168,7 @@ pip install trixdb
 **Solution**: Ensure you have the correct version installed:
 
 ```bash
-pip install --upgrade trixdb
+pip install --upgrade trix
 ```
 
 ### Issue: Dependency conflicts
@@ -178,7 +178,7 @@ pip install --upgrade trixdb
 ```bash
 python -m venv fresh_env
 source fresh_env/bin/activate
-pip install trixdb
+pip install trix
 ```
 
 ### Issue: SSL/Certificate errors
@@ -194,7 +194,7 @@ pip install --upgrade certifi
 **Solution**: Install for current user only:
 
 ```bash
-pip install --user trixdb
+pip install --user trix
 ```
 
 Or use a virtual environment (recommended).
@@ -204,32 +204,32 @@ Or use a virtual environment (recommended).
 ### Upgrade to Latest Version
 
 ```bash
-pip install --upgrade trixdb
+pip install --upgrade trix
 ```
 
 ### Upgrade to Specific Version
 
 ```bash
-pip install trixdb==0.1.0
+pip install trix==0.1.0
 ```
 
 ### Check Current Version
 
 ```bash
-pip show trixdb
+pip show trix
 ```
 
 Or in Python:
 
 ```python
-import trixdb
-print(trixdb.__version__)
+import trix
+print(trix.__version__)
 ```
 
 ## Uninstallation
 
 ```bash
-pip uninstall trixdb
+pip uninstall trix
 ```
 
 ## Development Setup
@@ -292,7 +292,7 @@ After installation:
 If you encounter installation issues:
 
 1. Check the [Troubleshooting](#troubleshooting) section above
-2. Open an issue: https://github.com/trixdb/trix-python-sdk/issues
+2. Open an issue: https://github.com/trix/trix-python-sdk/issues
 3. Email: support@trixdb.com
 
 ## System Requirements Summary

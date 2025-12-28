@@ -1,7 +1,7 @@
 .PHONY: help install install-dev test test-cov lint format type-check clean build publish
 
 help:
-	@echo "TrixDB Python SDK - Available Commands"
+	@echo "Trix Python SDK - Available Commands"
 	@echo "======================================"
 	@echo "install       - Install package"
 	@echo "install-dev   - Install package with dev dependencies"
@@ -25,7 +25,7 @@ test:
 	pytest
 
 test-cov:
-	pytest --cov=trixdb --cov-report=html --cov-report=term
+	pytest --cov=trix --cov-report=html --cov-report=term
 
 lint:
 	ruff check src/ tests/

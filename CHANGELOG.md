@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the TrixDB Python SDK will be documented in this file.
+All notable changes to the Trix Python SDK will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -12,9 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Core Features
-- Initial release of TrixDB Python SDK
-- Full support for TrixDB API v1
-- Synchronous client (`TrixDB`) and asynchronous client (`AsyncTrixDB`)
+- Initial release of Trix Python SDK
+- Full support for Trix API v1
+- Synchronous client (`Trix`) and asynchronous client (`AsyncTrix`)
 - Context manager support for both sync and async clients
 - Comprehensive type hints using Pydantic models
 
@@ -57,5 +57,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pydantic v2 for data validation
 - Support for both API key and JWT authentication
 
-[Unreleased]: https://github.com/trixdb/trix-python-sdk/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/trixdb/trix-python-sdk/releases/tag/v0.1.0
+[Unreleased]: https://github.com/trix/trix-python-sdk/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/trix/trix-python-sdk/releases/tag/v0.1.0

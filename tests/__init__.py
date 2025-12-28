@@ -1,1 +1,1 @@
-"""Test suite for TrixDB SDK."""
+"""Test suite for Trix SDK."""

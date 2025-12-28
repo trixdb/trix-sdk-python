@@ -40,7 +40,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest --cov=trixdb --cov-report=xml --cov-report=term
+        pytest --cov=trix --cov-report=xml --cov-report=term
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3

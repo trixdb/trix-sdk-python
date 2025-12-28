@@ -3,16 +3,16 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "trixdb"
+name = "trix"
 version = "1.0.0"
-description = "Official Python SDK for TrixDB - Memory and Knowledge Management API"
+description = "Official Python SDK for Trix - Memory and Knowledge Management API"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
 authors = [
-    { name = "TrixDB Team", email = "support@trixdb.com" }
+    { name = "Trix Team", email = "support@trixdb.com" }
 ]
-keywords = ["trixdb", "memory", "knowledge", "api", "sdk"]
+keywords = ["trix", "memory", "knowledge", "api", "sdk"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -48,8 +48,8 @@ telemetry = [
 [project.urls]
 Homepage = "https://trixdb.com"
 Documentation = "https://docs.trixdb.com"
-Repository = "https://github.com/trixdb/trix-python-sdk"
-Issues = "https://github.com/trixdb/trix-python-sdk/issues"
+Repository = "https://github.com/trix/trix-python-sdk"
+Issues = "https://github.com/trix/trix-python-sdk/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

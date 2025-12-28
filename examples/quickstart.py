@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-TrixDB Python SDK Quick Start
+Trix Python SDK Quick Start
 
-This script demonstrates the most common operations with TrixDB.
+This script demonstrates the most common operations with Trix.
 Replace 'your_api_key' with your actual API key from https://trixdb.com
 """
 
-from trixdb import TrixDB, MemoryType, RelationshipType, SearchMode
+from trix import Trix, MemoryType, RelationshipType, SearchMode
 
 
 def main():
     """Run quick start examples."""
     # Initialize the client
     print("=" * 60)
-    print("TrixDB Python SDK - Quick Start")
+    print("Trix Python SDK - Quick Start")
     print("=" * 60)
 
     # Replace with your actual API key
@@ -21,9 +21,9 @@ def main():
 
     # You can also use environment variable:
     # import os
-    # API_KEY = os.getenv("TRIXDB_API_KEY")
+    # API_KEY = os.getenv("TRIX_API_KEY")
 
-    client = TrixDB(api_key=API_KEY)
+    client = Trix(api_key=API_KEY)
 
     try:
         # 1. Create memories
@@ -100,7 +100,7 @@ def main():
 
         # 8. Traverse the graph
         print("\n8. Traversing the memory graph...")
-        from trixdb import Direction
+        from trix import Direction
 
         graph = client.graph.traverse(start_ids=[memory1.id], depth=2, direction=Direction.BOTH)
         print(f"   ✓ Graph traversal found {graph.total_nodes} connected nodes")

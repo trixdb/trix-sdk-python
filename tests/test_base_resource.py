@@ -4,7 +4,7 @@ import pytest
 from typing import Any, Dict, Optional
 from unittest.mock import Mock, AsyncMock
 
-from trixdb.resources.base import (
+from trix.resources.base import (
     BaseResource,
     BaseSyncResource,
     BaseAsyncResource,

@@ -1,21 +1,21 @@
 """Pytest configuration and fixtures."""
 
 import pytest
-from trixdb import TrixDB, AsyncTrixDB
+from trix import Trix, AsyncTrix
 
 
 @pytest.fixture
 def sync_client():
-    """Provide a sync TrixDB client for testing."""
-    client = TrixDB(api_key="test_api_key", base_url="https://test.api.com")
+    """Provide a sync Trix client for testing."""
+    client = Trix(api_key="test_api_key", base_url="https://test.api.com")
     yield client
     client.close()
 
 
 @pytest.fixture
 async def async_client():
-    """Provide an async TrixDB client for testing."""
-    client = AsyncTrixDB(api_key="test_api_key", base_url="https://test.api.com")
+    """Provide an async Trix client for testing."""
+    client = AsyncTrix(api_key="test_api_key", base_url="https://test.api.com")
     yield client
     await client.close()
 

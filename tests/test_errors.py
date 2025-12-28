@@ -4,9 +4,9 @@ import pytest
 from unittest.mock import Mock, patch, MagicMock
 import httpx
 
-from trixdb import TrixDB
-from trixdb.exceptions import (
-    TrixDBError,
+from trix import Trix
+from trix.exceptions import (
+    TrixError,
     APIError,
     APIVersionMismatchError,
     AuthenticationError,
@@ -23,8 +23,8 @@ from trixdb.exceptions import (
 class TestExceptionHierarchy:
     """Test exception class hierarchy."""
 
-    def test_all_exceptions_inherit_from_trixdb_error(self):
-        """Test all exceptions inherit from TrixDBError."""
+    def test_all_exceptions_inherit_from_trix_error(self):
+        """Test all exceptions inherit from TrixError."""
         exceptions = [
             APIError("test"),
             APIVersionMismatchError("test"),
@@ -38,7 +38,7 @@ class TestExceptionHierarchy:
             TimeoutError("test"),
         ]
         for exc in exceptions:
-            assert isinstance(exc, TrixDBError)
+            assert isinstance(exc, TrixError)
 
     def test_exception_attributes(self):
         """Test exception attributes are set correctly."""
@@ -85,7 +85,7 @@ class TestErrorResponseHandling:
 
     def test_401_raises_authentication_error(self):
         """Test 401 response raises AuthenticationError."""
-        from trixdb.client import _handle_response
+        from trix.client import _handle_response
 
         response = self._create_mock_response(401, {"message": "Invalid credentials"})
 
@@ -95,7 +95,7 @@ class TestErrorResponseHandling:
 
     def test_403_raises_permission_error(self):
         """Test 403 response raises PermissionError."""
-        from trixdb.client import _handle_response
+        from trix.client import _handle_response
 
         response = self._create_mock_response(403, {"message": "Access denied"})
 
@@ -105,7 +105,7 @@ class TestErrorResponseHandling:
 
     def test_404_raises_not_found_error(self):
         """Test 404 response raises NotFoundError."""
-        from trixdb.client import _handle_response
+        from trix.client import _handle_response
 
         response = self._create_mock_response(404, {"message": "Memory not found"})
 
@@ -115,7 +115,7 @@ class TestErrorResponseHandling:
 
     def test_422_raises_validation_error(self):
         """Test 422 response raises ValidationError."""
-        from trixdb.client import _handle_response
+        from trix.client import _handle_response
 
         response = self._create_mock_response(422, {"message": "Invalid input"})
 
@@ -125,7 +125,7 @@ class TestErrorResponseHandling:
 
     def test_429_raises_rate_limit_error(self):
         """Test 429 response raises RateLimitError."""
-        from trixdb.client import _handle_response
+        from trix.client import _handle_response
 
         response = self._create_mock_response(
             429,
@@ -139,7 +139,7 @@ class TestErrorResponseHandling:
 
     def test_500_raises_server_error(self):
         """Test 500 response raises ServerError."""
-        from trixdb.client import _handle_response
+        from trix.client import _handle_response
 
         response = self._create_mock_response(500, {"message": "Internal error"})
 
@@ -149,7 +149,7 @@ class TestErrorResponseHandling:
 
     def test_502_raises_server_error(self):
         """Test 502 response raises ServerError."""
-        from trixdb.client import _handle_response
+        from trix.client import _handle_response
 
         response = self._create_mock_response(502, {"message": "Bad gateway"})
 
@@ -158,7 +158,7 @@ class TestErrorResponseHandling:
 
     def test_unknown_error_raises_api_error(self):
         """Test unknown status code raises APIError."""
-        from trixdb.client import _handle_response
+        from trix.client import _handle_response
 
         response = self._create_mock_response(418, {"message": "I'm a teapot"})
 
@@ -180,7 +180,7 @@ class TestVersionChecking:
 
     def test_compatible_version_passes(self):
         """Test compatible API version doesn't raise."""
-        from trixdb.client import _check_api_version
+        from trix.client import _check_api_version
 
         response = self._create_mock_response_with_version("v1")
         # Should not raise
@@ -188,7 +188,7 @@ class TestVersionChecking:
 
     def test_incompatible_version_raises(self):
         """Test incompatible API version raises APIVersionMismatchError."""
-        from trixdb.client import _check_api_version
+        from trix.client import _check_api_version
 
         response = self._create_mock_response_with_version("v99")
 
@@ -199,7 +199,7 @@ class TestVersionChecking:
 
     def test_no_version_header_passes(self):
         """Test missing version header doesn't raise."""
-        from trixdb.client import _check_api_version
+        from trix.client import _check_api_version
 
         response = self._create_mock_response_with_version(None)
         # Should not raise
@@ -207,7 +207,7 @@ class TestVersionChecking:
 
     def test_invalid_version_format_logs_warning(self):
         """Test invalid version format logs warning but doesn't raise."""
-        from trixdb.client import _check_api_version
+        from trix.client import _check_api_version
 
         response = self._create_mock_response_with_version("invalid")
         # Should not raise, just log warning
@@ -219,7 +219,7 @@ class TestCredentialClearing:
 
     def test_sync_client_clears_credentials(self):
         """Test sync client clears credentials on close."""
-        client = TrixDB(api_key="secret_key")
+        client = Trix(api_key="secret_key")
         assert client._auth._api_key == "secret_key"
 
         client.close()
@@ -230,9 +230,9 @@ class TestCredentialClearing:
     @pytest.mark.asyncio
     async def test_async_client_clears_credentials(self):
         """Test async client clears credentials on close."""
-        from trixdb import AsyncTrixDB
+        from trix import AsyncTrix
 
-        client = AsyncTrixDB(api_key="secret_key")
+        client = AsyncTrix(api_key="secret_key")
         assert client._auth._api_key == "secret_key"
 
         await client.close()

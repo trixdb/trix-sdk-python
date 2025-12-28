@@ -1,9 +1,9 @@
-"""Error handling examples for TrixDB SDK."""
+"""Error handling examples for Trix SDK."""
 
 import time
-from trixdb import (
-    TrixDB,
-    TrixDBError,
+from trix import (
+    Trix,
+    TrixError,
     AuthenticationError,
     NotFoundError,
     ValidationError,
@@ -14,7 +14,7 @@ from trixdb import (
 
 def main():
     """Demonstrate error handling."""
-    client = TrixDB(api_key="your_api_key")
+    client = Trix(api_key="your_api_key")
 
     # Example 1: Handle not found errors
     print("Example 1: Handling NotFoundError")
@@ -37,7 +37,7 @@ def main():
     # Example 3: Handle authentication errors
     print("\nExample 3: Handling AuthenticationError")
     try:
-        invalid_client = TrixDB(api_key="invalid_key")
+        invalid_client = Trix(api_key="invalid_key")
         memory = invalid_client.memories.list()
     except AuthenticationError as e:
         print(f"  ✗ Authentication failed: {e.message}")
@@ -57,13 +57,13 @@ def main():
             time.sleep(e.retry_after)
             print(f"    ✓ Retry completed")
 
-    # Example 5: Catch all TrixDB errors
-    print("\nExample 5: Catching all TrixDB errors")
+    # Example 5: Catch all Trix errors
+    print("\nExample 5: Catching all Trix errors")
     try:
         # Some operation that might fail
         memory = client.memories.get("some_id")
-    except TrixDBError as e:
-        print(f"  ✗ TrixDB error: {e.message}")
+    except TrixError as e:
+        print(f"  ✗ Trix error: {e.message}")
         print(f"    Error type: {type(e).__name__}")
         if e.status_code:
             print(f"    Status code: {e.status_code}")
@@ -78,7 +78,7 @@ def main():
         except NotFoundError:
             print(f"  ! Memory {memory_id} not found, creating new one")
             return client.memories.create(content=fallback_content)
-        except TrixDBError as e:
+        except TrixError as e:
             print(f"  ! Error retrieving memory: {e.message}")
             return None
 
@@ -111,7 +111,7 @@ def main():
     # Example 8: Context manager ensures cleanup even on errors
     print("\nExample 8: Context manager with error handling")
     try:
-        with TrixDB(api_key="your_api_key") as client:
+        with Trix(api_key="your_api_key") as client:
             # Do some work
             memory = client.memories.create(content="Test")
             # Simulate an error

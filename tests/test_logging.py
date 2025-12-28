@@ -1,4 +1,4 @@
-"""Tests for TrixDB structured logging utilities."""
+"""Tests for Trix structured logging utilities."""
 
 import json
 import logging
@@ -6,7 +6,7 @@ from io import StringIO
 
 import pytest
 
-from trixdb.utils.logging import (
+from trix.utils.logging import (
     LogConfig,
     LogFormat,
     LogLevel,
@@ -36,7 +36,7 @@ class TestLogConfig:
         assert config.include_timestamp is True
         assert config.include_request_id is True
         assert config.redact_sensitive is True
-        assert config.logger_name == "trixdb"
+        assert config.logger_name == "trix"
 
     def test_custom_values(self):
         """Test custom configuration values."""
@@ -84,7 +84,7 @@ class TestSetupLogging:
         """Test setup_logging returns a logger."""
         logger = setup_logging()
         assert isinstance(logger, logging.Logger)
-        assert logger.name == "trixdb"
+        assert logger.name == "trix"
 
     def test_sets_level(self):
         """Test setup_logging sets the log level."""
@@ -105,12 +105,12 @@ class TestGetLogger:
     def test_get_default_logger(self):
         """Test getting default logger."""
         logger = get_logger()
-        assert logger.name == "trixdb"
+        assert logger.name == "trix"
 
     def test_get_named_logger(self):
         """Test getting named logger."""
-        logger = get_logger("trixdb.client")
-        assert logger.name == "trixdb.client"
+        logger = get_logger("trix.client")
+        assert logger.name == "trix.client"
 
 
 class TestRequestId:
@@ -201,7 +201,7 @@ class TestCreateLoggerAdapter:
     def test_create_with_default_name(self):
         """Test creating adapter with default name."""
         adapter = create_logger_adapter()
-        assert adapter.logger.name == "trixdb"
+        assert adapter.logger.name == "trix"
 
     def test_create_with_custom_name(self):
         """Test creating adapter with custom name."""
@@ -253,7 +253,7 @@ class TestTextFormatter:
         output = stream.getvalue()
         assert "INFO" in output
         assert "Test message" in output
-        assert "trixdb" in output
+        assert "trix" in output
 
 
 class TestLogHelpers:

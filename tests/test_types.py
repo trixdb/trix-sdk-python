@@ -1,10 +1,10 @@
-"""Tests for TrixDB types."""
+"""Tests for Trix types."""
 
 from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from trixdb.types import (
+from trix.types import (
     Memory,
     MemoryCreate,
     MemoryType,

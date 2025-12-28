@@ -1,9 +1,9 @@
-"""Basic usage examples for TrixDB SDK."""
+"""Basic usage examples for Trix SDK."""
 
-from trixdb import TrixDB, MemoryType, RelationshipType, SearchMode
+from trix import Trix, MemoryType, RelationshipType, SearchMode
 
 # Initialize client
-client = TrixDB(api_key="your_api_key")
+client = Trix(api_key="your_api_key")
 
 try:
     # Create a memory
@@ -59,7 +59,7 @@ try:
 
     # Traverse the graph
     print("\nTraversing the graph...")
-    from trixdb import Direction
+    from trix import Direction
 
     graph = client.graph.traverse(start_ids=[memory.id], depth=2, direction=Direction.BOTH)
     print(f"Found {graph.total_nodes} nodes in graph traversal")
@@ -96,7 +96,7 @@ try:
 
     # Submit feedback
     print("\nSubmitting feedback...")
-    from trixdb import FeedbackResult
+    from trix import FeedbackResult
 
     feedback = client.feedback.submit(
         query_context="Python programming language",

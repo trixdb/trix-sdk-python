@@ -3,8 +3,8 @@
 import pytest
 from unittest.mock import Mock, AsyncMock
 
-from trixdb.resources.entities import EntitiesResource, AsyncEntitiesResource
-from trixdb.resources.base import validate_bulk_array
+from trix.resources.entities import EntitiesResource, AsyncEntitiesResource
+from trix.resources.base import validate_bulk_array
 
 
 class TestEntitiesResource:
@@ -39,7 +39,7 @@ class TestEntitiesResource:
         mock_client = Mock()
         mock_client._request.return_value = {
             "id": "ent_124",
-            "name": "TrixDB",
+            "name": "Trix",
             "type": "product",
             "properties": {"language": "TypeScript", "open_source": True},
             "created_at": "2024-01-01T00:00:00Z",
@@ -48,7 +48,7 @@ class TestEntitiesResource:
 
         resource = EntitiesResource(mock_client)
         result = resource.create(
-            name="TrixDB",
+            name="Trix",
             entity_type="product",
             properties={"language": "TypeScript", "open_source": True},
         )

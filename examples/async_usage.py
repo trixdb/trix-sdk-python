@@ -1,13 +1,13 @@
-"""Async usage examples for TrixDB SDK."""
+"""Async usage examples for Trix SDK."""
 
 import asyncio
-from trixdb import AsyncTrixDB, MemoryType, RelationshipType
+from trix import AsyncTrix, MemoryType, RelationshipType
 
 
 async def main():
     """Main async example function."""
     # Use async context manager for automatic cleanup
-    async with AsyncTrixDB(api_key="your_api_key") as client:
+    async with AsyncTrix(api_key="your_api_key") as client:
         # Create multiple memories concurrently
         print("Creating memories concurrently...")
         memories = await asyncio.gather(
@@ -66,7 +66,7 @@ async def main():
 
         # Traverse graph
         print("\nTraversing memory graph...")
-        from trixdb import Direction
+        from trix import Direction
 
         graph = await client.graph.traverse(
             start_ids=[memories[0].id], depth=2, direction=Direction.BOTH

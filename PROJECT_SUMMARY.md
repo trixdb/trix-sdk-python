@@ -1,16 +1,16 @@
-# TrixDB Python SDK - Project Summary
+# Trix Python SDK - Project Summary
 
 ## Overview
 
-This is a best-in-class Python SDK for the TrixDB API - a memory and knowledge management platform. The SDK provides comprehensive, type-safe access to all TrixDB endpoints with both synchronous and asynchronous support.
+This is a best-in-class Python SDK for the Trix API - a memory and knowledge management platform. The SDK provides comprehensive, type-safe access to all Trix endpoints with both synchronous and asynchronous support.
 
 ## Project Structure
 
 ```
 trix-python-sdk/
-├── src/trixdb/                    # Main package source code
+├── src/trix/                    # Main package source code
 │   ├── __init__.py               # Package exports and version
-│   ├── client.py                 # Main TrixDB and AsyncTrixDB clients
+│   ├── client.py                 # Main Trix and AsyncTrix clients
 │   ├── auth.py                   # Authentication handling
 │   ├── exceptions.py             # Custom exception classes
 │   ├── types.py                  # Pydantic models for all API types
@@ -58,8 +58,8 @@ trix-python-sdk/
 ## Key Features
 
 ### 1. Dual Client Architecture
-- **Sync Client (`TrixDB`)**: Synchronous operations using httpx
-- **Async Client (`AsyncTrixDB`)**: Asynchronous operations with asyncio
+- **Sync Client (`Trix`)**: Synchronous operations using httpx
+- **Async Client (`AsyncTrix`)**: Asynchronous operations with asyncio
 - Both support context managers for automatic cleanup
 
 ### 2. Comprehensive Type Safety
@@ -294,27 +294,27 @@ trix-python-sdk/
 
 ### Basic Synchronous Usage
 ```python
-from trixdb import TrixDB
+from trix import Trix
 
-with TrixDB(api_key="your_api_key") as client:
-    memory = client.memories.create(content="Hello, TrixDB!")
+with Trix(api_key="your_api_key") as client:
+    memory = client.memories.create(content="Hello, Trix!")
     print(memory.id)
 ```
 
 ### Async Usage with Iteration
 ```python
-from trixdb import AsyncTrixDB
+from trix import AsyncTrix
 
-async with AsyncTrixDB(api_key="your_api_key") as client:
+async with AsyncTrix(api_key="your_api_key") as client:
     async for memory in await client.memories.iter():
         print(memory.content)
 ```
 
 ### Error Handling
 ```python
-from trixdb import TrixDB, NotFoundError, RateLimitError
+from trix import Trix, NotFoundError, RateLimitError
 
-client = TrixDB(api_key="your_api_key")
+client = Trix(api_key="your_api_key")
 
 try:
     memory = client.memories.get("invalid_id")
@@ -372,10 +372,10 @@ make build         # Build distribution
 
 ```bash
 # From PyPI (when published)
-pip install trixdb
+pip install trix
 
 # Development installation
-git clone https://github.com/trixdb/trix-python-sdk.git
+git clone https://github.com/trix/trix-python-sdk.git
 cd trix-python-sdk
 pip install -e ".[dev]"
 ```
@@ -396,7 +396,7 @@ MIT License - See LICENSE file for details
 
 ## Design Principles
 
-1. **User-First**: Intuitive API matching TrixDB's REST API structure
+1. **User-First**: Intuitive API matching Trix's REST API structure
 2. **Type-Safe**: Comprehensive type hints for IDE support
 3. **Error-Resilient**: Robust error handling and retry logic
 4. **Well-Documented**: Extensive documentation and examples

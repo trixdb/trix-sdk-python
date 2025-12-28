@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "=================================================="
-echo "TrixDB Python SDK - Installation Verification"
+echo "Trix Python SDK - Installation Verification"
 echo "=================================================="
 echo ""
 
@@ -18,10 +18,10 @@ fi
 # Check if we can import the module
 echo ""
 echo "Checking module structure..."
-if python3 -c "import sys; sys.path.insert(0, 'src'); import trixdb" 2>/dev/null; then
-    echo "✓ trixdb module can be imported"
+if python3 -c "import sys; sys.path.insert(0, 'src'); import trix" 2>/dev/null; then
+    echo "✓ trix module can be imported"
 else
-    echo "✗ Cannot import trixdb module"
+    echo "✗ Cannot import trix module"
     exit 1
 fi
 
@@ -53,9 +53,9 @@ echo "Checking configuration files..."
 # Check directory structure
 echo ""
 echo "Checking directory structure..."
-[ -d src/trixdb ] && echo "✓ src/trixdb/ exists" || echo "✗ src/trixdb/ missing"
-[ -d src/trixdb/resources ] && echo "✓ src/trixdb/resources/ exists" || echo "✗ resources/ missing"
-[ -d src/trixdb/utils ] && echo "✓ src/trixdb/utils/ exists" || echo "✗ utils/ missing"
+[ -d src/trix ] && echo "✓ src/trix/ exists" || echo "✗ src/trix/ missing"
+[ -d src/trix/resources ] && echo "✓ src/trix/resources/ exists" || echo "✗ resources/ missing"
+[ -d src/trix/utils ] && echo "✓ src/trix/utils/ exists" || echo "✗ utils/ missing"
 [ -d tests ] && echo "✓ tests/ exists" || echo "✗ tests/ missing"
 [ -d examples ] && echo "✓ examples/ exists" || echo "✗ examples/ missing"
 

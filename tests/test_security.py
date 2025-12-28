@@ -2,7 +2,7 @@
 
 import os
 import pytest
-from trixdb.utils.security import (
+from trix.utils.security import (
     validate_id,
     validate_base_url,
     validate_webhook_url,
@@ -451,27 +451,27 @@ class TestGetEnvCredential:
     """Tests for get_env_credential function."""
 
     def test_gets_credential_from_environment(self, monkeypatch):
-        monkeypatch.setenv("TRIXDB_API_KEY", "test_key")
-        assert get_env_credential("TRIXDB_API_KEY") == "test_key"
+        monkeypatch.setenv("TRIX_API_KEY", "test_key")
+        assert get_env_credential("TRIX_API_KEY") == "test_key"
 
     def test_trims_whitespace(self, monkeypatch):
-        monkeypatch.setenv("TRIXDB_API_KEY", "  test_key  ")
-        assert get_env_credential("TRIXDB_API_KEY") == "test_key"
+        monkeypatch.setenv("TRIX_API_KEY", "  test_key  ")
+        assert get_env_credential("TRIX_API_KEY") == "test_key"
 
     def test_throws_when_required_and_not_set(self, monkeypatch):
-        monkeypatch.delenv("TRIXDB_API_KEY", raising=False)
+        monkeypatch.delenv("TRIX_API_KEY", raising=False)
         with pytest.raises(ValueError, match="not set"):
-            get_env_credential("TRIXDB_API_KEY", required=True)
+            get_env_credential("TRIX_API_KEY", required=True)
 
     def test_returns_none_when_not_required_and_not_set(self, monkeypatch):
-        monkeypatch.delenv("TRIXDB_API_KEY", raising=False)
-        result = get_env_credential("TRIXDB_API_KEY", required=False)
+        monkeypatch.delenv("TRIX_API_KEY", raising=False)
+        result = get_env_credential("TRIX_API_KEY", required=False)
         assert result is None
 
     def test_throws_when_required_and_empty(self, monkeypatch):
-        monkeypatch.setenv("TRIXDB_API_KEY", "   ")
+        monkeypatch.setenv("TRIX_API_KEY", "   ")
         with pytest.raises(ValueError):
-            get_env_credential("TRIXDB_API_KEY", required=True)
+            get_env_credential("TRIX_API_KEY", required=True)
 
 
 class TestValidateLimit:

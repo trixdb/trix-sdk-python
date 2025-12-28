@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "=================================================="
-echo "TrixDB Python SDK - Structure Verification"
+echo "Trix Python SDK - Structure Verification"
 echo "=================================================="
 echo ""
 
@@ -20,7 +20,7 @@ echo ""
 
 # Resource modules
 echo "✓ Resource Modules (11):"
-for file in src/trixdb/resources/*.py; do
+for file in src/trix/resources/*.py; do
     if [ "$(basename $file)" != "__init__.py" ]; then
         echo "  - $(basename $file .py)"
     fi

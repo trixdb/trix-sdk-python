@@ -3,8 +3,8 @@
 import pytest
 from unittest.mock import Mock, AsyncMock
 
-from trixdb.resources.facts import FactsResource, AsyncFactsResource
-from trixdb.resources.base import validate_bulk_array
+from trix.resources.facts import FactsResource, AsyncFactsResource
+from trix.resources.base import validate_bulk_array
 
 
 class TestFactsResource:
