@@ -9,7 +9,7 @@ from ..types import (
     WebhookDelivery,
     WebhookDeliveryList,
     WebhookEvent,
-    WebhookEventType,
+    WebhookEventTypeInfo,
     WebhookFilter,
     WebhookList,
     WebhookStats,
@@ -232,7 +232,7 @@ class WebhooksResource:
         )
         return WebhookDelivery.model_validate(response)
 
-    def get_event_types(self) -> List[WebhookEventType]:
+    def get_event_types(self) -> List[WebhookEventTypeInfo]:
         """
         Get available webhook event types.
 
@@ -245,7 +245,7 @@ class WebhooksResource:
             ...     print(f"{et.name}: {et.description}")
         """
         response = self._client._request("GET", "/webhooks/event-types")
-        return [WebhookEventType.model_validate(e) for e in response.get("event_types", [])]
+        return [WebhookEventTypeInfo.model_validate(e) for e in response.get("event_types", [])]
 
     def get_stats(self) -> WebhookStats:
         """
@@ -434,10 +434,10 @@ class AsyncWebhooksResource:
         )
         return WebhookDelivery.model_validate(response)
 
-    async def get_event_types(self) -> List[WebhookEventType]:
+    async def get_event_types(self) -> List[WebhookEventTypeInfo]:
         """Get available webhook event types (async)."""
         response = await self._client._request("GET", "/webhooks/event-types")
-        return [WebhookEventType.model_validate(e) for e in response.get("event_types", [])]
+        return [WebhookEventTypeInfo.model_validate(e) for e in response.get("event_types", [])]
 
     async def get_stats(self) -> WebhookStats:
         """Get webhook statistics (async)."""

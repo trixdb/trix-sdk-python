@@ -51,3 +51,23 @@ class Auth:
             jwt_token: New JWT token
         """
         self._jwt_token = jwt_token
+
+    def clear(self) -> None:
+        """
+        Clear all stored credentials.
+
+        This method should be called when closing the client to ensure
+        credentials are not retained in memory longer than necessary.
+        """
+        self._api_key = None
+        self._jwt_token = None
+
+    @property
+    def is_authenticated(self) -> bool:
+        """
+        Check if valid credentials are present.
+
+        Returns:
+            True if either API key or JWT token is set, False otherwise.
+        """
+        return bool(self._api_key or self._jwt_token)

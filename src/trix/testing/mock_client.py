@@ -46,6 +46,7 @@ from ..types import (
     PaginatedResponse,
     Pagination,
     Relationship,
+    RelationshipType,
 )
 
 
@@ -68,16 +69,16 @@ def create_mock_memory(
     id: Optional[str] = None,
     space_id: Optional[str] = None,
     content: str = "Mock memory content",
-    type: MemoryType = "text",
+    type: MemoryType = MemoryType.TEXT,
     tags: Optional[list[str]] = None,
     metadata: Optional[dict[str, Any]] = None,
     **kwargs: Any,
 ) -> Memory:
     """Create a mock Memory object."""
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.utcnow()
     return Memory(
         id=id or f"mem_{random_id()}",
-        space_id=space_id or f"space_{random_id()}",
+        space_id=space_id,
         content=content,
         type=type,
         tags=tags or [],
@@ -90,21 +91,21 @@ def create_mock_memory(
 
 def create_mock_cluster(
     id: Optional[str] = None,
-    space_id: Optional[str] = None,
     name: str = "Mock Cluster",
     description: str = "A mock cluster for testing",
-    memory_ids: Optional[list[str]] = None,
+    color: Optional[str] = None,
+    memory_count: int = 0,
     metadata: Optional[dict[str, Any]] = None,
     **kwargs: Any,
 ) -> Cluster:
     """Create a mock Cluster object."""
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.utcnow()
     return Cluster(
         id=id or f"clus_{random_id()}",
-        space_id=space_id or f"space_{random_id()}",
         name=name,
         description=description,
-        memory_ids=memory_ids or [],
+        color=color,
+        memory_count=memory_count,
         metadata=metadata or {},
         created_at=now,
         updated_at=now,
@@ -116,20 +117,22 @@ def create_mock_relationship(
     id: Optional[str] = None,
     source_id: Optional[str] = None,
     target_id: Optional[str] = None,
-    relationship_type: str = "related_to",
-    strength: float = 0.8,
-    metadata: Optional[dict[str, Any]] = None,
+    relationship_type: RelationshipType = RelationshipType.RELATED_TO,
+    description: Optional[str] = None,
+    weight: float = 1.0,
+    bidirectional: bool = False,
     **kwargs: Any,
 ) -> Relationship:
     """Create a mock Relationship object."""
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.utcnow()
     return Relationship(
         id=id or f"rel_{random_id()}",
         source_id=source_id or f"mem_{random_id()}",
         target_id=target_id or f"mem_{random_id()}",
         relationship_type=relationship_type,
-        strength=strength,
-        metadata=metadata or {},
+        description=description,
+        weight=weight,
+        bidirectional=bidirectional,
         created_at=now,
         updated_at=now,
         **kwargs,
@@ -141,21 +144,25 @@ def create_mock_entity(
     name: str = "Mock Entity",
     type: str = "person",
     aliases: Optional[list[str]] = None,
+    description: Optional[str] = None,
     properties: Optional[dict[str, Any]] = None,
     memory_ids: Optional[list[str]] = None,
     metadata: Optional[dict[str, Any]] = None,
+    space_id: Optional[str] = None,
     **kwargs: Any,
 ) -> Entity:
     """Create a mock Entity object."""
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.utcnow()
     return Entity(
         id=id or f"ent_{random_id()}",
         name=name,
         type=type,
         aliases=aliases or [],
+        description=description,
         properties=properties or {},
         memory_ids=memory_ids or [],
         metadata=metadata or {},
+        space_id=space_id,
         created_at=now,
         updated_at=now,
         **kwargs,
@@ -169,10 +176,11 @@ def create_mock_fact(
     object: str = "Object",
     confidence: float = 1.0,
     metadata: Optional[dict[str, Any]] = None,
+    space_id: Optional[str] = None,
     **kwargs: Any,
 ) -> Fact:
     """Create a mock Fact object."""
-    now = datetime.utcnow().isoformat() + "Z"
+    now = datetime.utcnow()
     return Fact(
         id=id or f"fact_{random_id()}",
         subject=subject,
@@ -180,6 +188,7 @@ def create_mock_fact(
         object=object,
         confidence=confidence,
         metadata=metadata or {},
+        space_id=space_id,
         created_at=now,
         updated_at=now,
         **kwargs,

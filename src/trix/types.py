@@ -2,9 +2,12 @@
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
 
 from pydantic import BaseModel, Field, ConfigDict
+
+# Type variable for generic responses
+T = TypeVar("T")
 
 
 # Enums
@@ -86,6 +89,69 @@ class BaseResponse(BaseModel):
     """Base response model."""
 
     model_config = ConfigDict(extra="allow", populate_by_name=True)
+
+
+# Pagination Models
+class Pagination(BaseModel):
+    """Pagination metadata for list responses.
+
+    Supports both offset-based and cursor-based pagination.
+
+    Attributes:
+        total: Total number of items available.
+        page: Current page number (1-indexed).
+        limit: Maximum items per page.
+        has_more: Whether more items exist beyond this page.
+        cursor: Optional cursor for cursor-based pagination.
+    """
+
+    total: int
+    page: int
+    limit: int
+    has_more: bool
+    cursor: Optional[str] = None
+
+
+class PaginatedResponse(BaseResponse, Generic[T]):
+    """Generic paginated response wrapper.
+
+    Used for list endpoints that return paginated data.
+
+    Attributes:
+        data: List of items for the current page.
+        pagination: Pagination metadata.
+    """
+
+    data: List[T]
+    pagination: Pagination
+
+
+class BulkResult(BaseResponse):
+    """Result of a bulk operation.
+
+    Provides counts and error details for bulk create/update/delete operations.
+
+    Attributes:
+        success: Number of successfully processed items.
+        failed: Number of items that failed to process.
+        errors: List of error details for failed items.
+    """
+
+    success: int
+    failed: int
+    errors: List[Dict[str, Any]] = Field(default_factory=list)
+
+    @property
+    def total(self) -> int:
+        """Total number of items in the bulk operation."""
+        return self.success + self.failed
+
+    @property
+    def success_rate(self) -> float:
+        """Success rate as a decimal (0.0 to 1.0)."""
+        if self.total == 0:
+            return 0.0
+        return self.success / self.total
 
 
 # Memory Models

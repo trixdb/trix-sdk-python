@@ -86,25 +86,25 @@ class TestRequestContext:
         """Test RequestContext creation."""
         ctx = RequestContext(
             method="GET",
-            url="https://api.example.com/test",
+            path="/test",
             headers={"Authorization": "Bearer token"},
-            body={"key": "value"},
+            json={"key": "value"},
             params={"limit": 10},
         )
         assert ctx.method == "GET"
-        assert ctx.url == "https://api.example.com/test"
+        assert ctx.path == "/test"
         assert ctx.headers["Authorization"] == "Bearer token"
-        assert ctx.body == {"key": "value"}
+        assert ctx.json == {"key": "value"}
         assert ctx.params == {"limit": 10}
 
     def test_request_context_optional_fields(self):
         """Test RequestContext with optional fields."""
         ctx = RequestContext(
             method="GET",
-            url="https://api.example.com/test",
+            path="/test",
             headers={},
         )
-        assert ctx.body is None
+        assert ctx.json is None
         assert ctx.params is None
 
 
@@ -113,14 +113,17 @@ class TestResponseContext:
 
     def test_response_context_creation(self):
         """Test ResponseContext creation."""
+        req_ctx = RequestContext(method="GET", path="/test")
         ctx = ResponseContext(
+            request=req_ctx,
             status_code=200,
             headers={"Content-Type": "application/json"},
-            body={"id": "123"},
+            data={"id": "123"},
         )
         assert ctx.status_code == 200
         assert ctx.headers["Content-Type"] == "application/json"
-        assert ctx.body == {"id": "123"}
+        assert ctx.data == {"id": "123"}
+        assert ctx.request.method == "GET"
 
 
 class TestRequestInterceptors:
@@ -172,7 +175,7 @@ class TestRequestInterceptors:
         client.add_request_interceptor(interceptor1)
         client.add_request_interceptor(interceptor2)
 
-        ctx = RequestContext(method="GET", url="test", headers={})
+        ctx = RequestContext(method="GET", path="/test")
         client._run_request_interceptors(ctx)
 
         assert call_order == [1, 2]
@@ -188,7 +191,7 @@ class TestRequestInterceptors:
 
         client.add_request_interceptor(add_header)
 
-        ctx = RequestContext(method="GET", url="test", headers={})
+        ctx = RequestContext(method="GET", path="/test", headers={})
         result = client._run_request_interceptors(ctx)
 
         assert result.headers["X-Custom"] == "value"
@@ -229,16 +232,17 @@ class TestResponseInterceptors:
         """Test response interceptor can modify context."""
         client = Trix(api_key="test_key")
 
-        def transform_body(ctx: ResponseContext) -> ResponseContext:
-            ctx.body["transformed"] = True
+        def transform_data(ctx: ResponseContext) -> ResponseContext:
+            ctx.data["transformed"] = True
             return ctx
 
-        client.add_response_interceptor(transform_body)
+        client.add_response_interceptor(transform_data)
 
-        ctx = ResponseContext(status_code=200, headers={}, body={"id": "123"})
+        req_ctx = RequestContext(method="GET", path="/test")
+        ctx = ResponseContext(request=req_ctx, status_code=200, headers={}, data={"id": "123"})
         result = client._run_response_interceptors(ctx)
 
-        assert result.body["transformed"] is True
+        assert result.data["transformed"] is True
         client.close()
 
 
@@ -270,7 +274,7 @@ class TestErrorInterceptors:
         client.add_error_interceptor(transform_error)
 
         original_error = ValueError("Original error")
-        ctx = RequestContext(method="GET", url="test", headers={})
+        ctx = RequestContext(method="GET", path="/test")
         result = client._run_error_interceptors(original_error, ctx)
 
         assert isinstance(result, CustomError)
@@ -289,12 +293,12 @@ class TestErrorInterceptors:
 
         client.add_error_interceptor(log_error)
 
-        ctx = RequestContext(method="POST", url="/memories", headers={})
+        ctx = RequestContext(method="POST", path="/memories")
         client._run_error_interceptors(ValueError("test"), ctx)
 
         assert len(received_ctx) == 1
         assert received_ctx[0].method == "POST"
-        assert received_ctx[0].url == "/memories"
+        assert received_ctx[0].path == "/memories"
         client.close()
 
 
@@ -384,11 +388,11 @@ class TestInterceptorIntegration:
         client.add_response_interceptor(res_interceptor2)
 
         # Run request interceptors
-        req_ctx = RequestContext(method="GET", url="test", headers={})
+        req_ctx = RequestContext(method="GET", path="/test")
         client._run_request_interceptors(req_ctx)
 
         # Run response interceptors
-        res_ctx = ResponseContext(status_code=200, headers={}, body={})
+        res_ctx = ResponseContext(request=req_ctx, status_code=200, headers={}, data={})
         client._run_response_interceptors(res_ctx)
 
         assert execution_order == ["req1", "req2", "res1", "res2"]
@@ -409,7 +413,7 @@ class TestInterceptorIntegration:
         client.add_request_interceptor(observe_only)
         client.add_request_interceptor(modify)
 
-        ctx = RequestContext(method="GET", url="test", headers={})
+        ctx = RequestContext(method="GET", path="/test", headers={})
         result = client._run_request_interceptors(ctx)
 
         assert result.headers.get("Modified") == "true"

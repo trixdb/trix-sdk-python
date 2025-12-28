@@ -95,6 +95,7 @@ from .exceptions import (
 from .types import (
     AgentContext,
     AgentSession,
+    BulkResult,
     Cluster,
     ClusterCreate,
     ClusterList,
@@ -128,6 +129,8 @@ from .types import (
     MemoryOptions,
     MemoryType,
     MemoryUpdate,
+    PaginatedResponse,
+    Pagination,
     Relationship,
     RelationshipCreate,
     RelationshipList,
@@ -168,6 +171,10 @@ __all__ = [
     "PoolConfig",
     "SyncPaginator",
     "AsyncPaginator",
+    # Pagination types
+    "Pagination",
+    "PaginatedResponse",
+    "BulkResult",
     # Interceptors
     "RequestContext",
     "ResponseContext",

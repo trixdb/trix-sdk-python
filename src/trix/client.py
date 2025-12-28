@@ -11,20 +11,36 @@ import httpx
 
 @dataclass
 class RequestContext:
-    """Context passed to request interceptors."""
+    """Context passed to request interceptors.
+
+    Attributes:
+        method: HTTP method (GET, POST, PUT, DELETE, etc.)
+        path: API endpoint path
+        headers: Request headers
+        params: Query parameters
+        json: JSON body for POST/PUT requests
+    """
     method: str
-    url: str
-    headers: Dict[str, str]
-    body: Optional[Any] = None
+    path: str
+    headers: Dict[str, str] = field(default_factory=dict)
     params: Optional[Dict[str, Any]] = None
+    json: Optional[Dict[str, Any]] = None
 
 
 @dataclass
 class ResponseContext:
-    """Context passed to response interceptors."""
+    """Context passed to response interceptors.
+
+    Attributes:
+        request: The original request context
+        status_code: HTTP response status code
+        headers: Response headers
+        data: Parsed response data
+    """
+    request: RequestContext
     status_code: int
     headers: Dict[str, str]
-    body: Any
+    data: Any
 
 
 # Interceptor type aliases
@@ -462,14 +478,26 @@ class Trix:
         config = self._retry_config
         request_timeout = timeout if timeout is not None else self._timeout
 
+        # Create request context for interceptors
+        request_context = RequestContext(
+            method=method,
+            path=path,
+            params=params,
+            json=json,
+            headers=self._get_headers(),
+        )
+
+        # Run request interceptors (may modify context)
+        request_context = self._run_request_interceptors(request_context)
+
         for attempt in range(config.max_retries + 1):
             try:
-                logger.debug(f"Request: {method} {path} params={_safe_log_params(params)}")
+                logger.debug(f"Request: {request_context.method} {request_context.path} params={_safe_log_params(request_context.params)}")
                 response = self._client.request(
-                    method=method,
-                    url=path,
-                    params=params,
-                    json=json,
+                    method=request_context.method,
+                    url=request_context.path,
+                    params=request_context.params,
+                    json=request_context.json,
                     timeout=request_timeout,
                 )
                 # Redact Authorization header from logs
@@ -482,22 +510,42 @@ class Trix:
 
                 # Return empty dict for 204 No Content
                 if response.status_code == 204:
-                    return {}
+                    response_data: Any = {}
+                else:
+                    response_data = response.json()
 
-                return response.json()
+                # Create response context for interceptors
+                response_context = ResponseContext(
+                    request=request_context,
+                    status_code=response.status_code,
+                    headers=dict(response.headers),
+                    data=response_data,
+                )
+
+                # Run response interceptors (may modify context)
+                response_context = self._run_response_interceptors(response_context)
+
+                return response_context.data
             except httpx.TimeoutException as e:
                 logger.debug(f"Request timed out: {e}")
-                raise TimeoutError(f"Request timed out: {e}") from e
+                error = TimeoutError(f"Request timed out: {e}")
+                error = self._run_error_interceptors(error, request_context)
+                raise error from e
             except httpx.NetworkError as e:
                 logger.debug(f"Network error: {e}")
-                raise ConnectionError(f"Network error: {e}") from e
+                error = ConnectionError(f"Network error: {e}")
+                error = self._run_error_interceptors(error, request_context)
+                raise error from e
             except httpx.HTTPError as e:
                 logger.debug(f"HTTP error: {e}")
-                raise APIError(f"HTTP error: {e}") from e
+                error = APIError(f"HTTP error: {e}")
+                error = self._run_error_interceptors(error, request_context)
+                raise error from e
             except (RateLimitError, ServerError) as e:
                 last_exception = e
                 if attempt >= config.max_retries:
-                    raise
+                    last_exception = self._run_error_interceptors(e, request_context)
+                    raise last_exception
 
                 retry_after = getattr(e, "retry_after", None)
                 delay = config.calculate_delay(attempt, retry_after)
@@ -658,9 +706,8 @@ class Trix:
     def close(self) -> None:
         """Close the HTTP client and clear credentials."""
         self._client.close()
-        # Clear sensitive data
-        self._auth._api_key = None
-        self._auth._jwt_token = None
+        # Clear sensitive credentials
+        self._auth.clear()
         logger.debug("Client closed and credentials cleared")
 
     def __enter__(self) -> "Trix":
@@ -741,6 +788,9 @@ class AsyncTrix:
         retry_config: Optional[RetryConfig] = None,
         pool_config: Optional[PoolConfig] = None,
         allow_insecure: bool = False,
+        request_interceptors: Optional[List[RequestInterceptor]] = None,
+        response_interceptors: Optional[List[ResponseInterceptor]] = None,
+        error_interceptors: Optional[List[ErrorInterceptor]] = None,
     ) -> None:
         """
         Initialize async Trix client.
@@ -757,6 +807,9 @@ class AsyncTrix:
             retry_config: Custom retry configuration
             pool_config: Connection pool configuration
             allow_insecure: Allow HTTP for local development (NOT for production)
+            request_interceptors: List of request interceptors
+            response_interceptors: List of response interceptors
+            error_interceptors: List of error interceptors
 
         Raises:
             ValueError: If neither api_key nor jwt_token is provided
@@ -767,6 +820,11 @@ class AsyncTrix:
         self._timeout = timeout
         self._retry_config = retry_config or RetryConfig(max_retries=max_retries)
         self._pool_config = pool_config or PoolConfig()
+
+        # Initialize interceptors
+        self._request_interceptors: List[RequestInterceptor] = list(request_interceptors or [])
+        self._response_interceptors: List[ResponseInterceptor] = list(response_interceptors or [])
+        self._error_interceptors: List[ErrorInterceptor] = list(error_interceptors or [])
 
         # Create async HTTP client with connection pooling
         self._client = httpx.AsyncClient(
@@ -791,6 +849,85 @@ class AsyncTrix:
         self.facts = AsyncFactsResource(self)
         self.entities = AsyncEntitiesResource(self)
         self.enrichments = AsyncEnrichmentsResource(self)
+
+    def add_request_interceptor(self, interceptor: RequestInterceptor) -> Callable[[], None]:
+        """
+        Add a request interceptor.
+
+        Args:
+            interceptor: Function that receives RequestContext and optionally returns modified context
+
+        Returns:
+            Function to remove the interceptor
+        """
+        self._request_interceptors.append(interceptor)
+
+        def remove() -> None:
+            if interceptor in self._request_interceptors:
+                self._request_interceptors.remove(interceptor)
+
+        return remove
+
+    def add_response_interceptor(self, interceptor: ResponseInterceptor) -> Callable[[], None]:
+        """
+        Add a response interceptor.
+
+        Args:
+            interceptor: Function that receives ResponseContext and optionally returns modified context
+
+        Returns:
+            Function to remove the interceptor
+        """
+        self._response_interceptors.append(interceptor)
+
+        def remove() -> None:
+            if interceptor in self._response_interceptors:
+                self._response_interceptors.remove(interceptor)
+
+        return remove
+
+    def add_error_interceptor(self, interceptor: ErrorInterceptor) -> Callable[[], None]:
+        """
+        Add an error interceptor.
+
+        Args:
+            interceptor: Function that receives the error and request context, returns error
+
+        Returns:
+            Function to remove the interceptor
+        """
+        self._error_interceptors.append(interceptor)
+
+        def remove() -> None:
+            if interceptor in self._error_interceptors:
+                self._error_interceptors.remove(interceptor)
+
+        return remove
+
+    def _run_request_interceptors(self, context: RequestContext) -> RequestContext:
+        """Run all request interceptors."""
+        ctx = context
+        for interceptor in self._request_interceptors:
+            result = interceptor(ctx)
+            if result is not None:
+                ctx = result
+        return ctx
+
+    def _run_response_interceptors(self, context: ResponseContext) -> ResponseContext:
+        """Run all response interceptors."""
+        ctx = context
+        for interceptor in self._response_interceptors:
+            result = interceptor(ctx)
+            if result is not None:
+                ctx = result
+        return ctx
+
+    def _run_error_interceptors(self, error: Exception, request: RequestContext) -> Exception:
+        """Run all error interceptors."""
+        err = error
+        for interceptor in self._error_interceptors:
+            err = interceptor(err, request)
+        return err
 
     def _get_headers(self) -> Dict[str, str]:
         """Get request headers with authentication and versioning."""
@@ -834,14 +971,26 @@ class AsyncTrix:
         config = self._retry_config
         request_timeout = timeout if timeout is not None else self._timeout
 
+        # Create request context for interceptors
+        request_context = RequestContext(
+            method=method,
+            path=path,
+            params=params,
+            json=json,
+            headers=self._get_headers(),
+        )
+
+        # Run request interceptors (may modify context)
+        request_context = self._run_request_interceptors(request_context)
+
         for attempt in range(config.max_retries + 1):
             try:
-                logger.debug(f"Request: {method} {path} params={_safe_log_params(params)}")
+                logger.debug(f"Request: {request_context.method} {request_context.path} params={_safe_log_params(request_context.params)}")
                 response = await self._client.request(
-                    method=method,
-                    url=path,
-                    params=params,
-                    json=json,
+                    method=request_context.method,
+                    url=request_context.path,
+                    params=request_context.params,
+                    json=request_context.json,
                     timeout=request_timeout,
                 )
                 # Redact Authorization header from logs
@@ -854,22 +1003,42 @@ class AsyncTrix:
 
                 # Return empty dict for 204 No Content
                 if response.status_code == 204:
-                    return {}
+                    response_data: Any = {}
+                else:
+                    response_data = response.json()
 
-                return response.json()
+                # Create response context for interceptors
+                response_context = ResponseContext(
+                    request=request_context,
+                    status_code=response.status_code,
+                    headers=dict(response.headers),
+                    data=response_data,
+                )
+
+                # Run response interceptors (may modify context)
+                response_context = self._run_response_interceptors(response_context)
+
+                return response_context.data
             except httpx.TimeoutException as e:
                 logger.debug(f"Request timed out: {e}")
-                raise TimeoutError(f"Request timed out: {e}") from e
+                error = TimeoutError(f"Request timed out: {e}")
+                error = self._run_error_interceptors(error, request_context)
+                raise error from e
             except httpx.NetworkError as e:
                 logger.debug(f"Network error: {e}")
-                raise ConnectionError(f"Network error: {e}") from e
+                error = ConnectionError(f"Network error: {e}")
+                error = self._run_error_interceptors(error, request_context)
+                raise error from e
             except httpx.HTTPError as e:
                 logger.debug(f"HTTP error: {e}")
-                raise APIError(f"HTTP error: {e}") from e
+                error = APIError(f"HTTP error: {e}")
+                error = self._run_error_interceptors(error, request_context)
+                raise error from e
             except (RateLimitError, ServerError) as e:
                 last_exception = e
                 if attempt >= config.max_retries:
-                    raise
+                    last_exception = self._run_error_interceptors(e, request_context)
+                    raise last_exception
 
                 retry_after = getattr(e, "retry_after", None)
                 delay = config.calculate_delay(attempt, retry_after)
@@ -1030,9 +1199,8 @@ class AsyncTrix:
     async def close(self) -> None:
         """Close the async HTTP client and clear credentials."""
         await self._client.aclose()
-        # Clear sensitive data
-        self._auth._api_key = None
-        self._auth._jwt_token = None
+        # Clear sensitive credentials
+        self._auth.clear()
         logger.debug("Async client closed and credentials cleared")
 
     async def __aenter__(self) -> "AsyncTrix":
