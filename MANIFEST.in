@@ -1,0 +1,5 @@
+include README.md
+include LICENSE
+include py.typed
+recursive-include src/trixdb *.py
+recursive-include src/trixdb py.typed
