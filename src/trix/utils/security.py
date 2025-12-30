@@ -263,9 +263,11 @@ def redact_sensitive_data(data: Any, max_depth: int = 10) -> Any:
 
     if isinstance(data, dict):
         return {
-            key: "[REDACTED]"
-            if _is_sensitive_key(key)
-            else redact_sensitive_data(value, max_depth - 1)
+            key: (
+                "[REDACTED]"
+                if _is_sensitive_key(key)
+                else redact_sensitive_data(value, max_depth - 1)
+            )
             for key, value in data.items()
         }
     elif isinstance(data, (list, tuple)):
