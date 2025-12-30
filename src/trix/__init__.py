@@ -24,7 +24,7 @@ Async Example:
 """
 
 # Version constants - must be defined before importing submodules to avoid circular imports
-__version__ = "1.0.0"
+__version__ = "0.1.1"
 __api_version__ = "v1"
 MIN_API_VERSION = "v1"
 MAX_API_VERSION = "v1"
