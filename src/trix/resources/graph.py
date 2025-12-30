@@ -33,9 +33,7 @@ def _build_traverse_data(
     return data
 
 
-def _build_shortest_path_data(
-    source_id: str, target_id: str, max_hops: int
-) -> Dict[str, Any]:
+def _build_shortest_path_data(source_id: str, target_id: str, max_hops: int) -> Dict[str, Any]:
     """Build shortest path request data with validation."""
     validate_id(source_id, "source memory")
     validate_id(target_id, "target memory")
@@ -94,9 +92,7 @@ class GraphResource(BaseSyncResource):
         response = self._request("POST", "/graph/traverse", json=data)
         return GraphTraversal.model_validate(response)
 
-    def get_context(
-        self, query: str, depth: int = 2, semantic_limit: int = 10
-    ) -> GraphContext:
+    def get_context(self, query: str, depth: int = 2, semantic_limit: int = 10) -> GraphContext:
         """Get contextual graph around a semantic query.
 
         Args:

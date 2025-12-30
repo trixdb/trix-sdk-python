@@ -1,6 +1,6 @@
 """Clusters resource for Trix SDK."""
 
-from typing import Any, Dict, Iterator, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, Iterator, List, Optional
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
@@ -12,6 +12,9 @@ from ..types import (
 )
 from ..utils.pagination import AsyncPaginator, SyncPaginator
 from ..utils.security import validate_id, validate_limit, validate_threshold
+
+if TYPE_CHECKING:
+    from ..types import ClusterQuality, ClusterStats, ClusterTopics, IncrementalClusterResult
 
 
 class ClustersResource:
@@ -330,6 +333,7 @@ class ClustersResource:
     def get_stats(self) -> "ClusterStats":
         """Get cluster statistics."""
         from ..types import ClusterStats
+
         response = self._client._request("GET", "/clusters/stats")
         return ClusterStats.model_validate(response)
 
@@ -341,6 +345,7 @@ class ClustersResource:
     ) -> "IncrementalClusterResult":
         """Trigger incremental clustering."""
         from ..types import IncrementalClusterResult
+
         params: Dict[str, Any] = {}
         if space_id:
             params["space_id"] = space_id
@@ -366,6 +371,7 @@ class ClustersResource:
     def get_quality(self, cluster_id: str) -> "ClusterQuality":
         """Get quality metrics for a cluster."""
         from ..types import ClusterQuality
+
         validate_id(cluster_id, "cluster")
         response = self._client._request("GET", f"/clusters/{cluster_id}/quality")
         return ClusterQuality.model_validate(response)
@@ -373,6 +379,7 @@ class ClustersResource:
     def get_topics(self, cluster_id: str) -> "ClusterTopics":
         """Get topics for a cluster."""
         from ..types import ClusterTopics
+
         validate_id(cluster_id, "cluster")
         response = self._client._request("GET", f"/clusters/{cluster_id}/topics")
         return ClusterTopics.model_validate(response)
@@ -535,6 +542,7 @@ class AsyncClustersResource:
     async def get_stats(self) -> "ClusterStats":
         """Get cluster statistics (async)."""
         from ..types import ClusterStats
+
         response = await self._client._request("GET", "/clusters/stats")
         return ClusterStats.model_validate(response)
 
@@ -546,6 +554,7 @@ class AsyncClustersResource:
     ) -> "IncrementalClusterResult":
         """Trigger incremental clustering (async)."""
         from ..types import IncrementalClusterResult
+
         params: Dict[str, Any] = {}
         if space_id:
             params["space_id"] = space_id
@@ -571,6 +580,7 @@ class AsyncClustersResource:
     async def get_quality(self, cluster_id: str) -> "ClusterQuality":
         """Get quality metrics for a cluster (async)."""
         from ..types import ClusterQuality
+
         validate_id(cluster_id, "cluster")
         response = await self._client._request("GET", f"/clusters/{cluster_id}/quality")
         return ClusterQuality.model_validate(response)
@@ -578,6 +588,7 @@ class AsyncClustersResource:
     async def get_topics(self, cluster_id: str) -> "ClusterTopics":
         """Get topics for a cluster (async)."""
         from ..types import ClusterTopics
+
         validate_id(cluster_id, "cluster")
         response = await self._client._request("GET", f"/clusters/{cluster_id}/topics")
         return ClusterTopics.model_validate(response)

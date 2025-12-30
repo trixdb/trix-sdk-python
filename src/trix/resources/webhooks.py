@@ -262,9 +262,7 @@ class WebhooksResource:
         response = self._client._request("GET", "/webhooks/stats")
         return WebhookStats.model_validate(response)
 
-    def get_events(
-        self, limit: int = 100, offset: int = 0
-    ) -> WebhookDeliveryList:
+    def get_events(self, limit: int = 100, offset: int = 0) -> WebhookDeliveryList:
         """
         Get webhook events.
 
@@ -282,9 +280,7 @@ class WebhooksResource:
         response = self._client._request("GET", "/webhooks/events", params=params)
         return WebhookDeliveryList.model_validate(response)
 
-    def bulk_create(
-        self, webhooks: List[WebhookCreate]
-    ) -> Dict[str, Any]:
+    def bulk_create(self, webhooks: List[WebhookCreate]) -> Dict[str, Any]:
         """
         Create multiple webhooks in bulk.
 
@@ -444,17 +440,13 @@ class AsyncWebhooksResource:
         response = await self._client._request("GET", "/webhooks/stats")
         return WebhookStats.model_validate(response)
 
-    async def get_events(
-        self, limit: int = 100, offset: int = 0
-    ) -> WebhookDeliveryList:
+    async def get_events(self, limit: int = 100, offset: int = 0) -> WebhookDeliveryList:
         """Get webhook events (async)."""
         params = {"limit": limit, "offset": offset}
         response = await self._client._request("GET", "/webhooks/events", params=params)
         return WebhookDeliveryList.model_validate(response)
 
-    async def bulk_create(
-        self, webhooks: List[WebhookCreate]
-    ) -> Dict[str, Any]:
+    async def bulk_create(self, webhooks: List[WebhookCreate]) -> Dict[str, Any]:
         """Create multiple webhooks in bulk (async)."""
         for webhook in webhooks:
             validate_webhook_url(webhook.url)

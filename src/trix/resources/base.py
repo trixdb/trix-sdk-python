@@ -6,7 +6,7 @@ sync and async resource implementations.
 
 from abc import ABC
 from functools import wraps
-from typing import Any, Callable, Dict, Generic, List, Optional, TypeVar
+from typing import Any, Callable, Dict, List, Optional, TypeVar
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..utils.security import validate_id
@@ -63,9 +63,7 @@ def validate_bulk_array(
         )
 
 
-def find_duplicate_ids(
-    items: List[Dict[str, Any]], id_field: str = "id"
-) -> List[str]:
+def find_duplicate_ids(items: List[Dict[str, Any]], id_field: str = "id") -> List[str]:
     """Check for duplicate IDs in an array.
 
     Args:

@@ -373,7 +373,9 @@ class AsyncHighlightsResource:
         if extraction_types:
             data["extraction_types"] = [et.value for et in extraction_types]
 
-        response = await self._client._request("POST", f"/highlights/{memory_id}/extract", json=data)
+        response = await self._client._request(
+            "POST", f"/highlights/{memory_id}/extract", json=data
+        )
         return [ExtractedHighlights.model_validate(e) for e in response.get("extractions", [])]
 
     async def list_global(self, limit: int = 100, offset: int = 0) -> HighlightList:
@@ -410,5 +412,7 @@ class AsyncHighlightsResource:
         data: Dict[str, Any] = {"memory_id": memory_id}
         if note:
             data["note"] = note
-        response = await self._client._request("POST", f"/highlights/{highlight_id}/link", json=data)
+        response = await self._client._request(
+            "POST", f"/highlights/{highlight_id}/link", json=data
+        )
         return HighlightLinkResult.model_validate(response)

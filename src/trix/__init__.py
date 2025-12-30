@@ -29,6 +29,7 @@ __api_version__ = "v1"
 MIN_API_VERSION = "v1"
 MAX_API_VERSION = "v1"
 
+# ruff: noqa: E402
 from .client import (
     AsyncTrix,
     ErrorInterceptor,

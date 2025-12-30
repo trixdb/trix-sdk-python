@@ -215,9 +215,7 @@ class FactsResource(BaseSyncResource):
             valid_to=valid_to,
             metadata=metadata,
         )
-        response = self._request(
-            "PATCH", f"/facts/{id}", json=data.model_dump(exclude_none=True)
-        )
+        response = self._request("PATCH", f"/facts/{id}", json=data.model_dump(exclude_none=True))
         return Fact.model_validate(response)
 
     def delete(self, id: str) -> None:

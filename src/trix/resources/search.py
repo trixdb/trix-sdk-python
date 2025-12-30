@@ -145,9 +145,7 @@ class AsyncSearchResource(BaseAsyncResource):
             Embeddings response
         """
         validate_ids(memory_ids, "memory")
-        response = await self._request(
-            "POST", "/search/embed", json={"memory_ids": memory_ids}
-        )
+        response = await self._request("POST", "/search/embed", json={"memory_ids": memory_ids})
         return EmbeddingResponse.model_validate(response)
 
     async def embed_all(self, batch_size: int = 100) -> EmbedAllResponse:

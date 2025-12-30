@@ -134,12 +134,12 @@ class AgentResource:
         if importance is not None:
             data["importance"] = importance
 
-        response = self._client._request("POST", f"/agent/sessions/{session_id}/memories", json=data)
+        response = self._client._request(
+            "POST", f"/agent/sessions/{session_id}/memories", json=data
+        )
         return SessionMemory.model_validate(response)
 
-    def get_session(
-        self, session_id: str, limit: int = 100, offset: int = 0
-    ) -> SessionMemoryList:
+    def get_session(self, session_id: str, limit: int = 100, offset: int = 0) -> SessionMemoryList:
         """
         Get memories from an agent session.
 
@@ -216,7 +216,10 @@ class AgentResource:
         return AgentContext.model_validate(response)
 
     def end_session(
-        self, session_id: str, summary: Optional[str] = None, key_insights: Optional[List[str]] = None
+        self,
+        session_id: str,
+        summary: Optional[str] = None,
+        key_insights: Optional[List[str]] = None,
     ) -> AgentSession:
         """
         End an agent session with optional summary.
@@ -491,7 +494,9 @@ class AsyncAgentResource:
         validate_limit(limit)
         validate_offset(offset)
         params = {"limit": limit, "offset": offset}
-        response = await self._client._request("GET", f"/agent/sessions/{session_id}", params=params)
+        response = await self._client._request(
+            "GET", f"/agent/sessions/{session_id}", params=params
+        )
         return SessionMemoryList.model_validate(response)
 
     async def list_sessions(self, limit: int = 100, space_id: Optional[str] = None) -> SessionList:
@@ -521,7 +526,10 @@ class AsyncAgentResource:
         return AgentContext.model_validate(response)
 
     async def end_session(
-        self, session_id: str, summary: Optional[str] = None, key_insights: Optional[List[str]] = None
+        self,
+        session_id: str,
+        summary: Optional[str] = None,
+        key_insights: Optional[List[str]] = None,
     ) -> AgentSession:
         """End an agent session with optional summary (async)."""
         validate_id(session_id, "session")
@@ -531,7 +539,9 @@ class AsyncAgentResource:
         if key_insights:
             data["key_insights"] = key_insights
 
-        response = await self._client._request("POST", f"/agent/sessions/{session_id}/end", json=data)
+        response = await self._client._request(
+            "POST", f"/agent/sessions/{session_id}/end", json=data
+        )
         return AgentSession.model_validate(response)
 
     async def get_core_memory(self, session_id: Optional[str] = None) -> CoreMemory:

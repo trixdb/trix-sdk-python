@@ -2,7 +2,17 @@
 
 import json
 from pathlib import Path
-from typing import Any, AsyncIterator, BinaryIO, Dict, Iterator, List, Optional, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    AsyncIterator,
+    BinaryIO,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Union,
+)
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
@@ -16,6 +26,9 @@ from ..types import (
 )
 from ..utils.pagination import AsyncPaginator, SyncPaginator
 from ..utils.security import validate_id
+
+if TYPE_CHECKING:
+    from ..types import MemoryStats
 
 
 class MemoriesResource:
@@ -66,7 +79,9 @@ class MemoriesResource:
             space_id=space_id,
             options=options,
         )
-        response = self._client._request("POST", "/memories", json=data.model_dump(exclude_none=True))
+        response = self._client._request(
+            "POST", "/memories", json=data.model_dump(exclude_none=True)
+        )
         return Memory.model_validate(response)
 
     def list(
@@ -396,9 +411,7 @@ class MemoriesResource:
 
             files = {"file": (filename, file_handle, content_type)}
 
-            response = self._client._request_multipart(
-                "POST", "/memories", data=data, files=files
-            )
+            response = self._client._request_multipart("POST", "/memories", data=data, files=files)
             return Memory.model_validate(response)
         finally:
             if should_close:
@@ -421,9 +434,7 @@ class MemoriesResource:
         response = self._client._request("GET", f"/memories/{id}/transcript")
         return response.get("transcript", "")
 
-    def transcribe(
-        self, id: str, language: Optional[str] = None, force: bool = False
-    ) -> str:
+    def transcribe(self, id: str, language: Optional[str] = None, force: bool = False) -> str:
         """
         Transcribe or re-transcribe an audio memory.
 
@@ -672,7 +683,9 @@ class AsyncMemoriesResource:
             ...         await f.write(chunk)
         """
         validate_id(id, "memory")
-        async for chunk in self._client._request_stream("GET", f"/memories/{id}/audio", chunk_size=chunk_size):
+        async for chunk in self._client._request_stream(
+            "GET", f"/memories/{id}/audio", chunk_size=chunk_size
+        ):
             yield chunk
 
     async def create_with_audio(
@@ -750,9 +763,7 @@ class AsyncMemoriesResource:
         response = await self._client._request("GET", f"/memories/{id}/transcript")
         return response.get("transcript", "")
 
-    async def transcribe(
-        self, id: str, language: Optional[str] = None, force: bool = False
-    ) -> str:
+    async def transcribe(self, id: str, language: Optional[str] = None, force: bool = False) -> str:
         """Transcribe or re-transcribe an audio memory (async)."""
         validate_id(id, "memory")
         params: Dict[str, Any] = {}

@@ -7,7 +7,7 @@ import time
 from functools import wraps
 from typing import Any, Callable, Optional, Set, Type, TypeVar, cast
 
-from ..exceptions import RateLimitError, ServerError, TrixError
+from ..exceptions import RateLimitError, ServerError
 
 logger = logging.getLogger(__name__)
 
@@ -102,8 +102,7 @@ def retry_with_backoff(
 
                         # Don't retry if it's not a retryable exception
                         if not any(
-                            isinstance(e, exc_type)
-                            for exc_type in config.retryable_exceptions
+                            isinstance(e, exc_type) for exc_type in config.retryable_exceptions
                         ):
                             raise
 
@@ -145,8 +144,7 @@ def retry_with_backoff(
 
                         # Don't retry if it's not a retryable exception
                         if not any(
-                            isinstance(e, exc_type)
-                            for exc_type in config.retryable_exceptions
+                            isinstance(e, exc_type) for exc_type in config.retryable_exceptions
                         ):
                             raise
 

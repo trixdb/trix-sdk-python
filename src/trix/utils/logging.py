@@ -9,7 +9,7 @@ from contextvars import ContextVar
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Callable, Dict, Iterator, Optional, Union
+from typing import Any, Dict, Iterator, Optional, Union
 
 # Context variable for request ID tracking
 _request_id: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
@@ -277,9 +277,7 @@ class LoggerAdapter(logging.LoggerAdapter):
     ) -> None:
         super().__init__(logger, extra or {})
 
-    def process(
-        self, msg: str, kwargs: Dict[str, Any]
-    ) -> tuple[str, Dict[str, Any]]:
+    def process(self, msg: str, kwargs: Dict[str, Any]) -> tuple[str, Dict[str, Any]]:
         """Process log message to add extra context."""
         # Merge extra from adapter with extra from call
         call_extra = kwargs.get("extra", {})

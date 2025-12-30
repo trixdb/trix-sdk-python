@@ -1,12 +1,73 @@
 """Main Trix client for sync and async operations."""
 
 import logging
-from pathlib import Path
-from types import TracebackType
 from dataclasses import dataclass, field
-from typing import Any, AsyncIterator, BinaryIO, Callable, Dict, Iterator, List, Optional, Type, Union
+from types import TracebackType
+from typing import (
+    Any,
+    AsyncIterator,
+    BinaryIO,
+    Callable,
+    Dict,
+    Iterator,
+    List,
+    Optional,
+    Type,
+    Union,
+)
 
 import httpx
+
+from . import MAX_API_VERSION, MIN_API_VERSION, __api_version__, __version__
+from .auth import Auth
+from .exceptions import (
+    APIError,
+    APIVersionMismatchError,
+    AuthenticationError,
+    ConnectionError,
+    NotFoundError,
+    PermissionError,
+    RateLimitError,
+    ServerError,
+    TimeoutError,
+    ValidationError,
+)
+from .resources import (
+    AgentResource,
+    ClustersResource,
+    EnrichmentsResource,
+    EntitiesResource,
+    FactsResource,
+    FeedbackResource,
+    GraphResource,
+    HighlightsResource,
+    JobsResource,
+    MemoriesResource,
+    RelationshipsResource,
+    SearchResource,
+    SpacesResource,
+    WebhooksResource,
+)
+from .resources.agent import AsyncAgentResource
+from .resources.clusters import AsyncClustersResource
+from .resources.enrichments import AsyncEnrichmentsResource
+from .resources.entities import AsyncEntitiesResource
+from .resources.facts import AsyncFactsResource
+from .resources.feedback import AsyncFeedbackResource
+from .resources.graph import AsyncGraphResource
+from .resources.highlights import AsyncHighlightsResource
+from .resources.jobs import AsyncJobsResource
+from .resources.memories import AsyncMemoriesResource
+from .resources.relationships import AsyncRelationshipsResource
+from .resources.search import AsyncSearchResource
+from .resources.spaces import AsyncSpacesResource
+from .resources.webhooks import AsyncWebhooksResource
+from .utils.retry import RetryConfig
+from .utils.security import (
+    get_env_credential,
+    redact_sensitive_data,
+    validate_base_url,
+)
 
 
 @dataclass
@@ -20,6 +81,7 @@ class RequestContext:
         params: Query parameters
         json: JSON body for POST/PUT requests
     """
+
     method: str
     path: str
     headers: Dict[str, str] = field(default_factory=dict)
@@ -37,6 +99,7 @@ class ResponseContext:
         headers: Response headers
         data: Parsed response data
     """
+
     request: RequestContext
     status_code: int
     headers: Dict[str, str]
@@ -67,6 +130,7 @@ class PoolConfig:
         keepalive_expiry: Time in seconds for keep-alive connections to remain
             idle before being closed. Default is 5 seconds.
     """
+
     max_connections: int = 100
     max_keepalive_connections: int = 20
     keepalive_expiry: float = 5.0
@@ -79,57 +143,6 @@ class PoolConfig:
             keepalive_expiry=self.keepalive_expiry,
         )
 
-from . import __version__, __api_version__, MIN_API_VERSION, MAX_API_VERSION
-from .auth import Auth
-from .exceptions import (
-    APIError,
-    APIVersionMismatchError,
-    AuthenticationError,
-    ConnectionError,
-    NotFoundError,
-    PermissionError,
-    RateLimitError,
-    ServerError,
-    TimeoutError,
-    TrixError,
-    ValidationError,
-)
-from .resources import (
-    AgentResource,
-    ClustersResource,
-    EnrichmentsResource,
-    EntitiesResource,
-    FactsResource,
-    FeedbackResource,
-    GraphResource,
-    HighlightsResource,
-    JobsResource,
-    MemoriesResource,
-    RelationshipsResource,
-    SearchResource,
-    SpacesResource,
-    WebhooksResource,
-)
-from .resources.agent import AsyncAgentResource
-from .resources.clusters import AsyncClustersResource
-from .resources.entities import AsyncEntitiesResource
-from .resources.facts import AsyncFactsResource
-from .resources.feedback import AsyncFeedbackResource
-from .resources.graph import AsyncGraphResource
-from .resources.highlights import AsyncHighlightsResource
-from .resources.jobs import AsyncJobsResource
-from .resources.memories import AsyncMemoriesResource
-from .resources.relationships import AsyncRelationshipsResource
-from .resources.search import AsyncSearchResource
-from .resources.spaces import AsyncSpacesResource
-from .resources.webhooks import AsyncWebhooksResource
-from .resources.enrichments import AsyncEnrichmentsResource
-from .utils.retry import RetryConfig, retry_with_backoff
-from .utils.security import (
-    get_env_credential,
-    redact_sensitive_data,
-    validate_base_url,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -492,7 +505,9 @@ class Trix:
 
         for attempt in range(config.max_retries + 1):
             try:
-                logger.debug(f"Request: {request_context.method} {request_context.path} params={_safe_log_params(request_context.params)}")
+                logger.debug(
+                    f"Request: {request_context.method} {request_context.path} params={_safe_log_params(request_context.params)}"
+                )
                 response = self._client.request(
                     method=request_context.method,
                     url=request_context.path,
@@ -501,7 +516,10 @@ class Trix:
                     timeout=request_timeout,
                 )
                 # Redact Authorization header from logs
-                safe_headers = {k: v if k.lower() != "authorization" else "[REDACTED]" for k, v in response.headers.items()}
+                safe_headers = {
+                    k: v if k.lower() != "authorization" else "[REDACTED]"
+                    for k, v in response.headers.items()
+                }
                 logger.debug(f"Response: {response.status_code} headers={safe_headers}")
 
                 # Check API version compatibility
@@ -584,7 +602,9 @@ class Trix:
         request_timeout = timeout if timeout is not None else self._timeout
         try:
             logger.debug(f"Request (raw): {method} {path} params={params}")
-            response = self._client.request(method=method, url=path, params=params, timeout=request_timeout)
+            response = self._client.request(
+                method=method, url=path, params=params, timeout=request_timeout
+            )
             logger.debug(f"Response (raw): {response.status_code}")
             _check_api_version(response)
             _handle_response(response)
@@ -626,7 +646,9 @@ class Trix:
         request_timeout = timeout if timeout is not None else self._timeout
         try:
             logger.debug(f"Request (stream): {method} {path} params={params}")
-            with self._client.stream(method=method, url=path, params=params, timeout=request_timeout) as response:
+            with self._client.stream(
+                method=method, url=path, params=params, timeout=request_timeout
+            ) as response:
                 logger.debug(f"Response (stream): {response.status_code}")
                 _check_api_version(response)
                 _handle_response(response)
@@ -985,7 +1007,9 @@ class AsyncTrix:
 
         for attempt in range(config.max_retries + 1):
             try:
-                logger.debug(f"Request: {request_context.method} {request_context.path} params={_safe_log_params(request_context.params)}")
+                logger.debug(
+                    f"Request: {request_context.method} {request_context.path} params={_safe_log_params(request_context.params)}"
+                )
                 response = await self._client.request(
                     method=request_context.method,
                     url=request_context.path,
@@ -994,7 +1018,10 @@ class AsyncTrix:
                     timeout=request_timeout,
                 )
                 # Redact Authorization header from logs
-                safe_headers = {k: v if k.lower() != "authorization" else "[REDACTED]" for k, v in response.headers.items()}
+                safe_headers = {
+                    k: v if k.lower() != "authorization" else "[REDACTED]"
+                    for k, v in response.headers.items()
+                }
                 logger.debug(f"Response: {response.status_code} headers={safe_headers}")
 
                 # Check API version compatibility
@@ -1077,7 +1104,9 @@ class AsyncTrix:
         request_timeout = timeout if timeout is not None else self._timeout
         try:
             logger.debug(f"Request (raw): {method} {path} params={params}")
-            response = await self._client.request(method=method, url=path, params=params, timeout=request_timeout)
+            response = await self._client.request(
+                method=method, url=path, params=params, timeout=request_timeout
+            )
             logger.debug(f"Response (raw): {response.status_code}")
             _check_api_version(response)
             _handle_response(response)
@@ -1119,7 +1148,9 @@ class AsyncTrix:
         request_timeout = timeout if timeout is not None else self._timeout
         try:
             logger.debug(f"Request (stream): {method} {path} params={params}")
-            async with self._client.stream(method=method, url=path, params=params, timeout=request_timeout) as response:
+            async with self._client.stream(
+                method=method, url=path, params=params, timeout=request_timeout
+            ) as response:
                 logger.debug(f"Response (stream): {response.status_code}")
                 _check_api_version(response)
                 _handle_response(response)

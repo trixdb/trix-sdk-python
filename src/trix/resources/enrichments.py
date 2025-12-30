@@ -47,9 +47,7 @@ class EnrichmentsResource:
         if status:
             params["status"] = status.value
 
-        response = self._client._request(
-            "GET", f"/memories/{memory_id}/enrichments", params=params
-        )
+        response = self._client._request("GET", f"/memories/{memory_id}/enrichments", params=params)
         return [Enrichment.model_validate(e) for e in response.get("data", [])]
 
     def get(self, memory_id: str, enrichment_type: str) -> Enrichment:
@@ -111,9 +109,7 @@ class EnrichmentsResource:
         if force:
             data["force"] = force
 
-        response = self._client._request(
-            "POST", f"/memories/{memory_id}/enrichments", json=data
-        )
+        response = self._client._request("POST", f"/memories/{memory_id}/enrichments", json=data)
         return EnrichmentResult.model_validate(response)
 
     def retry(

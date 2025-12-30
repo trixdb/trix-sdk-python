@@ -2,7 +2,7 @@
 
 import os
 import re
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 
@@ -13,12 +13,22 @@ ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{1,255}$")
 WEBHOOK_URL_PATTERN = re.compile(r"^https://")
 
 # Sensitive keys that should be redacted in logs
-SENSITIVE_KEYS = frozenset({
-    "api_key", "apikey", "api-key",
-    "token", "jwt_token", "jwt", "bearer",
-    "password", "secret", "credential",
-    "authorization", "auth",
-})
+SENSITIVE_KEYS = frozenset(
+    {
+        "api_key",
+        "apikey",
+        "api-key",
+        "token",
+        "jwt_token",
+        "jwt",
+        "bearer",
+        "password",
+        "secret",
+        "credential",
+        "authorization",
+        "auth",
+    }
+)
 
 
 def validate_id(resource_id: str, resource_type: str = "resource") -> str:
@@ -190,33 +200,48 @@ def validate_webhook_url(url: str) -> str:
         raise ValueError("Webhook URL cannot point to private IPv6 addresses")
 
     # fe80::/10 (Link-local addresses)
-    if (normalized_host.startswith("fe8") or normalized_host.startswith("fe9") or
-            normalized_host.startswith("fea") or normalized_host.startswith("feb")):
+    if (
+        normalized_host.startswith("fe8")
+        or normalized_host.startswith("fe9")
+        or normalized_host.startswith("fea")
+        or normalized_host.startswith("feb")
+    ):
         raise ValueError("Webhook URL cannot point to IPv6 link-local addresses")
 
     # Block IPv4-mapped IPv6 addresses (::ffff:x.x.x.x)
     # These could be used to bypass IPv4 checks
     if "ffff:" in normalized_host.lower():
         import re
+
         ipv4_match = re.search(r"::ffff:(\d+\.\d+\.\d+\.\d+)$", normalized_host, re.IGNORECASE)
         if not ipv4_match:
             ipv4_match = re.search(r":ffff:(\d+\.\d+\.\d+\.\d+)$", normalized_host, re.IGNORECASE)
         if ipv4_match:
             ipv4 = ipv4_match.group(1)
-            if (ipv4.startswith("127.") or ipv4.startswith("10.") or
-                    ipv4.startswith("192.168.") or ipv4.startswith("169.254.") or
-                    ipv4 == "0.0.0.0"):
+            if (
+                ipv4.startswith("127.")
+                or ipv4.startswith("10.")
+                or ipv4.startswith("192.168.")
+                or ipv4.startswith("169.254.")
+                or ipv4 == "0.0.0.0"
+            ):
                 raise ValueError("Webhook URL cannot point to private IPv4-mapped IPv6 addresses")
             if ipv4.startswith("172."):
                 parts = ipv4.split(".")
                 if len(parts) >= 2 and parts[1].isdigit():
                     second_octet = int(parts[1])
                     if 16 <= second_octet <= 31:
-                        raise ValueError("Webhook URL cannot point to private IPv4-mapped IPv6 addresses")
+                        raise ValueError(
+                            "Webhook URL cannot point to private IPv4-mapped IPv6 addresses"
+                        )
 
     # Block site-local addresses (deprecated but still valid: fec0::/10)
-    if (normalized_host.startswith("fec") or normalized_host.startswith("fed") or
-            normalized_host.startswith("fee") or normalized_host.startswith("fef")):
+    if (
+        normalized_host.startswith("fec")
+        or normalized_host.startswith("fed")
+        or normalized_host.startswith("fee")
+        or normalized_host.startswith("fef")
+    ):
         raise ValueError("Webhook URL cannot point to deprecated IPv6 site-local addresses")
 
     return url
@@ -238,7 +263,9 @@ def redact_sensitive_data(data: Any, max_depth: int = 10) -> Any:
 
     if isinstance(data, dict):
         return {
-            key: "[REDACTED]" if _is_sensitive_key(key) else redact_sensitive_data(value, max_depth - 1)
+            key: "[REDACTED]"
+            if _is_sensitive_key(key)
+            else redact_sensitive_data(value, max_depth - 1)
             for key, value in data.items()
         }
     elif isinstance(data, (list, tuple)):
@@ -366,10 +393,7 @@ def validate_offset(offset: int, param_name: str = "offset") -> int:
 
 
 def validate_threshold(
-    threshold: float,
-    min_value: float = 0.0,
-    max_value: float = 1.0,
-    param_name: str = "threshold"
+    threshold: float, min_value: float = 0.0, max_value: float = 1.0, param_name: str = "threshold"
 ) -> float:
     """
     Validate a threshold/confidence parameter.
@@ -397,11 +421,7 @@ def validate_threshold(
     return float(threshold)
 
 
-def validate_positive_int(
-    value: int,
-    param_name: str = "value",
-    allow_zero: bool = False
-) -> int:
+def validate_positive_int(value: int, param_name: str = "value", allow_zero: bool = False) -> int:
     """
     Validate a positive integer parameter.
 

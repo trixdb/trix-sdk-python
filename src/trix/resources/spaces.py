@@ -103,9 +103,7 @@ class SpacesResource(BaseSyncResource):
         """
         validate_id(id, "space")
         data = SpaceUpdate(name=name, description=description)
-        response = self._request(
-            "PATCH", f"/spaces/{id}", json=data.model_dump(exclude_none=True)
-        )
+        response = self._request("PATCH", f"/spaces/{id}", json=data.model_dump(exclude_none=True))
         return Space.model_validate(response)
 
     def delete(self, id: str) -> None:
@@ -149,9 +147,7 @@ class AsyncSpacesResource(BaseAsyncResource):
             Created space object
         """
         data = SpaceCreate(name=name, description=description)
-        response = await self._request(
-            "POST", "/spaces", json=data.model_dump(exclude_none=True)
-        )
+        response = await self._request("POST", "/spaces", json=data.model_dump(exclude_none=True))
         return Space.model_validate(response)
 
     async def list(self) -> SpaceList:

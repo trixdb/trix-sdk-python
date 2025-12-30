@@ -37,7 +37,7 @@ from typing import (
 )
 
 if TYPE_CHECKING:
-    from opentelemetry.trace import Span as OTelSpan, Tracer as OTelTracer
+    pass
 
 
 # Type definitions that mirror OpenTelemetry API to avoid hard dependency
@@ -110,9 +110,7 @@ class TelemetryConfig:
     record_request_body: bool = False
     record_response_body: bool = False
     span_name_prefix: str = "trix"
-    default_attributes: dict[str, Union[str, int, float, bool]] = field(
-        default_factory=dict
-    )
+    default_attributes: dict[str, Union[str, int, float, bool]] = field(default_factory=dict)
 
 
 # Global telemetry configuration
@@ -401,9 +399,7 @@ def with_tracing(operation: str) -> Generator[RequestSpan, None, None]:
         raise
 
 
-async def with_tracing_async(
-    operation: str, func: Callable[[], Awaitable[Any]]
-) -> Any:
+async def with_tracing_async(operation: str, func: Callable[[], Awaitable[Any]]) -> Any:
     """Utility to wrap an async function with tracing.
 
     Args:

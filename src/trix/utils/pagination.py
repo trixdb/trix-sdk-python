@@ -1,6 +1,6 @@
 """Pagination helpers for Trix SDK."""
 
-from typing import Any, AsyncIterator, Callable, Dict, Iterator, List, Optional, TypeVar
+from typing import Any, AsyncIterator, Callable, Dict, Iterator, Optional, TypeVar
 
 T = TypeVar("T")
 
