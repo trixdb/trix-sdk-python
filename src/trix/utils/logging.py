@@ -1,5 +1,7 @@
 """Structured logging utilities for Trix SDK."""
 
+from __future__ import annotations
+
 import json
 import logging
 import sys
@@ -267,7 +269,7 @@ def request_context(request_id: Optional[str] = None) -> Iterator[str]:
         clear_request_id()
 
 
-class LoggerAdapter(logging.LoggerAdapter[logging.Logger]):
+class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]
     """Logger adapter that adds extra context to log messages."""
 
     def __init__(
