@@ -1,0 +1,219 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'python-v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.0.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write  # Required for trusted publishing to PyPI
+
+jobs:
+  # Pre-release quality checks
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Run linting
+        run: |
+          ruff check .
+          black --check .
+
+      - name: Run type checking
+        run: mypy src/trix
+
+      - name: Run tests
+        run: pytest tests/ -v --cov=trix --cov-report=xml
+
+      - name: Run security scan
+        run: pip-audit
+
+  # Build the package
+  build:
+    name: Build Distribution
+    needs: quality-checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install build tools
+        run: python -m pip install --upgrade pip build twine
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            # Remove 'v' or 'python-v' prefix from tag
+            VERSION=${GITHUB_REF#refs/tags/}
+            VERSION=${VERSION#v}
+            VERSION=${VERSION#python-v}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Releasing version: $VERSION"
+
+      - name: Verify version matches pyproject.toml
+        run: |
+          TOML_VERSION=$(grep '^version = ' pyproject.toml | cut -d'"' -f2)
+          TAG_VERSION="${{ steps.get_version.outputs.version }}"
+          if [ "$TOML_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Version mismatch! pyproject.toml: $TOML_VERSION, Tag: $TAG_VERSION"
+            exit 1
+          fi
+          echo "Version verified: $TOML_VERSION"
+
+      - name: Build package
+        run: python -m build
+
+      - name: Check package with twine
+        run: twine check dist/*
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+          retention-days: 7
+
+  # Publish to PyPI
+  publish-pypi:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/trix
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_TOKEN }}
+          skip-existing: true
+
+  # Create GitHub Release
+  create-release:
+    name: Create GitHub Release
+    needs: publish-pypi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+            VERSION=${VERSION#v}
+            VERSION=${VERSION#python-v}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${{ steps.get_version.outputs.version }}"
+          # Extract changelog section for this version
+          CHANGELOG=$(sed -n "/## \[$VERSION\]/,/## \[/p" CHANGELOG.md | sed '$d')
+          if [ -z "$CHANGELOG" ]; then
+            echo "changelog=No changelog entry found for version $VERSION" >> $GITHUB_OUTPUT
+          else
+            # Use EOF delimiter for multiline content
+            echo "changelog<<EOF" >> $GITHUB_OUTPUT
+            echo "$CHANGELOG" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Python SDK v${{ steps.get_version.outputs.version }}
+          body: |
+            ## Trix Python SDK v${{ steps.get_version.outputs.version }}
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            ## Installation
+
+            ```bash
+            pip install trix==${{ steps.get_version.outputs.version }}
+            ```
+
+            ## What's Changed
+
+            See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for full details.
+
+            ## PyPI
+
+            📦 https://pypi.org/project/trix/${{ steps.get_version.outputs.version }}/
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Notify on completion
+  notify-success:
+    name: Notify Success
+    needs: create-release
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Extract version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+            VERSION=${VERSION#v}
+            VERSION=${VERSION#python-v}
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Success message
+        run: |
+          echo "✅ Python SDK v${{ steps.get_version.outputs.version }} released successfully!"
+          echo "📦 PyPI: https://pypi.org/project/trix/${{ steps.get_version.outputs.version }}/"
+          echo "🎉 GitHub Release: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.get_version.outputs.version }}"

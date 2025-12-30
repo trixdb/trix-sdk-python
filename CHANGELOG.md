@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] - 2025-12-25
+## [1.0.0] - 2025-12-25
 
 ### Added
 
@@ -57,5 +57,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pydantic v2 for data validation
 - Support for both API key and JWT authentication
 
-[Unreleased]: https://github.com/trix/trix-python-sdk/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/trix/trix-python-sdk/releases/tag/v0.1.0
+[Unreleased]: https://github.com/trix/trix-python-sdk/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/trix/trix-python-sdk/releases/tag/v1.0.0
