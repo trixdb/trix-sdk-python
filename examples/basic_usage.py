@@ -78,9 +78,7 @@ try:
 
     # Update memory with space
     print("\nUpdating memory...")
-    updated_memory = client.memories.update(
-        memory.id, tags=["programming", "python", "updated"]
-    )
+    updated_memory = client.memories.update(memory.id, tags=["programming", "python", "updated"])
     print(f"Updated memory tags: {updated_memory.tags}")
 
     # Create a highlight

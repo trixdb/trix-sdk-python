@@ -8,7 +8,6 @@ from trix.utils.metrics import (
     CallbackCollector,
     CompositeCollector,
     InMemoryCollector,
-    MetricsCollector,
     NoOpCollector,
     RequestMetrics,
     get_metrics_collector,
@@ -77,17 +76,11 @@ class TestInMemoryCollector:
         collector = InMemoryCollector()
 
         # Success
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/test", status_code=200)
-        )
-        collector.on_request_complete(
-            RequestMetrics(method="POST", path="/test", status_code=201)
-        )
+        collector.on_request_complete(RequestMetrics(method="GET", path="/test", status_code=200))
+        collector.on_request_complete(RequestMetrics(method="POST", path="/test", status_code=201))
 
         # Errors
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/test", status_code=404)
-        )
+        collector.on_request_complete(RequestMetrics(method="GET", path="/test", status_code=404))
         collector.on_request_complete(
             RequestMetrics(method="GET", path="/test", error="NetworkError")
         )
@@ -100,15 +93,9 @@ class TestInMemoryCollector:
         """Test average latency calculation."""
         collector = InMemoryCollector()
 
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/test", duration_ms=10)
-        )
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/test", duration_ms=20)
-        )
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/test", duration_ms=30)
-        )
+        collector.on_request_complete(RequestMetrics(method="GET", path="/test", duration_ms=10))
+        collector.on_request_complete(RequestMetrics(method="GET", path="/test", duration_ms=20))
+        collector.on_request_complete(RequestMetrics(method="GET", path="/test", duration_ms=30))
 
         assert collector.average_latency_ms == 20.0
 
@@ -130,15 +117,9 @@ class TestInMemoryCollector:
         """Test filtering by method."""
         collector = InMemoryCollector()
 
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/test")
-        )
-        collector.on_request_complete(
-            RequestMetrics(method="POST", path="/test")
-        )
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/test")
-        )
+        collector.on_request_complete(RequestMetrics(method="GET", path="/test"))
+        collector.on_request_complete(RequestMetrics(method="POST", path="/test"))
+        collector.on_request_complete(RequestMetrics(method="GET", path="/test"))
 
         get_metrics = collector.get_metrics_by_method("GET")
         assert len(get_metrics) == 2
@@ -147,15 +128,9 @@ class TestInMemoryCollector:
         """Test filtering by path."""
         collector = InMemoryCollector()
 
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/memories")
-        )
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/spaces")
-        )
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/memories/123")
-        )
+        collector.on_request_complete(RequestMetrics(method="GET", path="/memories"))
+        collector.on_request_complete(RequestMetrics(method="GET", path="/spaces"))
+        collector.on_request_complete(RequestMetrics(method="GET", path="/memories/123"))
 
         memories_metrics = collector.get_metrics_by_path("/memories")
         assert len(memories_metrics) == 2
@@ -164,9 +139,7 @@ class TestInMemoryCollector:
         """Test clearing metrics."""
         collector = InMemoryCollector()
 
-        collector.on_request_complete(
-            RequestMetrics(method="GET", path="/test")
-        )
+        collector.on_request_complete(RequestMetrics(method="GET", path="/test"))
         assert collector.request_count == 1
 
         collector.clear()
@@ -177,9 +150,7 @@ class TestInMemoryCollector:
         collector = InMemoryCollector(max_entries=5)
 
         for i in range(10):
-            collector.on_request_complete(
-                RequestMetrics(method="GET", path=f"/test/{i}")
-            )
+            collector.on_request_complete(RequestMetrics(method="GET", path=f"/test/{i}"))
 
         assert collector.request_count == 5
         # Should have the last 5 entries
@@ -305,7 +276,7 @@ class TestTimedRequest:
         collector = InMemoryCollector()
 
         with pytest.raises(ValueError):
-            with timed_request("GET", "/test", collector=collector) as metrics:
+            with timed_request("GET", "/test", collector=collector):
                 raise ValueError("Test error")
 
         assert collector.request_count == 1

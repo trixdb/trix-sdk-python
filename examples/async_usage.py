@@ -1,7 +1,7 @@
 """Async usage examples for Trix SDK."""
 
 import asyncio
-from trix import AsyncTrix, MemoryType, RelationshipType
+from trix import AsyncTrix, RelationshipType
 
 
 async def main():

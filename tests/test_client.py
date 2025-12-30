@@ -2,7 +2,6 @@
 
 import pytest
 from trix import Trix, AsyncTrix
-from trix.exceptions import TrixError
 
 
 def test_client_initialization_with_api_key():

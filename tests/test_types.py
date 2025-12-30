@@ -1,16 +1,12 @@
 """Tests for Trix types."""
 
 from datetime import datetime
-import pytest
-from pydantic import ValidationError
 
 from trix.types import (
     Memory,
     MemoryCreate,
     MemoryType,
-    Relationship,
     RelationshipType,
-    Cluster,
     SearchMode,
 )
 

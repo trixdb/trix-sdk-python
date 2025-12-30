@@ -4,7 +4,6 @@ import json
 import logging
 from io import StringIO
 
-import pytest
 
 from trix.utils.logging import (
     LogConfig,

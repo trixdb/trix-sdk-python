@@ -6,7 +6,7 @@ This script demonstrates the most common operations with Trix.
 Replace 'your_api_key' with your actual API key from https://trixdb.com
 """
 
-from trix import Trix, MemoryType, RelationshipType, SearchMode
+from trix import Trix, RelationshipType, SearchMode
 
 
 def main():

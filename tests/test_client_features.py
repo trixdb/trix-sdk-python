@@ -1,8 +1,6 @@
 """Tests for new Trix client features: connection pooling, timeouts, interceptors."""
 
-import io
 import pytest
-from unittest.mock import MagicMock, patch, AsyncMock
 import httpx
 
 from trix import (
@@ -11,11 +9,7 @@ from trix import (
     PoolConfig,
     RequestContext,
     ResponseContext,
-    RequestInterceptor,
-    ResponseInterceptor,
-    ErrorInterceptor,
 )
-from trix.exceptions import TimeoutError
 
 
 class TestPoolConfig:

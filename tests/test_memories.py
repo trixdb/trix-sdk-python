@@ -1,8 +1,7 @@
 """Tests for memories resource."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-import httpx
+from unittest.mock import patch
 
 from trix import Trix, AsyncTrix, Memory, MemoryList, MemoryType, MemoryCreate
 
@@ -40,7 +39,7 @@ class TestMemoriesCreate:
 
     def test_create_basic(self, mock_memory_data):
         """Test basic memory creation."""
-        with patch.object(Trix, '_request') as mock_request:
+        with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_memory_data
             client = Trix(api_key="test_key")
 
@@ -54,7 +53,7 @@ class TestMemoriesCreate:
 
     def test_create_with_all_options(self, mock_memory_data):
         """Test memory creation with all options."""
-        with patch.object(Trix, '_request') as mock_request:
+        with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_memory_data
             client = Trix(api_key="test_key")
 
@@ -79,7 +78,7 @@ class TestMemoriesList:
 
     def test_list_basic(self, mock_memory_list_data):
         """Test basic memory listing."""
-        with patch.object(Trix, '_request') as mock_request:
+        with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_memory_list_data
             client = Trix(api_key="test_key")
 
@@ -92,11 +91,11 @@ class TestMemoriesList:
 
     def test_list_with_filters(self, mock_memory_list_data):
         """Test memory listing with filters."""
-        with patch.object(Trix, '_request') as mock_request:
+        with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_memory_list_data
             client = Trix(api_key="test_key")
 
-            result = client.memories.list(
+            client.memories.list(
                 q="test query",
                 tags=["tag1"],
                 limit=50,
@@ -116,7 +115,7 @@ class TestMemoriesGet:
 
     def test_get_by_id(self, mock_memory_data):
         """Test getting memory by ID."""
-        with patch.object(Trix, '_request') as mock_request:
+        with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_memory_data
             client = Trix(api_key="test_key")
 
@@ -132,7 +131,7 @@ class TestMemoriesUpdate:
 
     def test_update_content(self, mock_memory_data):
         """Test updating memory content."""
-        with patch.object(Trix, '_request') as mock_request:
+        with patch.object(Trix, "_request") as mock_request:
             mock_memory_data["content"] = "Updated content"
             mock_request.return_value = mock_memory_data
             client = Trix(api_key="test_key")
@@ -148,7 +147,7 @@ class TestMemoriesDelete:
 
     def test_delete_by_id(self):
         """Test deleting memory by ID."""
-        with patch.object(Trix, '_request') as mock_request:
+        with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = {}
             client = Trix(api_key="test_key")
 
@@ -163,21 +162,23 @@ class TestMemoriesBulkOperations:
 
     def test_bulk_create(self, mock_memory_data):
         """Test bulk memory creation."""
-        with patch.object(Trix, '_request') as mock_request:
+        with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = {"data": [mock_memory_data, mock_memory_data]}
             client = Trix(api_key="test_key")
 
-            memories = client.memories.bulk_create([
-                MemoryCreate(content="First"),
-                MemoryCreate(content="Second"),
-            ])
+            memories = client.memories.bulk_create(
+                [
+                    MemoryCreate(content="First"),
+                    MemoryCreate(content="Second"),
+                ]
+            )
 
             assert len(memories) == 2
             client.close()
 
     def test_bulk_delete(self):
         """Test bulk memory deletion."""
-        with patch.object(Trix, '_request') as mock_request:
+        with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = {}
             client = Trix(api_key="test_key")
 
@@ -194,7 +195,7 @@ class TestAsyncMemories:
     @pytest.mark.asyncio
     async def test_async_create(self, mock_memory_data):
         """Test async memory creation."""
-        with patch.object(AsyncTrix, '_request') as mock_request:
+        with patch.object(AsyncTrix, "_request") as mock_request:
             mock_request.return_value = mock_memory_data
             async with AsyncTrix(api_key="test_key") as client:
                 memory = await client.memories.create(content="Test content")
@@ -203,7 +204,7 @@ class TestAsyncMemories:
     @pytest.mark.asyncio
     async def test_async_list(self, mock_memory_list_data):
         """Test async memory listing."""
-        with patch.object(AsyncTrix, '_request') as mock_request:
+        with patch.object(AsyncTrix, "_request") as mock_request:
             mock_request.return_value = mock_memory_list_data
             async with AsyncTrix(api_key="test_key") as client:
                 result = await client.memories.list()
@@ -212,7 +213,7 @@ class TestAsyncMemories:
     @pytest.mark.asyncio
     async def test_async_get(self, mock_memory_data):
         """Test async memory get."""
-        with patch.object(AsyncTrix, '_request') as mock_request:
+        with patch.object(AsyncTrix, "_request") as mock_request:
             mock_request.return_value = mock_memory_data
             async with AsyncTrix(api_key="test_key") as client:
                 memory = await client.memories.get("mem_123")
@@ -221,7 +222,7 @@ class TestAsyncMemories:
     @pytest.mark.asyncio
     async def test_async_delete(self):
         """Test async memory deletion."""
-        with patch.object(AsyncTrix, '_request') as mock_request:
+        with patch.object(AsyncTrix, "_request") as mock_request:
             mock_request.return_value = {}
             async with AsyncTrix(api_key="test_key") as client:
                 await client.memories.delete("mem_123")

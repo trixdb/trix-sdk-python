@@ -4,7 +4,6 @@ import pytest
 from unittest.mock import Mock, AsyncMock
 
 from trix.resources.facts import FactsResource, AsyncFactsResource
-from trix.resources.base import validate_bulk_array
 
 
 class TestFactsResource:

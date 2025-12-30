@@ -1,7 +1,7 @@
 """Tests for error handling."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock
 import httpx
 
 from trix import Trix
@@ -128,9 +128,7 @@ class TestErrorResponseHandling:
         from trix.client import _handle_response
 
         response = self._create_mock_response(
-            429,
-            {"message": "Too many requests"},
-            headers={"Retry-After": "60"}
+            429, {"message": "Too many requests"}, headers={"Retry-After": "60"}
         )
 
         with pytest.raises(RateLimitError) as exc_info:

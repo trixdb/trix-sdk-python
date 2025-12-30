@@ -5,7 +5,6 @@ from typing import Any, Dict, Optional
 from unittest.mock import Mock, AsyncMock
 
 from trix.resources.base import (
-    BaseResource,
     BaseSyncResource,
     BaseAsyncResource,
     validate_params,
@@ -20,6 +19,7 @@ class TestValidateParams:
 
     def test_removes_none_values(self):
         """Test that None values are removed from params."""
+
         @validate_params
         def build_params(
             limit: Optional[int] = None,
@@ -34,6 +34,7 @@ class TestValidateParams:
 
     def test_keeps_all_non_none_values(self):
         """Test that all non-None values are kept."""
+
         @validate_params
         def build_params(a: int, b: str, c: bool) -> Dict[str, Any]:
             return {"a": a, "b": b, "c": c}
@@ -43,6 +44,7 @@ class TestValidateParams:
 
     def test_handles_empty_dict(self):
         """Test handling of all None values."""
+
         @validate_params
         def build_params(a: Optional[int] = None) -> Dict[str, Any]:
             return {"a": a}
@@ -66,9 +68,7 @@ class TestValidateBulkArray:
     def test_exceeding_max_raises(self):
         """Test that exceeding max raises ValueError."""
         items = [{"id": "test"}] * 1001
-        with pytest.raises(
-            ValueError, match="bulk_update: array exceeds maximum of 1000 items"
-        ):
+        with pytest.raises(ValueError, match="bulk_update: array exceeds maximum of 1000 items"):
             validate_bulk_array(items, "bulk_update")
 
     def test_custom_max_limit(self):
@@ -128,7 +128,9 @@ class TestBaseSyncResource:
         resource = BaseSyncResource(mock_client)
         result = resource._request("GET", "/test")
 
-        mock_client._request.assert_called_once_with("GET", "/test", params=None, json=None, timeout=None)
+        mock_client._request.assert_called_once_with(
+            "GET", "/test", params=None, json=None, timeout=None
+        )
         assert result == {"id": "test"}
 
     def test_request_with_params(self):
@@ -187,7 +189,9 @@ class TestBaseAsyncResource:
         resource = BaseAsyncResource(mock_client)
         result = await resource._request("GET", "/test")
 
-        mock_client._request.assert_called_once_with("GET", "/test", params=None, json=None, timeout=None)
+        mock_client._request.assert_called_once_with(
+            "GET", "/test", params=None, json=None, timeout=None
+        )
         assert result == {"id": "test"}
 
     @pytest.mark.asyncio

@@ -1,6 +1,5 @@
 """TDD tests for pagination types."""
 
-import pytest
 from trix.types import (
     BulkResult,
     Pagination,

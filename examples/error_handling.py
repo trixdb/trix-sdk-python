@@ -53,9 +53,9 @@ def main():
         print(f"  ✗ Rate limited: {e.message}")
         if e.retry_after:
             print(f"    Retry after: {e.retry_after} seconds")
-            print(f"    Waiting before retry...")
+            print("    Waiting before retry...")
             time.sleep(e.retry_after)
-            print(f"    ✓ Retry completed")
+            print("    ✓ Retry completed")
 
     # Example 5: Catch all Trix errors
     print("\nExample 5: Catching all Trix errors")
@@ -94,7 +94,7 @@ def main():
         for attempt in range(max_retries):
             try:
                 return func()
-            except ServerError as e:
+            except ServerError:
                 if attempt < max_retries - 1:
                     print(f"  ! Server error on attempt {attempt + 1}, retrying...")
                     time.sleep(delay * (2**attempt))  # Exponential backoff
@@ -118,7 +118,7 @@ def main():
             raise ValueError("Simulated error")
     except ValueError as e:
         print(f"  ! Error occurred: {e}")
-        print(f"  ✓ Client was still properly closed")
+        print("  ✓ Client was still properly closed")
 
     print("\n✓ Error handling examples completed!")
 

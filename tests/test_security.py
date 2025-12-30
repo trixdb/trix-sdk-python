@@ -1,6 +1,5 @@
 """TDD-style tests for security utilities."""
 
-import os
 import pytest
 from trix.utils.security import (
     validate_id,
@@ -129,7 +128,9 @@ class TestValidateBaseUrl:
             assert validate_base_url("https://api.example.com") == "https://api.example.com"
 
         def test_accepts_https_urls_with_port(self):
-            assert validate_base_url("https://api.example.com:8443") == "https://api.example.com:8443"
+            assert (
+                validate_base_url("https://api.example.com:8443") == "https://api.example.com:8443"
+            )
 
         def test_accepts_https_urls_with_path(self):
             assert validate_base_url("https://api.example.com/v1") == "https://api.example.com/v1"
