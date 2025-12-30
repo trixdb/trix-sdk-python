@@ -312,7 +312,7 @@ class MockResource(Generic[TItem]):
     def delete(self, id: str) -> None:
         """Mock delete method."""
         self.delete_calls.append(id)
-        self._resolve_response(self._delete_response)
+        self._resolve_response(self._delete_response)  # type: ignore[arg-type]
 
     def reset(self) -> None:
         """Reset all mock responses and call history."""
@@ -454,7 +454,7 @@ class MockAsyncResource(Generic[TItem]):
     async def delete(self, id: str) -> None:
         """Mock async delete method."""
         self.delete_calls.append(id)
-        self._resolve_response(self._delete_response)
+        self._resolve_response(self._delete_response)  # type: ignore[arg-type]
 
     def reset(self) -> None:
         """Reset all mock responses and call history."""

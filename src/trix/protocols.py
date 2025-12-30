@@ -8,6 +8,7 @@ from typing import (
     Iterator,
     Optional,
     Protocol,
+    Tuple,
     Union,
     runtime_checkable,
 )
@@ -59,7 +60,7 @@ class SyncClientProtocol(Protocol):
         method: str,
         path: str,
         data: Optional[Dict[str, Any]] = None,
-        files: Optional[Dict[str, Union[BinaryIO, tuple]]] = None,
+        files: Optional[Dict[str, Union[BinaryIO, Tuple[Any, ...]]]] = None,
         params: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
     ) -> Any:
@@ -97,7 +98,7 @@ class AsyncClientProtocol(Protocol):
         """Make an async HTTP request and return raw bytes."""
         ...
 
-    async def _request_stream(
+    def _request_stream(
         self,
         method: str,
         path: str,
@@ -105,7 +106,7 @@ class AsyncClientProtocol(Protocol):
         chunk_size: int = 8192,
         timeout: Optional[float] = None,
     ) -> AsyncIterator[bytes]:
-        """Make an async HTTP request and stream the response."""
+        """Make an async HTTP request and stream the response (async generator)."""
         ...
 
     async def _request_multipart(
@@ -113,7 +114,7 @@ class AsyncClientProtocol(Protocol):
         method: str,
         path: str,
         data: Optional[Dict[str, Any]] = None,
-        files: Optional[Dict[str, Union[BinaryIO, tuple]]] = None,
+        files: Optional[Dict[str, Union[BinaryIO, Tuple[Any, ...]]]] = None,
         params: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
     ) -> Any:

@@ -162,7 +162,7 @@ class JobsResource(BaseSyncResource):
         validate_id(queue, "queue")
         params = _build_clean_params(grace, status)
         response = self._request("POST", f"/jobs/{queue}/clean", params=params)
-        return response
+        return dict(response)
 
 
 class AsyncJobsResource(BaseAsyncResource):
@@ -259,4 +259,4 @@ class AsyncJobsResource(BaseAsyncResource):
         validate_id(queue, "queue")
         params = _build_clean_params(grace, status)
         response = await self._request("POST", f"/jobs/{queue}/clean", params=params)
-        return response
+        return dict(response)

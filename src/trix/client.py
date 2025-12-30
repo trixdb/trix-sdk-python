@@ -12,6 +12,7 @@ from typing import (
     Iterator,
     List,
     Optional,
+    Tuple,
     Type,
     Union,
 )
@@ -546,19 +547,19 @@ class Trix:
                 return response_context.data
             except httpx.TimeoutException as e:
                 logger.debug(f"Request timed out: {e}")
-                error = TimeoutError(f"Request timed out: {e}")
-                error = self._run_error_interceptors(error, request_context)
-                raise error from e
+                exc: Exception = TimeoutError(f"Request timed out: {e}")
+                exc = self._run_error_interceptors(exc, request_context)
+                raise exc from e
             except httpx.NetworkError as e:
                 logger.debug(f"Network error: {e}")
-                error = ConnectionError(f"Network error: {e}")
-                error = self._run_error_interceptors(error, request_context)
-                raise error from e
+                exc = ConnectionError(f"Network error: {e}")
+                exc = self._run_error_interceptors(exc, request_context)
+                raise exc from e
             except httpx.HTTPError as e:
                 logger.debug(f"HTTP error: {e}")
-                error = APIError(f"HTTP error: {e}")
-                error = self._run_error_interceptors(error, request_context)
-                raise error from e
+                exc = APIError(f"HTTP error: {e}")
+                exc = self._run_error_interceptors(exc, request_context)
+                raise exc from e
             except (RateLimitError, ServerError) as e:
                 last_exception = e
                 if attempt >= config.max_retries:
@@ -669,7 +670,7 @@ class Trix:
         method: str,
         path: str,
         data: Optional[Dict[str, Any]] = None,
-        files: Optional[Dict[str, Union[BinaryIO, tuple]]] = None,
+        files: Optional[Dict[str, Union[BinaryIO, Tuple[Any, ...]]]] = None,
         params: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
     ) -> Any:
@@ -1048,19 +1049,19 @@ class AsyncTrix:
                 return response_context.data
             except httpx.TimeoutException as e:
                 logger.debug(f"Request timed out: {e}")
-                error = TimeoutError(f"Request timed out: {e}")
-                error = self._run_error_interceptors(error, request_context)
-                raise error from e
+                exc: Exception = TimeoutError(f"Request timed out: {e}")
+                exc = self._run_error_interceptors(exc, request_context)
+                raise exc from e
             except httpx.NetworkError as e:
                 logger.debug(f"Network error: {e}")
-                error = ConnectionError(f"Network error: {e}")
-                error = self._run_error_interceptors(error, request_context)
-                raise error from e
+                exc = ConnectionError(f"Network error: {e}")
+                exc = self._run_error_interceptors(exc, request_context)
+                raise exc from e
             except httpx.HTTPError as e:
                 logger.debug(f"HTTP error: {e}")
-                error = APIError(f"HTTP error: {e}")
-                error = self._run_error_interceptors(error, request_context)
-                raise error from e
+                exc = APIError(f"HTTP error: {e}")
+                exc = self._run_error_interceptors(exc, request_context)
+                raise exc from e
             except (RateLimitError, ServerError) as e:
                 last_exception = e
                 if attempt >= config.max_retries:
@@ -1171,7 +1172,7 @@ class AsyncTrix:
         method: str,
         path: str,
         data: Optional[Dict[str, Any]] = None,
-        files: Optional[Dict[str, Union[BinaryIO, tuple]]] = None,
+        files: Optional[Dict[str, Union[BinaryIO, Tuple[Any, ...]]]] = None,
         params: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
     ) -> Any:

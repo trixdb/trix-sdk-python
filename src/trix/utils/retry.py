@@ -96,7 +96,7 @@ def retry_with_backoff(
 
                 for attempt in range(config.max_retries + 1):
                     try:
-                        return await func(*args, **kwargs)
+                        return cast(T, await func(*args, **kwargs))
                     except Exception as e:
                         last_exception = e
 

@@ -176,12 +176,12 @@ class WebhooksResource:
             >>> result = client.webhooks.test("webhook_123")
         """
         validate_id(id, "webhook")
-        params = {}
+        params: Dict[str, Any] = {}
         if event_type:
             params["event_type"] = event_type.value
 
         response = self._client._request("POST", f"/webhooks/{id}/test", params=params)
-        return response
+        return dict(response)
 
     def get_deliveries(
         self, id: str, limit: int = 100, status: Optional[str] = None
@@ -201,7 +201,7 @@ class WebhooksResource:
             >>> deliveries = client.webhooks.get_deliveries("webhook_123", limit=50)
         """
         validate_id(id, "webhook")
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if status:
             params["status"] = status
 
@@ -301,7 +301,7 @@ class WebhooksResource:
             validate_webhook_url(webhook.url)
         data = {"webhooks": [w.model_dump(exclude_none=True) for w in webhooks]}
         response = self._client._request("POST", "/webhooks/bulk", json=data)
-        return response
+        return dict(response)
 
     def bulk_delete(self, ids: List[str]) -> Dict[str, Any]:
         """
@@ -320,7 +320,7 @@ class WebhooksResource:
             validate_id(id, "webhook")
         data = {"ids": ids}
         response = self._client._request("DELETE", "/webhooks/bulk", json=data)
-        return response
+        return dict(response)
 
 
 class AsyncWebhooksResource:
@@ -402,19 +402,19 @@ class AsyncWebhooksResource:
     async def test(self, id: str, event_type: Optional[WebhookEvent] = None) -> Dict[str, Any]:
         """Test a webhook by sending a test event (async)."""
         validate_id(id, "webhook")
-        params = {}
+        params: Dict[str, Any] = {}
         if event_type:
             params["event_type"] = event_type.value
 
         response = await self._client._request("POST", f"/webhooks/{id}/test", params=params)
-        return response
+        return dict(response)
 
     async def get_deliveries(
         self, id: str, limit: int = 100, status: Optional[str] = None
     ) -> WebhookDeliveryList:
         """Get webhook delivery history (async)."""
         validate_id(id, "webhook")
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if status:
             params["status"] = status
 
@@ -452,7 +452,7 @@ class AsyncWebhooksResource:
             validate_webhook_url(webhook.url)
         data = {"webhooks": [w.model_dump(exclude_none=True) for w in webhooks]}
         response = await self._client._request("POST", "/webhooks/bulk", json=data)
-        return response
+        return dict(response)
 
     async def bulk_delete(self, ids: List[str]) -> Dict[str, Any]:
         """Delete multiple webhooks in bulk (async)."""
@@ -460,4 +460,4 @@ class AsyncWebhooksResource:
             validate_id(id, "webhook")
         data = {"ids": ids}
         response = await self._client._request("DELETE", "/webhooks/bulk", json=data)
-        return response
+        return dict(response)

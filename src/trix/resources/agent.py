@@ -178,7 +178,7 @@ class AgentResource:
         validate_limit(limit)
         if space_id:
             validate_id(space_id, "space")
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if space_id:
             params["space_id"] = space_id
 
@@ -323,7 +323,7 @@ class AgentResource:
             params["session_id"] = session_id
 
         response = self._client._request("GET", "/agent/core-memory/format", params=params)
-        return response.get("formatted", "")
+        return str(response.get("formatted", ""))
 
     def get_block(self, block_type: str) -> CoreMemoryBlock:
         """
@@ -504,7 +504,7 @@ class AsyncAgentResource:
         validate_limit(limit)
         if space_id:
             validate_id(space_id, "space")
-        params = {"limit": limit}
+        params: Dict[str, Any] = {"limit": limit}
         if space_id:
             params["space_id"] = space_id
 
@@ -579,7 +579,7 @@ class AsyncAgentResource:
             params["session_id"] = session_id
 
         response = await self._client._request("GET", "/agent/core-memory/format", params=params)
-        return response.get("formatted", "")
+        return str(response.get("formatted", ""))
 
     async def get_block(self, block_type: str) -> CoreMemoryBlock:
         """Get a specific core memory block (async)."""

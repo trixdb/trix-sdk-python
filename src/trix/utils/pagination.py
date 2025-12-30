@@ -10,7 +10,7 @@ class SyncPaginator:
 
     def __init__(
         self,
-        fetch_func: Callable[..., Dict[str, Any]],
+        fetch_func: Callable[..., Any],
         initial_params: Optional[Dict[str, Any]] = None,
         limit: int = 100,
         max_items: Optional[int] = None,
@@ -55,8 +55,12 @@ class SyncPaginator:
 
             response = self._fetch_func(**self._params)
 
+            # Convert pydantic model to dict if needed
+            if hasattr(response, "model_dump"):
+                response = response.model_dump()
+
             # Handle different response formats
-            if "data" in response:
+            if isinstance(response, dict) and "data" in response:
                 items = response["data"]
             else:
                 items = response
@@ -72,7 +76,7 @@ class SyncPaginator:
                     return
 
             # Check for next page
-            if "cursor" in response and response["cursor"]:
+            if isinstance(response, dict) and "cursor" in response and response["cursor"]:
                 cursor = response["cursor"]
             elif len(items) < self._limit:
                 # No more pages
@@ -131,8 +135,12 @@ class AsyncPaginator:
 
             response = await self._fetch_func(**self._params)
 
+            # Convert pydantic model to dict if needed
+            if hasattr(response, "model_dump"):
+                response = response.model_dump()
+
             # Handle different response formats
-            if "data" in response:
+            if isinstance(response, dict) and "data" in response:
                 items = response["data"]
             else:
                 items = response
@@ -148,7 +156,7 @@ class AsyncPaginator:
                     return
 
             # Check for next page
-            if "cursor" in response and response["cursor"]:
+            if isinstance(response, dict) and "cursor" in response and response["cursor"]:
                 cursor = response["cursor"]
             elif len(items) < self._limit:
                 # No more pages

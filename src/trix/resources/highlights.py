@@ -189,7 +189,7 @@ class HighlightsResource:
             ... )
         """
         validate_id(memory_id, "memory")
-        data = {"limit": limit}
+        data: Dict[str, Any] = {"limit": limit}
         if extraction_types:
             data["extraction_types"] = [et.value for et in extraction_types]
 
@@ -369,7 +369,7 @@ class AsyncHighlightsResource:
     ) -> List[ExtractedHighlights]:
         """Automatically extract highlights from a memory (async)."""
         validate_id(memory_id, "memory")
-        data = {"limit": limit}
+        data: Dict[str, Any] = {"limit": limit}
         if extraction_types:
             data["extraction_types"] = [et.value for et in extraction_types]
 

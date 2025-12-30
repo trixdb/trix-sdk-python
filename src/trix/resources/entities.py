@@ -331,7 +331,7 @@ class EntitiesResource(BaseSyncResource):
         """
         validate_bulk_array(entities, "bulk_create")
         response = self._request("POST", "/entities/bulk", json={"entities": entities})
-        return response
+        return dict(response)
 
     def bulk_delete(self, ids: List[str]) -> Dict[str, Any]:
         """Delete multiple entities in bulk.
@@ -344,7 +344,7 @@ class EntitiesResource(BaseSyncResource):
         """
         validate_bulk_array(ids, "bulk_delete")
         response = self._request("DELETE", "/entities/bulk", json={"ids": ids})
-        return response
+        return dict(response)
 
     def extract(
         self,
@@ -556,13 +556,13 @@ class AsyncEntitiesResource(BaseAsyncResource):
         """Create multiple entities in bulk (async)."""
         validate_bulk_array(entities, "bulk_create")
         response = await self._request("POST", "/entities/bulk", json={"entities": entities})
-        return response
+        return dict(response)
 
     async def bulk_delete(self, ids: List[str]) -> Dict[str, Any]:
         """Delete multiple entities in bulk (async)."""
         validate_bulk_array(ids, "bulk_delete")
         response = await self._request("DELETE", "/entities/bulk", json={"ids": ids})
-        return response
+        return dict(response)
 
     async def extract(
         self,

@@ -1,6 +1,7 @@
 """Facts resource for Trix SDK - Knowledge Graph Triples."""
 
-from typing import Any, Dict, List, Optional
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Union
 
 from .base import BaseAsyncResource, BaseSyncResource, validate_bulk_array
 from ..types import (
@@ -76,8 +77,8 @@ class FactsResource(BaseSyncResource):
         subject_type: Optional[FactNodeType] = None,
         object_type: Optional[FactNodeType] = None,
         source: Optional[FactSource] = None,
-        valid_from: Optional[str] = None,
-        valid_to: Optional[str] = None,
+        valid_from: Optional[Union[str, datetime]] = None,
+        valid_to: Optional[Union[str, datetime]] = None,
         metadata: Optional[Dict[str, Any]] = None,
         space_id: Optional[str] = None,
     ) -> Fact:
@@ -115,8 +116,8 @@ class FactsResource(BaseSyncResource):
             subject_type=subject_type,
             object_type=object_type,
             source=source,
-            valid_from=valid_from,
-            valid_to=valid_to,
+            valid_from=valid_from,  # type: ignore[arg-type]
+            valid_to=valid_to,  # type: ignore[arg-type]
             metadata=metadata,
             space_id=space_id,
         )
@@ -186,8 +187,8 @@ class FactsResource(BaseSyncResource):
         predicate: Optional[str] = None,
         obj: Optional[str] = None,
         confidence: Optional[float] = None,
-        valid_from: Optional[str] = None,
-        valid_to: Optional[str] = None,
+        valid_from: Optional[Union[str, datetime]] = None,
+        valid_to: Optional[Union[str, datetime]] = None,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Fact:
         """Update a fact.
@@ -211,8 +212,8 @@ class FactsResource(BaseSyncResource):
             predicate=predicate,
             object=obj,
             confidence=confidence,
-            valid_from=valid_from,
-            valid_to=valid_to,
+            valid_from=valid_from,  # type: ignore[arg-type]
+            valid_to=valid_to,  # type: ignore[arg-type]
             metadata=metadata,
         )
         response = self._request("PATCH", f"/facts/{id}", json=data.model_dump(exclude_none=True))
@@ -293,7 +294,7 @@ class FactsResource(BaseSyncResource):
         """
         validate_bulk_array(facts, "bulk_create")
         response = self._request("POST", "/facts/bulk", json={"facts": facts})
-        return response
+        return dict(response)
 
     def bulk_delete(self, ids: List[str]) -> Dict[str, Any]:
         """Delete multiple facts in bulk.
@@ -306,7 +307,7 @@ class FactsResource(BaseSyncResource):
         """
         validate_bulk_array(ids, "bulk_delete")
         response = self._request("DELETE", "/facts/bulk", json={"ids": ids})
-        return response
+        return dict(response)
 
     def extract(
         self,
@@ -366,8 +367,8 @@ class AsyncFactsResource(BaseAsyncResource):
         subject_type: Optional[FactNodeType] = None,
         object_type: Optional[FactNodeType] = None,
         source: Optional[FactSource] = None,
-        valid_from: Optional[str] = None,
-        valid_to: Optional[str] = None,
+        valid_from: Optional[Union[str, datetime]] = None,
+        valid_to: Optional[Union[str, datetime]] = None,
         metadata: Optional[Dict[str, Any]] = None,
         space_id: Optional[str] = None,
     ) -> Fact:
@@ -380,8 +381,8 @@ class AsyncFactsResource(BaseAsyncResource):
             subject_type=subject_type,
             object_type=object_type,
             source=source,
-            valid_from=valid_from,
-            valid_to=valid_to,
+            valid_from=valid_from,  # type: ignore[arg-type]
+            valid_to=valid_to,  # type: ignore[arg-type]
             metadata=metadata,
             space_id=space_id,
         )
@@ -426,8 +427,8 @@ class AsyncFactsResource(BaseAsyncResource):
         predicate: Optional[str] = None,
         obj: Optional[str] = None,
         confidence: Optional[float] = None,
-        valid_from: Optional[str] = None,
-        valid_to: Optional[str] = None,
+        valid_from: Optional[Union[str, datetime]] = None,
+        valid_to: Optional[Union[str, datetime]] = None,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Fact:
         """Update a fact (async)."""
@@ -437,8 +438,8 @@ class AsyncFactsResource(BaseAsyncResource):
             predicate=predicate,
             object=obj,
             confidence=confidence,
-            valid_from=valid_from,
-            valid_to=valid_to,
+            valid_from=valid_from,  # type: ignore[arg-type]
+            valid_to=valid_to,  # type: ignore[arg-type]
             metadata=metadata,
         )
         response = await self._request(
@@ -497,13 +498,13 @@ class AsyncFactsResource(BaseAsyncResource):
         """Create multiple facts in bulk (async)."""
         validate_bulk_array(facts, "bulk_create")
         response = await self._request("POST", "/facts/bulk", json={"facts": facts})
-        return response
+        return dict(response)
 
     async def bulk_delete(self, ids: List[str]) -> Dict[str, Any]:
         """Delete multiple facts in bulk (async)."""
         validate_bulk_array(ids, "bulk_delete")
         response = await self._request("DELETE", "/facts/bulk", json={"ids": ids})
-        return response
+        return dict(response)
 
     async def extract(
         self,

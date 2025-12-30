@@ -20,6 +20,7 @@ from ..types import (
     MemoryConfig,
     MemoryCreate,
     MemoryList,
+    MemoryOptions,
     MemoryType,
     MemoryUpdate,
     SearchMode,
@@ -77,7 +78,7 @@ class MemoriesResource:
             metadata=metadata,
             priority=priority,
             space_id=space_id,
-            options=options,
+            options=MemoryOptions(**options) if options else None,
         )
         response = self._client._request(
             "POST", "/memories", json=data.model_dump(exclude_none=True)
@@ -385,6 +386,7 @@ class MemoriesResource:
             ... )
         """
         # Handle different input types
+        file_handle: BinaryIO
         if isinstance(audio_file, (str, Path)):
             path = Path(audio_file)
             filename = filename or path.name
@@ -409,7 +411,7 @@ class MemoriesResource:
             if language:
                 data["language"] = language
 
-            files = {"file": (filename, file_handle, content_type)}
+            files: Dict[str, Any] = {"file": (filename, file_handle, content_type)}
 
             response = self._client._request_multipart("POST", "/memories", data=data, files=files)
             return Memory.model_validate(response)
@@ -432,7 +434,7 @@ class MemoriesResource:
         """
         validate_id(id, "memory")
         response = self._client._request("GET", f"/memories/{id}/transcript")
-        return response.get("transcript", "")
+        return str(response.get("transcript", ""))
 
     def transcribe(self, id: str, language: Optional[str] = None, force: bool = False) -> str:
         """
@@ -457,7 +459,7 @@ class MemoriesResource:
             params["force"] = "true"
 
         response = self._client._request("POST", f"/memories/{id}/transcribe", params=params)
-        return response.get("transcript", "")
+        return str(response.get("transcript", ""))
 
     def get_stats(
         self,
@@ -535,7 +537,7 @@ class AsyncMemoriesResource:
             metadata=metadata,
             priority=priority,
             space_id=space_id,
-            options=options,
+            options=MemoryOptions(**options) if options else None,
         )
         response = await self._client._request(
             "POST", "/memories", json=data.model_dump(exclude_none=True)
@@ -683,9 +685,8 @@ class AsyncMemoriesResource:
             ...         await f.write(chunk)
         """
         validate_id(id, "memory")
-        async for chunk in self._client._request_stream(
-            "GET", f"/memories/{id}/audio", chunk_size=chunk_size
-        ):
+        stream = self._client._request_stream("GET", f"/memories/{id}/audio", chunk_size=chunk_size)
+        async for chunk in stream:
             yield chunk
 
     async def create_with_audio(
@@ -723,6 +724,7 @@ class AsyncMemoriesResource:
             ... )
         """
         # Handle different input types
+        file_handle: BinaryIO
         if isinstance(audio_file, (str, Path)):
             path = Path(audio_file)
             filename = filename or path.name
@@ -747,7 +749,7 @@ class AsyncMemoriesResource:
             if language:
                 data["language"] = language
 
-            files = {"file": (filename, file_handle, content_type)}
+            files: Dict[str, Any] = {"file": (filename, file_handle, content_type)}
 
             response = await self._client._request_multipart(
                 "POST", "/memories", data=data, files=files
@@ -761,7 +763,7 @@ class AsyncMemoriesResource:
         """Get transcript for an audio memory (async)."""
         validate_id(id, "memory")
         response = await self._client._request("GET", f"/memories/{id}/transcript")
-        return response.get("transcript", "")
+        return str(response.get("transcript", ""))
 
     async def transcribe(self, id: str, language: Optional[str] = None, force: bool = False) -> str:
         """Transcribe or re-transcribe an audio memory (async)."""
@@ -773,7 +775,7 @@ class AsyncMemoriesResource:
             params["force"] = "true"
 
         response = await self._client._request("POST", f"/memories/{id}/transcribe", params=params)
-        return response.get("transcript", "")
+        return str(response.get("transcript", ""))
 
     async def get_stats(
         self,

@@ -328,7 +328,7 @@ class ClustersResource:
         validate_threshold(threshold)
         params = {"limit": limit, "threshold": threshold}
         response = self._client._request("POST", f"/clusters/{cluster_id}/expand", params=params)
-        return response.get("suggestions", [])
+        return list(response.get("suggestions", []))
 
     def get_stats(self) -> "ClusterStats":
         """Get cluster statistics."""
@@ -537,7 +537,7 @@ class AsyncClustersResource:
         response = await self._client._request(
             "POST", f"/clusters/{cluster_id}/expand", params=params
         )
-        return response.get("suggestions", [])
+        return list(response.get("suggestions", []))
 
     async def get_stats(self) -> "ClusterStats":
         """Get cluster statistics (async)."""
