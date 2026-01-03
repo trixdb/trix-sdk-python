@@ -373,6 +373,43 @@ class ShortestPath(BaseResponse):
     distance: int
 
 
+class HybridScoringWeights(BaseModel):
+    """Weights used in hybrid scoring."""
+
+    semantic: float
+    graph: float
+    co_activation: float
+    recency: float
+    salience: float
+
+
+class GraphExpansionScoring(BaseModel):
+    """Scoring metadata for graph expansion."""
+
+    applied: bool
+    weights: Optional[HybridScoringWeights] = None
+
+
+class GraphExpansionStats(BaseModel):
+    """Statistics from graph expansion."""
+
+    seed_count: int
+    expanded_count: int
+    final_count: int
+    relationships_found: Optional[int] = None
+    hops_used: Optional[int] = None
+
+
+class GraphExpansionResult(BaseResponse):
+    """Result of graph expansion from seed memories."""
+
+    seed_memories: List[str]
+    expanded_memories: List[Memory]
+    relationships: List[Relationship]
+    stats: GraphExpansionStats
+    scoring: Optional[GraphExpansionScoring] = None
+
+
 # Search Models
 class SearchResult(BaseResponse):
     """Search result with similarity score."""

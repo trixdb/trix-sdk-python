@@ -6,6 +6,7 @@ from .base import BaseAsyncResource, BaseSyncResource, validate_ids
 from ..types import (
     Direction,
     GraphContext,
+    GraphExpansionResult,
     GraphNeighbors,
     GraphStats,
     GraphTraversal,
@@ -175,6 +176,68 @@ class GraphResource(BaseSyncResource):
         response = self._request("GET", "/graph/stats")
         return GraphStats.model_validate(response)
 
+    def expand(
+        self,
+        seed_memory_ids: List[str],
+        max_hops: int = 2,
+        min_weight: float = 0.3,
+        relationship_types: Optional[List[str]] = None,
+        direction: str = "both",
+        include_content: bool = True,
+        apply_hybrid_scoring: bool = False,
+    ) -> GraphExpansionResult:
+        """Expand graph from seed memories using traversal and optional hybrid scoring.
+
+        Args:
+            seed_memory_ids: Starting memory IDs for expansion
+            max_hops: Maximum traversal depth (default: 2)
+            min_weight: Minimum relationship strength (default: 0.3)
+            relationship_types: Filter by specific relationship types
+            direction: Traversal direction ('incoming', 'outgoing', 'both')
+            include_content: Include full memory content (default: True)
+            apply_hybrid_scoring: Enable multi-signal scoring (default: False)
+
+        Returns:
+            GraphExpansionResult with expanded memories, relationships, and stats
+
+        Raises:
+            ValueError: If seed_memory_ids is empty
+
+        Example:
+            >>> # Basic expansion
+            >>> result = client.graph.expand(seed_memory_ids=["mem_123", "mem_456"])
+            >>> print(f"Expanded to {result.stats.expanded_count} memories")
+            >>>
+            >>> # Advanced expansion with hybrid scoring
+            >>> result = client.graph.expand(
+            ...     seed_memory_ids=["mem_123"],
+            ...     max_hops=3,
+            ...     min_weight=0.5,
+            ...     relationship_types=["related_to", "supports"],
+            ...     apply_hybrid_scoring=True
+            ... )
+            >>> print(f"Scoring applied: {result.scoring.applied}")
+        """
+        if not seed_memory_ids:
+            raise ValueError("seed_memory_ids cannot be empty")
+
+        validate_ids(seed_memory_ids, "memory")
+
+        data: Dict[str, Any] = {
+            "seed_memory_ids": seed_memory_ids,
+            "max_hops": max_hops,
+            "min_weight": min_weight,
+            "direction": direction,
+            "include_content": include_content,
+            "apply_hybrid_scoring": apply_hybrid_scoring,
+        }
+
+        if relationship_types is not None:
+            data["relationship_types"] = relationship_types
+
+        response = self._request("POST", "/graph/expand", json=data)
+        return GraphExpansionResult.model_validate(response)
+
 
 class AsyncGraphResource(BaseAsyncResource):
     """Async resource for graph traversal and analysis.
@@ -267,3 +330,54 @@ class AsyncGraphResource(BaseAsyncResource):
         """
         response = await self._request("GET", "/graph/stats")
         return GraphStats.model_validate(response)
+
+    async def expand(
+        self,
+        seed_memory_ids: List[str],
+        max_hops: int = 2,
+        min_weight: float = 0.3,
+        relationship_types: Optional[List[str]] = None,
+        direction: str = "both",
+        include_content: bool = True,
+        apply_hybrid_scoring: bool = False,
+    ) -> GraphExpansionResult:
+        """Expand graph from seed memories using traversal and optional hybrid scoring (async).
+
+        Args:
+            seed_memory_ids: Starting memory IDs for expansion
+            max_hops: Maximum traversal depth (default: 2)
+            min_weight: Minimum relationship strength (default: 0.3)
+            relationship_types: Filter by specific relationship types
+            direction: Traversal direction ('incoming', 'outgoing', 'both')
+            include_content: Include full memory content (default: True)
+            apply_hybrid_scoring: Enable multi-signal scoring (default: False)
+
+        Returns:
+            GraphExpansionResult with expanded memories, relationships, and stats
+
+        Raises:
+            ValueError: If seed_memory_ids is empty
+
+        Example:
+            >>> result = await client.graph.expand(seed_memory_ids=["mem_123"])
+            >>> print(f"Expanded to {result.stats.expanded_count} memories")
+        """
+        if not seed_memory_ids:
+            raise ValueError("seed_memory_ids cannot be empty")
+
+        validate_ids(seed_memory_ids, "memory")
+
+        data: Dict[str, Any] = {
+            "seed_memory_ids": seed_memory_ids,
+            "max_hops": max_hops,
+            "min_weight": min_weight,
+            "direction": direction,
+            "include_content": include_content,
+            "apply_hybrid_scoring": apply_hybrid_scoring,
+        }
+
+        if relationship_types is not None:
+            data["relationship_types"] = relationship_types
+
+        response = await self._request("POST", "/graph/expand", json=data)
+        return GraphExpansionResult.model_validate(response)
