@@ -57,6 +57,8 @@ def test_graph_expand_basic(sync_client, respx_mock):
     assert len(result.expanded_memories) == 1
     assert result.expanded_memories[0].id == "mem_3"
     assert len(result.relationships) == 1
+    # Verify relationship has strength field from graph expansion
+    assert result.relationships[0].strength == 0.8
     assert result.stats.seed_count == 2
     assert result.stats.expanded_count == 1
     assert result.scoring is None
@@ -206,3 +208,37 @@ async def test_graph_expand_async_empty_error(async_client):
     # Act & Assert
     with pytest.raises(ValueError, match="seed_memory_ids cannot be empty"):
         await async_client.graph.expand(seed_memory_ids=[])
+
+
+def test_relationship_strength_and_weight_fields(sync_client, respx_mock):
+    """Test that Relationship model supports both strength and weight fields."""
+    # Arrange - Test with strength field (from graph expansion)
+    mock_response_strength = {
+        "seed_memories": ["mem_1"],
+        "expanded_memories": [],
+        "relationships": [
+            {
+                "id": "rel_1",
+                "source_id": "mem_1",
+                "target_id": "mem_2",
+                "relationship_type": "related_to",
+                "strength": 0.9,  # Graph expansion uses strength
+                "created_at": "2024-01-01T00:00:00Z",
+                "updated_at": "2024-01-01T00:00:00Z",
+            }
+        ],
+        "stats": {"seed_count": 1, "expanded_count": 0, "final_count": 0},
+        "scoring": None,
+    }
+
+    respx_mock.post("https://test.api.com/graph/expand").mock(
+        return_value=Response(200, json=mock_response_strength)
+    )
+
+    # Act
+    result = sync_client.graph.expand(seed_memory_ids=["mem_1"])
+
+    # Assert - Verify strength field is populated
+    assert len(result.relationships) == 1
+    assert result.relationships[0].strength == 0.9
+    assert result.relationships[0].weight == 1.0  # Default value when not provided

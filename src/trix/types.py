@@ -231,6 +231,7 @@ class Relationship(BaseResponse):
     relationship_type: RelationshipType
     description: Optional[str] = None
     weight: float = 1.0
+    strength: Optional[float] = None  # Used in graph expansion (alternative to weight)
     bidirectional: bool = False
     created_at: datetime
     updated_at: datetime
