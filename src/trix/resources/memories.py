@@ -363,26 +363,41 @@ class MemoriesResource:
         language: Optional[str] = None,
     ) -> Memory:
         """
-        Create a memory from an audio file.
+        Create a memory from an audio or video file.
+
+        Supports audio formats: mp3, mp4, m4a, wav, webm, ogg, flac, aac
+        Supports video formats: mp4, webm, mov, avi, mkv, flv, mpeg
+
+        For advanced transcription options (speaker diarization, entity detection,
+        chapters, etc.), use the transcribe() method after upload.
 
         Args:
-            audio_file: File object, path, or string path to the audio file
+            audio_file: File object, path, or string path to the audio/video file
             filename: Override filename (default: extracted from path or "audio")
-            content_type: MIME type of the audio file
+            content_type: MIME type (e.g., 'audio/mpeg', 'video/mp4')
             tags: List of tags for categorization
             metadata: Additional metadata
             space_id: ID of the space to add memory to
-            transcribe: Whether to transcribe the audio
-            language: Language code for transcription
+            transcribe: Whether to transcribe the audio/video automatically
+            language: Language code for transcription (e.g., 'en', 'es')
 
         Returns:
             Created memory object
 
         Example:
+            >>> # Upload audio file
             >>> memory = client.memories.create_with_audio(
             ...     "recording.mp3",
             ...     tags=["meeting", "important"],
             ...     transcribe=True
+            ... )
+            >>>
+            >>> # Upload video file with transcription
+            >>> memory = client.memories.create_with_audio(
+            ...     "meeting.mp4",
+            ...     content_type="video/mp4",
+            ...     transcribe=True,
+            ...     language="en"
             ... )
         """
         # Handle different input types
@@ -436,29 +451,72 @@ class MemoriesResource:
         response = self._client._request("GET", f"/memories/{id}/transcript")
         return str(response.get("transcript", ""))
 
-    def transcribe(self, id: str, language: Optional[str] = None, force: bool = False) -> str:
+    def transcribe(
+        self,
+        id: str,
+        language: Optional[str] = None,
+        prompt: Optional[str] = None,
+        provider: Optional[str] = None,
+        enable_speaker_diarization: Optional[bool] = None,
+        enable_entity_detection: Optional[bool] = None,
+        enable_content_safety: Optional[bool] = None,
+        enable_auto_chapters: Optional[bool] = None,
+        enable_auto_summarization: Optional[bool] = None,
+        speakers_expected: Optional[int] = None,
+    ) -> str:
         """
-        Transcribe or re-transcribe an audio memory.
+        Transcribe or re-transcribe an audio memory with advanced options.
 
         Args:
             id: Memory ID
-            language: Language code for transcription
-            force: Force re-transcription even if transcript exists
+            language: Language code for transcription (e.g., 'en', 'es')
+            prompt: Context to improve transcription accuracy
+            provider: Transcription provider ('assemblyai' or 'openai')
+            enable_speaker_diarization: Enable speaker identification and labeling
+            enable_entity_detection: Enable entity detection in transcript
+            enable_content_safety: Enable content safety labeling
+            enable_auto_chapters: Enable automatic chapter generation
+            enable_auto_summarization: Enable automatic summarization
+            speakers_expected: Expected number of speakers (hint for diarization)
 
         Returns:
             Transcript text
 
         Example:
+            >>> # Basic transcription
             >>> transcript = client.memories.transcribe("mem_123", language="en")
+            >>>
+            >>> # Advanced transcription with speaker diarization
+            >>> transcript = client.memories.transcribe(
+            ...     "mem_123",
+            ...     provider="assemblyai",
+            ...     enable_speaker_diarization=True,
+            ...     speakers_expected=2,
+            ...     enable_auto_chapters=True
+            ... )
         """
         validate_id(id, "memory")
-        params: Dict[str, Any] = {}
+        body: Dict[str, Any] = {}
         if language:
-            params["language"] = language
-        if force:
-            params["force"] = "true"
+            body["language"] = language
+        if prompt:
+            body["prompt"] = prompt
+        if provider:
+            body["provider"] = provider
+        if enable_speaker_diarization is not None:
+            body["enableSpeakerDiarization"] = enable_speaker_diarization
+        if enable_entity_detection is not None:
+            body["enableEntityDetection"] = enable_entity_detection
+        if enable_content_safety is not None:
+            body["enableContentSafety"] = enable_content_safety
+        if enable_auto_chapters is not None:
+            body["enableAutoChapters"] = enable_auto_chapters
+        if enable_auto_summarization is not None:
+            body["enableAutoSummarization"] = enable_auto_summarization
+        if speakers_expected is not None:
+            body["speakersExpected"] = speakers_expected
 
-        response = self._client._request("POST", f"/memories/{id}/transcribe", params=params)
+        response = self._client._request("POST", f"/memories/{id}/transcribe", json=body)
         return str(response.get("transcript", ""))
 
     def get_stats(
@@ -701,26 +759,41 @@ class AsyncMemoriesResource:
         language: Optional[str] = None,
     ) -> Memory:
         """
-        Create a memory from an audio file (async).
+        Create a memory from an audio or video file (async).
+
+        Supports audio formats: mp3, mp4, m4a, wav, webm, ogg, flac, aac
+        Supports video formats: mp4, webm, mov, avi, mkv, flv, mpeg
+
+        For advanced transcription options (speaker diarization, entity detection,
+        chapters, etc.), use the transcribe() method after upload.
 
         Args:
-            audio_file: File object, path, or string path to the audio file
+            audio_file: File object, path, or string path to the audio/video file
             filename: Override filename (default: extracted from path or "audio")
-            content_type: MIME type of the audio file
+            content_type: MIME type (e.g., 'audio/mpeg', 'video/mp4')
             tags: List of tags for categorization
             metadata: Additional metadata
             space_id: ID of the space to add memory to
-            transcribe: Whether to transcribe the audio
-            language: Language code for transcription
+            transcribe: Whether to transcribe the audio/video automatically
+            language: Language code for transcription (e.g., 'en', 'es')
 
         Returns:
             Created memory object
 
         Example:
+            >>> # Upload audio file
             >>> memory = await client.memories.create_with_audio(
             ...     "recording.mp3",
             ...     tags=["meeting", "important"],
             ...     transcribe=True
+            ... )
+            >>>
+            >>> # Upload video file with transcription
+            >>> memory = await client.memories.create_with_audio(
+            ...     "meeting.mp4",
+            ...     content_type="video/mp4",
+            ...     transcribe=True,
+            ...     language="en"
             ... )
         """
         # Handle different input types
@@ -765,16 +838,72 @@ class AsyncMemoriesResource:
         response = await self._client._request("GET", f"/memories/{id}/transcript")
         return str(response.get("transcript", ""))
 
-    async def transcribe(self, id: str, language: Optional[str] = None, force: bool = False) -> str:
-        """Transcribe or re-transcribe an audio memory (async)."""
-        validate_id(id, "memory")
-        params: Dict[str, Any] = {}
-        if language:
-            params["language"] = language
-        if force:
-            params["force"] = "true"
+    async def transcribe(
+        self,
+        id: str,
+        language: Optional[str] = None,
+        prompt: Optional[str] = None,
+        provider: Optional[str] = None,
+        enable_speaker_diarization: Optional[bool] = None,
+        enable_entity_detection: Optional[bool] = None,
+        enable_content_safety: Optional[bool] = None,
+        enable_auto_chapters: Optional[bool] = None,
+        enable_auto_summarization: Optional[bool] = None,
+        speakers_expected: Optional[int] = None,
+    ) -> str:
+        """
+        Transcribe or re-transcribe an audio memory with advanced options (async).
 
-        response = await self._client._request("POST", f"/memories/{id}/transcribe", params=params)
+        Args:
+            id: Memory ID
+            language: Language code for transcription (e.g., 'en', 'es')
+            prompt: Context to improve transcription accuracy
+            provider: Transcription provider ('assemblyai' or 'openai')
+            enable_speaker_diarization: Enable speaker identification and labeling
+            enable_entity_detection: Enable entity detection in transcript
+            enable_content_safety: Enable content safety labeling
+            enable_auto_chapters: Enable automatic chapter generation
+            enable_auto_summarization: Enable automatic summarization
+            speakers_expected: Expected number of speakers (hint for diarization)
+
+        Returns:
+            Transcript text
+
+        Example:
+            >>> # Basic transcription
+            >>> transcript = await client.memories.transcribe("mem_123", language="en")
+            >>>
+            >>> # Advanced transcription with speaker diarization
+            >>> transcript = await client.memories.transcribe(
+            ...     "mem_123",
+            ...     provider="assemblyai",
+            ...     enable_speaker_diarization=True,
+            ...     speakers_expected=2,
+            ...     enable_auto_chapters=True
+            ... )
+        """
+        validate_id(id, "memory")
+        body: Dict[str, Any] = {}
+        if language:
+            body["language"] = language
+        if prompt:
+            body["prompt"] = prompt
+        if provider:
+            body["provider"] = provider
+        if enable_speaker_diarization is not None:
+            body["enableSpeakerDiarization"] = enable_speaker_diarization
+        if enable_entity_detection is not None:
+            body["enableEntityDetection"] = enable_entity_detection
+        if enable_content_safety is not None:
+            body["enableContentSafety"] = enable_content_safety
+        if enable_auto_chapters is not None:
+            body["enableAutoChapters"] = enable_auto_chapters
+        if enable_auto_summarization is not None:
+            body["enableAutoSummarization"] = enable_auto_summarization
+        if speakers_expected is not None:
+            body["speakersExpected"] = speakers_expected
+
+        response = await self._client._request("POST", f"/memories/{id}/transcribe", json=body)
         return str(response.get("transcript", ""))
 
     async def get_stats(
