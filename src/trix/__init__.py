@@ -104,6 +104,7 @@ from .types import (
     ClusterUpdate,
     ConsolidationResult,
     ConsolidationStrategy,
+    ContentSafetyLabel,
     Direction,
     EmbedAllResponse,
     EmbeddingResponse,
@@ -149,6 +150,11 @@ from .types import (
     SpaceCreate,
     SpaceList,
     SpaceUpdate,
+    TimestampRange,
+    Transcript,
+    TranscriptChapter,
+    TranscriptEntity,
+    TranscriptSegment,
     Webhook,
     WebhookCreate,
     WebhookDelivery,
@@ -157,6 +163,7 @@ from .types import (
     WebhookFilter,
     WebhookList,
     WebhookUpdate,
+    WordTimestamp,
 )
 
 __all__ = [
@@ -298,4 +305,12 @@ __all__ = [
     "JobList",
     "JobStats",
     "JobStatus",
+    # Types - Transcripts
+    "Transcript",
+    "TranscriptSegment",
+    "TranscriptEntity",
+    "TranscriptChapter",
+    "ContentSafetyLabel",
+    "TimestampRange",
+    "WordTimestamp",
 ]

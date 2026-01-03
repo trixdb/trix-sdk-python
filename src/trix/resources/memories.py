@@ -434,7 +434,7 @@ class MemoriesResource:
             if should_close:
                 file_handle.close()
 
-    def get_transcript(self, id: str) -> str:
+    def get_transcript(self, id: str) -> "Transcript":
         """
         Get transcript for an audio memory.
 
@@ -442,14 +442,19 @@ class MemoriesResource:
             id: Memory ID
 
         Returns:
-            Transcript text
+            Full transcript with metadata, segments, entities, and chapters
 
         Example:
             >>> transcript = client.memories.get_transcript("mem_123")
+            >>> print(transcript.text)  # Full transcript text
+            >>> print(transcript.summary)  # Auto-generated summary
+            >>> for segment in transcript.segments or []:
+            ...     print(f"{segment.speaker}: {segment.text}")
         """
         validate_id(id, "memory")
         response = self._client._request("GET", f"/memories/{id}/transcript")
-        return str(response.get("transcript", ""))
+        from ..types import Transcript
+        return Transcript.model_validate(response)
 
     def transcribe(
         self,
@@ -463,7 +468,7 @@ class MemoriesResource:
         enable_auto_chapters: Optional[bool] = None,
         enable_auto_summarization: Optional[bool] = None,
         speakers_expected: Optional[int] = None,
-    ) -> str:
+    ) -> "Job":
         """
         Transcribe or re-transcribe an audio memory with advanced options.
 
@@ -480,20 +485,23 @@ class MemoriesResource:
             speakers_expected: Expected number of speakers (hint for diarization)
 
         Returns:
-            Transcript text
+            Job object for tracking transcription progress
 
         Example:
             >>> # Basic transcription
-            >>> transcript = client.memories.transcribe("mem_123", language="en")
+            >>> job = client.memories.transcribe("mem_123", language="en")
+            >>> print(f"Transcription status: {job.status}")
             >>>
             >>> # Advanced transcription with speaker diarization
-            >>> transcript = client.memories.transcribe(
+            >>> job = client.memories.transcribe(
             ...     "mem_123",
             ...     provider="assemblyai",
             ...     enable_speaker_diarization=True,
             ...     speakers_expected=2,
             ...     enable_auto_chapters=True
             ... )
+            >>> # Poll for completion or use webhooks
+            >>> print(f"Job ID: {job.id}, Progress: {job.progress}%")
         """
         validate_id(id, "memory")
         body: Dict[str, Any] = {}
@@ -517,7 +525,8 @@ class MemoriesResource:
             body["speakersExpected"] = speakers_expected
 
         response = self._client._request("POST", f"/memories/{id}/transcribe", json=body)
-        return str(response.get("transcript", ""))
+        from ..types import Job
+        return Job.model_validate(response)
 
     def get_stats(
         self,
@@ -832,11 +841,27 @@ class AsyncMemoriesResource:
             if should_close:
                 file_handle.close()
 
-    async def get_transcript(self, id: str) -> str:
-        """Get transcript for an audio memory (async)."""
+    async def get_transcript(self, id: str) -> "Transcript":
+        """
+        Get transcript for an audio memory (async).
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Full transcript with metadata, segments, entities, and chapters
+
+        Example:
+            >>> transcript = await client.memories.get_transcript("mem_123")
+            >>> print(transcript.text)  # Full transcript text
+            >>> print(transcript.summary)  # Auto-generated summary
+            >>> for segment in transcript.segments or []:
+            ...     print(f"{segment.speaker}: {segment.text}")
+        """
         validate_id(id, "memory")
         response = await self._client._request("GET", f"/memories/{id}/transcript")
-        return str(response.get("transcript", ""))
+        from ..types import Transcript
+        return Transcript.model_validate(response)
 
     async def transcribe(
         self,
@@ -850,7 +875,7 @@ class AsyncMemoriesResource:
         enable_auto_chapters: Optional[bool] = None,
         enable_auto_summarization: Optional[bool] = None,
         speakers_expected: Optional[int] = None,
-    ) -> str:
+    ) -> "Job":
         """
         Transcribe or re-transcribe an audio memory with advanced options (async).
 
@@ -867,20 +892,23 @@ class AsyncMemoriesResource:
             speakers_expected: Expected number of speakers (hint for diarization)
 
         Returns:
-            Transcript text
+            Job object for tracking transcription progress
 
         Example:
             >>> # Basic transcription
-            >>> transcript = await client.memories.transcribe("mem_123", language="en")
+            >>> job = await client.memories.transcribe("mem_123", language="en")
+            >>> print(f"Transcription status: {job.status}")
             >>>
             >>> # Advanced transcription with speaker diarization
-            >>> transcript = await client.memories.transcribe(
+            >>> job = await client.memories.transcribe(
             ...     "mem_123",
             ...     provider="assemblyai",
             ...     enable_speaker_diarization=True,
             ...     speakers_expected=2,
             ...     enable_auto_chapters=True
             ... )
+            >>> # Poll for completion or use webhooks
+            >>> print(f"Job ID: {job.id}, Progress: {job.progress}%")
         """
         validate_id(id, "memory")
         body: Dict[str, Any] = {}
@@ -904,7 +932,8 @@ class AsyncMemoriesResource:
             body["speakersExpected"] = speakers_expected
 
         response = await self._client._request("POST", f"/memories/{id}/transcribe", json=body)
-        return str(response.get("transcript", ""))
+        from ..types import Job
+        return Job.model_validate(response)
 
     async def get_stats(
         self,
