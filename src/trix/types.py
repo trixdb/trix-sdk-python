@@ -66,6 +66,50 @@ class WebhookEvent(str, Enum):
     CLUSTER_CREATED = "cluster.created"
 
 
+class OriginType(str, Enum):
+    """Origin types for memory context classification.
+
+    These represent the life domain context of a memory.
+    """
+
+    WORK = "work"
+    PRIVATE = "private"
+    SHARED = "shared"
+    LEARNING = "learning"
+
+
+class SourceType(str, Enum):
+    """Source types for memory provenance tracking.
+
+    These represent how/where the memory was captured.
+    """
+
+    EMAIL = "email"
+    MEETING = "meeting"
+    CHAT = "chat"
+    DOCUMENT = "document"
+    WEBPAGE = "webpage"
+    AUDIO = "audio"
+    VIDEO = "video"
+    SCREENSHOT = "screenshot"
+    MANUAL = "manual"
+    AGENT = "agent"
+    API = "api"
+    IMPORT = "import"
+
+
+class ResourceRelationshipType(str, Enum):
+    """Relationship types for memory-resource associations.
+
+    These describe the nature of the link between a memory and a resource.
+    """
+
+    PRIMARY = "primary"
+    RELATED = "related"
+    MENTIONED = "mentioned"
+    DERIVED = "derived"
+
+
 class JobStatus(str, Enum):
     """Job processing status."""
 
@@ -180,6 +224,12 @@ class Memory(BaseResponse):
     last_accessed_at: Optional[datetime] = None
     transcript: Optional[str] = None
     audio_url: Optional[str] = None
+    # Origin/Context fields (provenance tracking)
+    session_id: Optional[str] = None
+    origin_type: Optional[OriginType] = None
+    source_type: Optional[SourceType] = None
+    source_id: Optional[str] = None
+    source_metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
 class MemoryCreate(BaseModel):
@@ -192,6 +242,13 @@ class MemoryCreate(BaseModel):
     priority: Optional[int] = None
     space_id: Optional[str] = None
     options: Optional[MemoryOptions] = None
+    # Origin/Context fields (provenance tracking)
+    session_id: Optional[str] = None
+    origin_type: Optional[OriginType] = None
+    source_type: Optional[SourceType] = None
+    source_id: Optional[str] = None
+    source_metadata: Optional[Dict[str, Any]] = None
+    resource_ids: Optional[List[str]] = None
 
 
 class MemoryUpdate(BaseModel):
@@ -201,6 +258,11 @@ class MemoryUpdate(BaseModel):
     tags: Optional[List[str]] = None
     metadata: Optional[Dict[str, Any]] = None
     priority: Optional[int] = None
+    # Origin/Context fields (provenance tracking)
+    origin_type: Optional[OriginType] = None
+    source_type: Optional[SourceType] = None
+    source_id: Optional[str] = None
+    source_metadata: Optional[Dict[str, Any]] = None
 
 
 class MemoryList(BaseResponse):
@@ -1327,3 +1389,78 @@ class HighlightLinkResult(BaseResponse):
     highlight_id: str
     memory_id: str
     linked: bool
+
+
+# ============================================================================
+# Resource Types - Project/Topic Management for Memory Context
+# ============================================================================
+
+
+class Resource(BaseResponse):
+    """Resource object - represents a project, topic, or other grouping for memories."""
+
+    id: str
+    name: str
+    type: str = "project"
+    description: Optional[str] = None
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+    updated_at: datetime
+
+
+class ResourceCreate(BaseModel):
+    """Request to create a resource."""
+
+    name: str
+    type: Optional[str] = "project"
+    description: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
+
+
+class ResourceUpdate(BaseModel):
+    """Request to update a resource."""
+
+    name: Optional[str] = None
+    type: Optional[str] = None
+    description: Optional[str] = None
+    metadata: Optional[Dict[str, Any]] = None
+
+
+class ResourceList(BaseResponse):
+    """List of resources with pagination."""
+
+    data: List[Resource]
+    pagination: Pagination
+
+
+class MemoryResource(BaseResponse):
+    """Memory-resource link."""
+
+    memory_id: str
+    resource_id: str
+    relationship_type: ResourceRelationshipType = ResourceRelationshipType.RELATED
+    created_at: datetime
+    resource: Optional[Resource] = None
+
+
+class MemoryResourceList(BaseResponse):
+    """List of memory-resource links."""
+
+    data: List[MemoryResource]
+
+
+class MemoryResourceLinkResult(BaseResponse):
+    """Result of linking a resource to a memory."""
+
+    memory_id: str
+    resource_id: str
+    relationship_type: ResourceRelationshipType
+    linked: bool
+
+
+class MemoryResourceUnlinkResult(BaseResponse):
+    """Result of unlinking a resource from a memory."""
+
+    memory_id: str
+    resource_id: str
+    unlinked: bool
