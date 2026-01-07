@@ -128,6 +128,33 @@ class ExtractionType(str, Enum):
     QUOTES = "quotes"
 
 
+class SessionType(str, Enum):
+    """Session types for categorizing conversation contexts."""
+
+    CONVERSATION = "conversation"
+    PROJECT = "project"
+    TASK = "task"
+    TEMPORARY = "temporary"
+
+
+class SessionStatus(str, Enum):
+    """Session lifecycle status."""
+
+    ACTIVE = "active"
+    PAUSED = "paused"
+    COMPLETED = "completed"
+    ARCHIVED = "archived"
+
+
+class RetentionPolicy(str, Enum):
+    """Session retention policies."""
+
+    PERMANENT = "permanent"
+    AUTO_DELETE = "auto_delete"
+    ON_COMPLETION = "on_completion"
+    TEMPORARY = "temporary"
+
+
 # Base Models
 class BaseResponse(BaseModel):
     """Base response model."""
@@ -1464,3 +1491,166 @@ class MemoryResourceUnlinkResult(BaseResponse):
     memory_id: str
     resource_id: str
     unlinked: bool
+
+
+# Session Models
+class Session(BaseResponse):
+    """CLI session for managing conversation/project/task contexts.
+
+    Sessions provide lifecycle management for conversations, projects,
+    and tasks with features like pause/resume, completion tracking,
+    and automatic retention policies.
+
+    Attributes:
+        id: Unique session identifier.
+        account_id: Account that owns the session.
+        user_id: User that owns the session.
+        created_by: User who created the session.
+        name: Session name.
+        description: Optional session description.
+        type: Session type (conversation, project, task, temporary).
+        status: Current lifecycle status (active, paused, completed, archived).
+        space_id: Optional space association.
+        origin_type: Optional origin context.
+        tags: List of tags for categorization.
+        retention_policy: Data retention policy.
+        retention_days: Days to retain data (for auto_delete policy).
+        summary: Optional session summary.
+        is_private: Whether session is private to user.
+        message_count: Number of messages in session.
+        memory_count: Number of memories in session.
+        metadata: Additional custom metadata.
+        created_at: Session creation timestamp.
+        updated_at: Last update timestamp.
+        last_active_at: Last activity timestamp.
+        paused_at: When session was paused (if applicable).
+        completed_at: When session was completed (if applicable).
+        archived_at: When session was archived (if applicable).
+    """
+
+    id: str
+    account_id: str
+    user_id: str
+    created_by: str
+    name: str
+    description: Optional[str] = None
+    type: SessionType
+    status: SessionStatus
+    space_id: Optional[str] = None
+    origin_type: Optional[str] = None
+    tags: Optional[List[str]] = None
+    retention_policy: RetentionPolicy
+    retention_days: Optional[int] = None
+    summary: Optional[str] = None
+    is_private: bool = False
+    message_count: int = 0
+    memory_count: int = 0
+    metadata: Optional[Dict[str, Any]] = None
+    created_at: str
+    updated_at: str
+    last_active_at: str
+    paused_at: Optional[str] = None
+    completed_at: Optional[str] = None
+    archived_at: Optional[str] = None
+
+
+class CreateSessionParams(BaseModel):
+    """Parameters for creating a new session.
+
+    Attributes:
+        name: Session name (required).
+        description: Optional session description.
+        type: Session type (default: conversation).
+        space_id: Optional space to associate with.
+        origin_type: Optional origin context.
+        tags: List of tags.
+        retention_policy: Retention policy (default: permanent).
+        retention_days: Days to retain (for auto_delete).
+        is_private: Whether session is private.
+        metadata: Additional custom metadata.
+    """
+
+    name: str
+    description: Optional[str] = None
+    type: SessionType = SessionType.CONVERSATION
+    space_id: Optional[str] = None
+    origin_type: Optional[str] = None
+    tags: Optional[List[str]] = None
+    retention_policy: RetentionPolicy = RetentionPolicy.PERMANENT
+    retention_days: Optional[int] = None
+    is_private: bool = False
+    metadata: Optional[Dict[str, Any]] = None
+
+
+class UpdateSessionParams(BaseModel):
+    """Parameters for updating a session.
+
+    All fields are optional. Only provided fields will be updated.
+
+    Attributes:
+        name: New session name.
+        description: New description.
+        tags: New tags list.
+        retention_policy: New retention policy.
+        retention_days: New retention days.
+        is_private: New privacy setting.
+        metadata: New metadata.
+    """
+
+    name: Optional[str] = None
+    description: Optional[str] = None
+    tags: Optional[List[str]] = None
+    retention_policy: Optional[RetentionPolicy] = None
+    retention_days: Optional[int] = None
+    is_private: Optional[bool] = None
+    metadata: Optional[Dict[str, Any]] = None
+
+
+class CompleteSessionParams(BaseModel):
+    """Parameters for completing a session.
+
+    Attributes:
+        summary: Optional completion summary.
+    """
+
+    summary: Optional[str] = None
+
+
+class SessionsResponse(BaseResponse):
+    """Paginated list of sessions.
+
+    Attributes:
+        data: List of session objects.
+        total: Total number of sessions matching filters.
+        limit: Maximum items per page.
+        offset: Current offset in result set.
+    """
+
+    data: List[Session]
+    total: int
+    limit: int
+    offset: int
+
+
+class SessionStats(BaseResponse):
+    """Session statistics.
+
+    Attributes:
+        total: Total number of sessions.
+        active: Number of active sessions.
+        paused: Number of paused sessions.
+        completed: Number of completed sessions.
+        archived: Number of archived sessions.
+        by_type: Distribution by session type.
+        total_messages: Total messages across all sessions.
+        total_memories: Total memories across all sessions.
+    """
+
+    total: int
+    active: int
+    paused: int
+    completed: int
+    archived: int
+    by_type: Dict[str, int]
+    total_messages: int
+    total_memories: int

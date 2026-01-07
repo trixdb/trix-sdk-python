@@ -11,7 +11,9 @@ from .highlights import HighlightsResource
 from .jobs import JobsResource
 from .memories import MemoriesResource
 from .relationships import RelationshipsResource
+from .resources import ResourcesResource, AsyncResourcesResource
 from .search import SearchResource
+from .sessions import SessionsResource, AsyncSessionsResource
 from .spaces import SpacesResource
 from .webhooks import WebhooksResource
 
@@ -20,6 +22,8 @@ __all__ = [
     "AsyncEnrichmentsResource",
     "AsyncEntitiesResource",
     "AsyncFactsResource",
+    "AsyncResourcesResource",
+    "AsyncSessionsResource",
     "ClustersResource",
     "EnrichmentsResource",
     "EntitiesResource",
@@ -30,7 +34,9 @@ __all__ = [
     "JobsResource",
     "MemoriesResource",
     "RelationshipsResource",
+    "ResourcesResource",
     "SearchResource",
+    "SessionsResource",
     "SpacesResource",
     "WebhooksResource",
 ]

@@ -16,6 +16,7 @@ from typing import (
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
+    BulkResult,
     Memory,
     MemoryConfig,
     MemoryCreate,
@@ -243,7 +244,7 @@ class MemoriesResource:
         validate_id(id, "memory")
         self._client._request("DELETE", f"/memories/{id}")
 
-    def bulk_create(self, memories: List[MemoryCreate]) -> List[Memory]:
+    def bulk_create(self, memories: List[MemoryCreate]) -> BulkResult:
         """
         Create multiple memories at once.
 
@@ -251,19 +252,20 @@ class MemoriesResource:
             memories: List of memory creation requests
 
         Returns:
-            List of created memories
+            Bulk operation result with success/failure counts
 
         Example:
-            >>> memories = client.memories.bulk_create([
+            >>> result = client.memories.bulk_create([
             ...     MemoryCreate(content="First memory"),
             ...     MemoryCreate(content="Second memory"),
             ... ])
+            >>> print(f"Created {result.success} memories, {result.failed} failed")
         """
         data = [m.model_dump(exclude_none=True) for m in memories]
         response = self._client._request("POST", "/memories/bulk", json={"memories": data})
-        return [Memory.model_validate(m) for m in response.get("data", [])]
+        return BulkResult.model_validate(response)
 
-    def bulk_update(self, updates: List[Dict[str, Any]]) -> List[Memory]:
+    def bulk_update(self, updates: List[Dict[str, Any]]) -> BulkResult:
         """
         Update multiple memories at once.
 
@@ -271,13 +273,14 @@ class MemoriesResource:
             updates: List of update objects with 'id' and update fields
 
         Returns:
-            List of updated memories
+            Bulk operation result with success/failure counts
 
         Example:
-            >>> memories = client.memories.bulk_update([
+            >>> result = client.memories.bulk_update([
             ...     {"id": "mem_123", "tags": ["updated"]},
             ...     {"id": "mem_456", "priority": 5},
             ... ])
+            >>> print(f"Updated {result.success} memories, {result.failed} failed")
         """
         # Validate all IDs before making the request
         for i, update in enumerate(updates):
@@ -285,22 +288,27 @@ class MemoriesResource:
                 raise ValueError(f"Update at index {i} is missing an 'id'")
             validate_id(update["id"], f"memory[{i}]")
         response = self._client._request("PATCH", "/memories/bulk", json={"updates": updates})
-        return [Memory.model_validate(m) for m in response.get("data", [])]
+        return BulkResult.model_validate(response)
 
-    def bulk_delete(self, ids: List[str]) -> None:
+    def bulk_delete(self, ids: List[str]) -> BulkResult:
         """
         Delete multiple memories at once.
 
         Args:
             ids: List of memory IDs to delete
 
+        Returns:
+            Bulk operation result with success/failure counts
+
         Example:
-            >>> client.memories.bulk_delete(["mem_123", "mem_456"])
+            >>> result = client.memories.bulk_delete(["mem_123", "mem_456"])
+            >>> print(f"Deleted {result.success} memories, {result.failed} failed")
         """
         # Validate all IDs before making the request
         for i, item_id in enumerate(ids):
             validate_id(item_id, f"memory[{i}]")
-        self._client._request("DELETE", "/memories/bulk", json={"ids": ids})
+        response = self._client._request("DELETE", "/memories/bulk", json={"ids": ids})
+        return BulkResult.model_validate(response)
 
     def get_config(self) -> MemoryConfig:
         """
@@ -578,6 +586,80 @@ class MemoriesResource:
         response = self._client._request("GET", "/memories/stats", params=params)
         return MemoryStats.model_validate(response)
 
+    def link_resource(
+        self,
+        id: str,
+        resource_id: str,
+        relationship_type: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Link a resource to a memory.
+
+        Args:
+            id: Memory ID
+            resource_id: Resource ID to link
+            relationship_type: Type of relationship (primary, related, mentioned, derived)
+
+        Returns:
+            Dictionary containing memory_id, resource_id, relationship_type, and linked status
+
+        Example:
+            >>> result = client.memories.link_resource(
+            ...     "mem_123",
+            ...     resource_id="res_456",
+            ...     relationship_type="primary"
+            ... )
+            >>> print(f"Linked: {result['linked']}")
+        """
+        validate_id(id, "memory")
+        validate_id(resource_id, "resource")
+
+        body: Dict[str, Any] = {"resource_id": resource_id}
+        if relationship_type:
+            body["relationship_type"] = relationship_type
+
+        response = self._client._request("POST", f"/memories/{id}/resources", json=body)
+        return response
+
+    def get_resources(self, id: str) -> Dict[str, Any]:
+        """
+        Get resources linked to a memory.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Dictionary containing memory_id and list of linked resources with metadata
+
+        Example:
+            >>> result = client.memories.get_resources("mem_123")
+            >>> for resource in result["data"]:
+            ...     print(resource["name"], resource["relationship_type"])
+        """
+        validate_id(id, "memory")
+        response = self._client._request("GET", f"/memories/{id}/resources")
+        return response
+
+    def unlink_resource(self, id: str, resource_id: str) -> Dict[str, Any]:
+        """
+        Unlink a resource from a memory.
+
+        Args:
+            id: Memory ID
+            resource_id: Resource ID to unlink
+
+        Returns:
+            Dictionary containing memory_id, resource_id, and unlinked status
+
+        Example:
+            >>> result = client.memories.unlink_resource("mem_123", "res_456")
+            >>> print(f"Unlinked: {result['unlinked']}")
+        """
+        validate_id(id, "memory")
+        validate_id(resource_id, "resource")
+        response = self._client._request("DELETE", f"/memories/{id}/resources/{resource_id}")
+        return response
+
 
 class AsyncMemoriesResource:
     """Async resource for managing memories."""
@@ -702,28 +784,41 @@ class AsyncMemoriesResource:
         validate_id(id, "memory")
         await self._client._request("DELETE", f"/memories/{id}")
 
-    async def bulk_create(self, memories: List[MemoryCreate]) -> List[Memory]:
-        """Create multiple memories at once (async)."""
+    async def bulk_create(self, memories: List[MemoryCreate]) -> BulkResult:
+        """Create multiple memories at once (async).
+
+        Returns:
+            Bulk operation result with success/failure counts
+        """
         data = [m.model_dump(exclude_none=True) for m in memories]
         response = await self._client._request("POST", "/memories/bulk", json={"memories": data})
-        return [Memory.model_validate(m) for m in response.get("data", [])]
+        return BulkResult.model_validate(response)
 
-    async def bulk_update(self, updates: List[Dict[str, Any]]) -> List[Memory]:
-        """Update multiple memories at once (async)."""
+    async def bulk_update(self, updates: List[Dict[str, Any]]) -> BulkResult:
+        """Update multiple memories at once (async).
+
+        Returns:
+            Bulk operation result with success/failure counts
+        """
         # Validate all IDs before making the request
         for i, update in enumerate(updates):
             if "id" not in update:
                 raise ValueError(f"Update at index {i} is missing an 'id'")
             validate_id(update["id"], f"memory[{i}]")
         response = await self._client._request("PATCH", "/memories/bulk", json={"updates": updates})
-        return [Memory.model_validate(m) for m in response.get("data", [])]
+        return BulkResult.model_validate(response)
 
-    async def bulk_delete(self, ids: List[str]) -> None:
-        """Delete multiple memories at once (async)."""
+    async def bulk_delete(self, ids: List[str]) -> BulkResult:
+        """Delete multiple memories at once (async).
+
+        Returns:
+            Bulk operation result with success/failure counts
+        """
         # Validate all IDs before making the request
         for i, item_id in enumerate(ids):
             validate_id(item_id, f"memory[{i}]")
-        await self._client._request("DELETE", "/memories/bulk", json={"ids": ids})
+        response = await self._client._request("DELETE", "/memories/bulk", json={"ids": ids})
+        return BulkResult.model_validate(response)
 
     async def get_config(self) -> MemoryConfig:
         """Get memory system configuration (async)."""
@@ -966,3 +1061,77 @@ class AsyncMemoriesResource:
 
         response = await self._client._request("GET", "/memories/stats", params=params)
         return MemoryStats.model_validate(response)
+
+    async def link_resource(
+        self,
+        id: str,
+        resource_id: str,
+        relationship_type: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Link a resource to a memory (async).
+
+        Args:
+            id: Memory ID
+            resource_id: Resource ID to link
+            relationship_type: Type of relationship (primary, related, mentioned, derived)
+
+        Returns:
+            Dictionary containing memory_id, resource_id, relationship_type, and linked status
+
+        Example:
+            >>> result = await client.memories.link_resource(
+            ...     "mem_123",
+            ...     resource_id="res_456",
+            ...     relationship_type="primary"
+            ... )
+            >>> print(f"Linked: {result['linked']}")
+        """
+        validate_id(id, "memory")
+        validate_id(resource_id, "resource")
+
+        body: Dict[str, Any] = {"resource_id": resource_id}
+        if relationship_type:
+            body["relationship_type"] = relationship_type
+
+        response = await self._client._request("POST", f"/memories/{id}/resources", json=body)
+        return response
+
+    async def get_resources(self, id: str) -> Dict[str, Any]:
+        """
+        Get resources linked to a memory (async).
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Dictionary containing memory_id and list of linked resources with metadata
+
+        Example:
+            >>> result = await client.memories.get_resources("mem_123")
+            >>> for resource in result["data"]:
+            ...     print(resource["name"], resource["relationship_type"])
+        """
+        validate_id(id, "memory")
+        response = await self._client._request("GET", f"/memories/{id}/resources")
+        return response
+
+    async def unlink_resource(self, id: str, resource_id: str) -> Dict[str, Any]:
+        """
+        Unlink a resource from a memory (async).
+
+        Args:
+            id: Memory ID
+            resource_id: Resource ID to unlink
+
+        Returns:
+            Dictionary containing memory_id, resource_id, and unlinked status
+
+        Example:
+            >>> result = await client.memories.unlink_resource("mem_123", "res_456")
+            >>> print(f"Unlinked: {result['unlinked']}")
+        """
+        validate_id(id, "memory")
+        validate_id(resource_id, "resource")
+        response = await self._client._request("DELETE", f"/memories/{id}/resources/{resource_id}")
+        return response

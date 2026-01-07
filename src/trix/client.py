@@ -45,7 +45,9 @@ from .resources import (
     JobsResource,
     MemoriesResource,
     RelationshipsResource,
+    ResourcesResource,
     SearchResource,
+    SessionsResource,
     SpacesResource,
     WebhooksResource,
 )
@@ -60,7 +62,9 @@ from .resources.highlights import AsyncHighlightsResource
 from .resources.jobs import AsyncJobsResource
 from .resources.memories import AsyncMemoriesResource
 from .resources.relationships import AsyncRelationshipsResource
+from .resources.resources import AsyncResourcesResource
 from .resources.search import AsyncSearchResource
+from .resources.sessions import AsyncSessionsResource
 from .resources.spaces import AsyncSpacesResource
 from .resources.webhooks import AsyncWebhooksResource
 from .utils.retry import RetryConfig
@@ -353,6 +357,8 @@ class Trix:
         self.relationships = RelationshipsResource(self)
         self.clusters = ClustersResource(self)
         self.spaces = SpacesResource(self)
+        self.sessions = SessionsResource(self)
+        self.resources = ResourcesResource(self)
         self.graph = GraphResource(self)
         self.search = SearchResource(self)
         self.webhooks = WebhooksResource(self)
@@ -862,6 +868,8 @@ class AsyncTrix:
         self.relationships = AsyncRelationshipsResource(self)
         self.clusters = AsyncClustersResource(self)
         self.spaces = AsyncSpacesResource(self)
+        self.sessions = AsyncSessionsResource(self)
+        self.resources = AsyncResourcesResource(self)
         self.graph = AsyncGraphResource(self)
         self.search = AsyncSearchResource(self)
         self.webhooks = AsyncWebhooksResource(self)
