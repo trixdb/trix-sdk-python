@@ -49,6 +49,8 @@ class MemoriesResource:
         priority: Optional[int] = None,
         space_id: Optional[str] = None,
         options: Optional[Dict[str, Any]] = None,
+        is_pinned: bool = False,
+        protection_level: str = "none",
     ) -> Memory:
         """
         Create a new memory.
@@ -61,6 +63,8 @@ class MemoriesResource:
             priority: Priority level for the memory
             space_id: ID of the space to add memory to
             options: Additional options (transcribe_audio, language, skip_embedding)
+            is_pinned: Whether to pin the memory (prevents decay)
+            protection_level: Protection level ("none", "soft", "hard")
 
         Returns:
             Created memory object
@@ -69,7 +73,9 @@ class MemoriesResource:
             >>> memory = client.memories.create(
             ...     content="Important information",
             ...     tags=["work", "important"],
-            ...     metadata={"source": "meeting"}
+            ...     metadata={"source": "meeting"},
+            ...     is_pinned=True,
+            ...     protection_level="soft"
             ... )
         """
         data = MemoryCreate(
@@ -80,6 +86,8 @@ class MemoriesResource:
             priority=priority,
             space_id=space_id,
             options=MemoryOptions(**options) if options else None,
+            is_pinned=is_pinned if is_pinned else None,
+            protection_level=protection_level if protection_level != "none" else None,
         )
         response = self._client._request(
             "POST", "/memories", json=data.model_dump(exclude_none=True)
@@ -94,6 +102,10 @@ class MemoriesResource:
         offset: int = 0,
         tags: Optional[List[str]] = None,
         space_id: Optional[str] = None,
+        pinned: Optional[bool] = None,
+        protected: Optional[bool] = None,
+        min_quality: Optional[float] = None,
+        include_deleted: bool = False,
     ) -> MemoryList:
         """
         List memories with optional filtering.
@@ -105,6 +117,10 @@ class MemoriesResource:
             offset: Offset for pagination
             tags: Filter by tags
             space_id: Filter by space
+            pinned: Filter by pinned status (True=only pinned, False=only unpinned)
+            protected: Filter by protection status (True=any protection, False=none)
+            min_quality: Minimum quality score (0-1)
+            include_deleted: Include soft-deleted memories
 
         Returns:
             List of memories with pagination info
@@ -113,7 +129,9 @@ class MemoriesResource:
             >>> results = client.memories.list(
             ...     q="important",
             ...     mode=SearchMode.HYBRID,
-            ...     tags=["work"]
+            ...     tags=["work"],
+            ...     pinned=True,
+            ...     min_quality=0.5
             ... )
         """
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
@@ -125,6 +143,14 @@ class MemoriesResource:
             params["tags"] = ",".join(tags)
         if space_id:
             params["space_id"] = space_id
+        if pinned is not None:
+            params["pinned"] = "true" if pinned else "false"
+        if protected is not None:
+            params["protected"] = "true" if protected else "false"
+        if min_quality is not None:
+            params["min_quality"] = str(min_quality)
+        if include_deleted:
+            params["include_deleted"] = "true"
 
         response = self._client._request("GET", "/memories", params=params)
         return MemoryList.model_validate(response)
@@ -660,6 +686,177 @@ class MemoriesResource:
         response = self._client._request("DELETE", f"/memories/{id}/resources/{resource_id}")
         return response
 
+    # =========================================================================
+    # Memory Pinning & Protection
+    # =========================================================================
+
+    def pin(self, id: str) -> Memory:
+        """
+        Pin a memory to prevent decay.
+
+        Pinned memories are protected from automatic decay and prioritized in searches.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Updated memory object with is_pinned=True
+
+        Example:
+            >>> memory = client.memories.pin("mem_123")
+            >>> assert memory.is_pinned == True
+        """
+        validate_id(id, "memory")
+        response = self._client._request("POST", f"/memories/{id}/pin")
+        return Memory.model_validate(response)
+
+    def unpin(self, id: str) -> Memory:
+        """
+        Unpin a memory to allow normal decay.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Updated memory object with is_pinned=False
+
+        Example:
+            >>> memory = client.memories.unpin("mem_123")
+            >>> assert memory.is_pinned == False
+        """
+        validate_id(id, "memory")
+        response = self._client._request("POST", f"/memories/{id}/unpin")
+        return Memory.model_validate(response)
+
+    def set_protection_level(
+        self,
+        id: str,
+        level: str,
+    ) -> Memory:
+        """
+        Set memory protection level.
+
+        Protection levels:
+        - "none": No protection, normal decay applies
+        - "soft": Protected from auto-decay, can be manually deleted
+        - "hard": Protected from deletion, requires explicit unprotection
+
+        Args:
+            id: Memory ID
+            level: Protection level ("none", "soft", "hard")
+
+        Returns:
+            Updated memory object
+
+        Example:
+            >>> memory = client.memories.set_protection_level("mem_123", "hard")
+            >>> print(f"Protection: {memory.protection_level}")
+        """
+        validate_id(id, "memory")
+        if level not in ("none", "soft", "hard"):
+            raise ValueError(f"Invalid protection level: {level}. Must be 'none', 'soft', or 'hard'")
+        response = self._client._request(
+            "POST", f"/memories/{id}/protection", json={"level": level}
+        )
+        return Memory.model_validate(response)
+
+    def soft_delete(self, id: str) -> Memory:
+        """
+        Soft delete a memory (can be restored).
+
+        Soft-deleted memories are hidden from normal queries but can be restored.
+        Use delete() for permanent deletion.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Updated memory object with is_deleted=True
+
+        Example:
+            >>> memory = client.memories.soft_delete("mem_123")
+            >>> assert memory.is_deleted == True
+        """
+        validate_id(id, "memory")
+        response = self._client._request("POST", f"/memories/{id}/soft-delete")
+        return Memory.model_validate(response)
+
+    def restore(self, id: str) -> Memory:
+        """
+        Restore a soft-deleted memory.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Restored memory object with is_deleted=False
+
+        Example:
+            >>> memory = client.memories.restore("mem_123")
+            >>> assert memory.is_deleted == False
+        """
+        validate_id(id, "memory")
+        response = self._client._request("POST", f"/memories/{id}/restore")
+        return Memory.model_validate(response)
+
+    def get_quality_score(self, id: str) -> float:
+        """
+        Get the quality score for a memory.
+
+        Quality scores range from 0-1 and indicate how valuable/useful a memory is.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Quality score (0.0 to 1.0)
+
+        Example:
+            >>> score = client.memories.get_quality_score("mem_123")
+            >>> print(f"Quality: {score:.2%}")
+        """
+        validate_id(id, "memory")
+        response = self._client._request("GET", f"/memories/{id}/quality")
+        return float(response.get("quality_score", 0.0))
+
+    def get_topics(
+        self,
+        id: str,
+        refresh: bool = False,
+        min_relevance: Optional[float] = None,
+        categories: Optional[List[str]] = None,
+    ) -> List["Topic"]:
+        """
+        Get extracted topics for a memory.
+
+        Args:
+            id: Memory ID
+            refresh: Force re-extraction of topics
+            min_relevance: Minimum relevance score (0-1)
+            categories: Filter by specific categories
+
+        Returns:
+            List of Topic objects
+
+        Example:
+            >>> topics = client.memories.get_topics("mem_123", min_relevance=0.5)
+            >>> for topic in topics:
+            ...     print(f"{topic.name}: {topic.relevance:.0%}")
+        """
+        from ..types import Topic
+
+        validate_id(id, "memory")
+        params: Dict[str, Any] = {}
+        if refresh:
+            params["refresh"] = "true"
+        if min_relevance is not None:
+            params["min_relevance"] = str(min_relevance)
+        if categories:
+            params["categories"] = ",".join(categories)
+
+        response = self._client._request("GET", f"/memories/{id}/topics", params=params)
+        return [Topic.model_validate(t) for t in response.get("topics", [])]
+
 
 class AsyncMemoriesResource:
     """Async resource for managing memories."""
@@ -677,6 +874,8 @@ class AsyncMemoriesResource:
         priority: Optional[int] = None,
         space_id: Optional[str] = None,
         options: Optional[Dict[str, Any]] = None,
+        is_pinned: bool = False,
+        protection_level: str = "none",
     ) -> Memory:
         """Create a new memory (async)."""
         data = MemoryCreate(
@@ -687,6 +886,8 @@ class AsyncMemoriesResource:
             priority=priority,
             space_id=space_id,
             options=MemoryOptions(**options) if options else None,
+            is_pinned=is_pinned if is_pinned else None,
+            protection_level=protection_level if protection_level != "none" else None,
         )
         response = await self._client._request(
             "POST", "/memories", json=data.model_dump(exclude_none=True)
@@ -701,6 +902,10 @@ class AsyncMemoriesResource:
         offset: int = 0,
         tags: Optional[List[str]] = None,
         space_id: Optional[str] = None,
+        pinned: Optional[bool] = None,
+        protected: Optional[bool] = None,
+        min_quality: Optional[float] = None,
+        include_deleted: bool = False,
     ) -> MemoryList:
         """List memories with optional filtering (async)."""
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
@@ -712,6 +917,14 @@ class AsyncMemoriesResource:
             params["tags"] = ",".join(tags)
         if space_id:
             params["space_id"] = space_id
+        if pinned is not None:
+            params["pinned"] = "true" if pinned else "false"
+        if protected is not None:
+            params["protected"] = "true" if protected else "false"
+        if min_quality is not None:
+            params["min_quality"] = str(min_quality)
+        if include_deleted:
+            params["include_deleted"] = "true"
 
         response = await self._client._request("GET", "/memories", params=params)
         return MemoryList.model_validate(response)
@@ -1135,3 +1348,174 @@ class AsyncMemoriesResource:
         validate_id(resource_id, "resource")
         response = await self._client._request("DELETE", f"/memories/{id}/resources/{resource_id}")
         return response
+
+    # =========================================================================
+    # Memory Pinning & Protection (async)
+    # =========================================================================
+
+    async def pin(self, id: str) -> Memory:
+        """
+        Pin a memory to prevent decay (async).
+
+        Pinned memories are protected from automatic decay and prioritized in searches.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Updated memory object with is_pinned=True
+
+        Example:
+            >>> memory = await client.memories.pin("mem_123")
+            >>> assert memory.is_pinned == True
+        """
+        validate_id(id, "memory")
+        response = await self._client._request("POST", f"/memories/{id}/pin")
+        return Memory.model_validate(response)
+
+    async def unpin(self, id: str) -> Memory:
+        """
+        Unpin a memory to allow normal decay (async).
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Updated memory object with is_pinned=False
+
+        Example:
+            >>> memory = await client.memories.unpin("mem_123")
+            >>> assert memory.is_pinned == False
+        """
+        validate_id(id, "memory")
+        response = await self._client._request("POST", f"/memories/{id}/unpin")
+        return Memory.model_validate(response)
+
+    async def set_protection_level(
+        self,
+        id: str,
+        level: str,
+    ) -> Memory:
+        """
+        Set memory protection level (async).
+
+        Protection levels:
+        - "none": No protection, normal decay applies
+        - "soft": Protected from auto-decay, can be manually deleted
+        - "hard": Protected from deletion, requires explicit unprotection
+
+        Args:
+            id: Memory ID
+            level: Protection level ("none", "soft", "hard")
+
+        Returns:
+            Updated memory object
+
+        Example:
+            >>> memory = await client.memories.set_protection_level("mem_123", "hard")
+            >>> print(f"Protection: {memory.protection_level}")
+        """
+        validate_id(id, "memory")
+        if level not in ("none", "soft", "hard"):
+            raise ValueError(f"Invalid protection level: {level}. Must be 'none', 'soft', or 'hard'")
+        response = await self._client._request(
+            "POST", f"/memories/{id}/protection", json={"level": level}
+        )
+        return Memory.model_validate(response)
+
+    async def soft_delete(self, id: str) -> Memory:
+        """
+        Soft delete a memory (can be restored) (async).
+
+        Soft-deleted memories are hidden from normal queries but can be restored.
+        Use delete() for permanent deletion.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Updated memory object with is_deleted=True
+
+        Example:
+            >>> memory = await client.memories.soft_delete("mem_123")
+            >>> assert memory.is_deleted == True
+        """
+        validate_id(id, "memory")
+        response = await self._client._request("POST", f"/memories/{id}/soft-delete")
+        return Memory.model_validate(response)
+
+    async def restore(self, id: str) -> Memory:
+        """
+        Restore a soft-deleted memory (async).
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Restored memory object with is_deleted=False
+
+        Example:
+            >>> memory = await client.memories.restore("mem_123")
+            >>> assert memory.is_deleted == False
+        """
+        validate_id(id, "memory")
+        response = await self._client._request("POST", f"/memories/{id}/restore")
+        return Memory.model_validate(response)
+
+    async def get_quality_score(self, id: str) -> float:
+        """
+        Get the quality score for a memory (async).
+
+        Quality scores range from 0-1 and indicate how valuable/useful a memory is.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Quality score (0.0 to 1.0)
+
+        Example:
+            >>> score = await client.memories.get_quality_score("mem_123")
+            >>> print(f"Quality: {score:.2%}")
+        """
+        validate_id(id, "memory")
+        response = await self._client._request("GET", f"/memories/{id}/quality")
+        return float(response.get("quality_score", 0.0))
+
+    async def get_topics(
+        self,
+        id: str,
+        refresh: bool = False,
+        min_relevance: Optional[float] = None,
+        categories: Optional[List[str]] = None,
+    ) -> List["Topic"]:
+        """
+        Get extracted topics for a memory (async).
+
+        Args:
+            id: Memory ID
+            refresh: Force re-extraction of topics
+            min_relevance: Minimum relevance score (0-1)
+            categories: Filter by specific categories
+
+        Returns:
+            List of Topic objects
+
+        Example:
+            >>> topics = await client.memories.get_topics("mem_123", min_relevance=0.5)
+            >>> for topic in topics:
+            ...     print(f"{topic.name}: {topic.relevance:.0%}")
+        """
+        from ..types import Topic
+
+        validate_id(id, "memory")
+        params: Dict[str, Any] = {}
+        if refresh:
+            params["refresh"] = "true"
+        if min_relevance is not None:
+            params["min_relevance"] = str(min_relevance)
+        if categories:
+            params["categories"] = ",".join(categories)
+
+        response = await self._client._request("GET", f"/memories/{id}/topics", params=params)
+        return [Topic.model_validate(t) for t in response.get("topics", [])]

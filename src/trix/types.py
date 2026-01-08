@@ -28,6 +28,22 @@ class SearchMode(str, Enum):
     HYBRID = "hybrid"
 
 
+class ClusterScale(str, Enum):
+    """Multi-scale clustering levels."""
+
+    FINE = "fine"  # Small, specific clusters
+    MEDIUM = "medium"  # Balanced clusters
+    COARSE = "coarse"  # Large, abstract clusters
+
+
+class ProtectionLevel(str, Enum):
+    """Memory protection levels to control decay and deletion."""
+
+    NONE = "none"  # No protection, normal decay
+    SOFT = "soft"  # Protected from auto-decay, can be manually deleted
+    HARD = "hard"  # Protected from deletion, requires explicit unprotection
+
+
 class RelationshipType(str, Enum):
     """Relationship types between memories."""
 
@@ -257,6 +273,12 @@ class Memory(BaseResponse):
     source_type: Optional[SourceType] = None
     source_id: Optional[str] = None
     source_metadata: Dict[str, Any] = Field(default_factory=dict)
+    # Pinning and protection fields
+    is_pinned: bool = False
+    protection_level: Optional[str] = None  # "none", "soft", "hard"
+    is_deleted: bool = False  # Soft delete flag
+    deleted_at: Optional[datetime] = None
+    quality_score: Optional[float] = None  # 0-1 quality score
 
 
 class MemoryCreate(BaseModel):
@@ -276,6 +298,9 @@ class MemoryCreate(BaseModel):
     source_id: Optional[str] = None
     source_metadata: Optional[Dict[str, Any]] = None
     resource_ids: Optional[List[str]] = None
+    # Pinning and protection fields
+    is_pinned: Optional[bool] = None
+    protection_level: Optional[str] = None  # "none", "soft", "hard"
 
 
 class MemoryUpdate(BaseModel):
@@ -290,6 +315,9 @@ class MemoryUpdate(BaseModel):
     source_type: Optional[SourceType] = None
     source_id: Optional[str] = None
     source_metadata: Optional[Dict[str, Any]] = None
+    # Pinning and protection fields
+    is_pinned: Optional[bool] = None
+    protection_level: Optional[str] = None  # "none", "soft", "hard"
 
 
 class MemoryList(BaseResponse):
@@ -359,6 +387,8 @@ class Cluster(BaseResponse):
     color: Optional[str] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
     memory_count: int = 0
+    scale: Optional[str] = None  # "fine", "medium", "coarse"
+    memories: Optional[List["Memory"]] = None  # Included when requested
     created_at: datetime
     updated_at: datetime
 
@@ -1140,6 +1170,15 @@ class EnrichmentType(str, Enum):
     CUSTOM = "custom"
 
 
+class EnrichmentOperation(str, Enum):
+    """Enrichment operations that can be triggered."""
+
+    TOPICS = "topics"
+    SUMMARY = "summary"
+    ENTITIES = "entities"
+    QUALITY = "quality"
+
+
 class Enrichment(BaseResponse):
     """Enrichment object for a memory."""
 
@@ -1165,6 +1204,33 @@ class EnrichmentResult(BaseResponse):
     triggered: List[str]
     job_ids: Optional[List[str]] = None
     status: str
+
+
+# ============================================================================
+# Topic Types - Topic Extraction
+# ============================================================================
+
+
+class Topic(BaseModel):
+    """Extracted topic from a memory."""
+
+    name: str
+    relevance: float  # 0-1 relevance score
+    category: str
+
+
+class TopicList(BaseResponse):
+    """List of topics extracted from a memory."""
+
+    memory_id: str
+    topics: List[Topic]
+
+
+class TopicSearchResult(BaseResponse):
+    """Result of searching by topic."""
+
+    topic: str
+    memories: List["Memory"]
 
 
 # ============================================================================

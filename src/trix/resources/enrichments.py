@@ -1,10 +1,11 @@
 """Enrichments resource for Trix SDK."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
     Enrichment,
+    EnrichmentOperation,
     EnrichmentResult,
     EnrichmentStatus,
 )
@@ -171,6 +172,56 @@ class EnrichmentsResource:
         )
         return EnrichmentResult.model_validate(response)
 
+    def enrich(
+        self,
+        memory_id: str,
+        operations: Optional[List[Union[EnrichmentOperation, str]]] = None,
+        priority: Optional[str] = None,
+        force: bool = False,
+    ) -> EnrichmentResult:
+        """
+        Trigger LLM enrichment for a memory with specific operations.
+
+        This is a convenience method that accepts EnrichmentOperation enums.
+
+        Args:
+            memory_id: Memory ID
+            operations: List of enrichment operations to trigger (EnrichmentOperation enum or strings)
+            priority: Priority level ('low', 'normal', 'high')
+            force: Force re-processing even if already completed
+
+        Returns:
+            Enrichment result with job info
+
+        Example:
+            >>> from trix import EnrichmentOperation
+            >>> result = client.enrichments.enrich(
+            ...     "mem_123",
+            ...     operations=[
+            ...         EnrichmentOperation.TOPICS,
+            ...         EnrichmentOperation.SUMMARY,
+            ...         EnrichmentOperation.QUALITY
+            ...     ]
+            ... )
+        """
+        validate_id(memory_id, "memory")
+        data: Dict[str, Any] = {}
+        if operations:
+            # Convert EnrichmentOperation enums to strings
+            data["types"] = [
+                op.value if isinstance(op, EnrichmentOperation) else op
+                for op in operations
+            ]
+        if priority:
+            data["priority"] = priority
+        if force:
+            data["force"] = force
+
+        response = self._client._request(
+            "POST", f"/memories/{memory_id}/enrichments", json=data
+        )
+        return EnrichmentResult.model_validate(response)
+
 
 class AsyncEnrichmentsResource:
     """Async resource for managing memory enrichments."""
@@ -257,5 +308,44 @@ class AsyncEnrichmentsResource:
 
         response = await self._client._request(
             "POST", f"/memories/{memory_id}/enrichments/full", json=data
+        )
+        return EnrichmentResult.model_validate(response)
+
+    async def enrich(
+        self,
+        memory_id: str,
+        operations: Optional[List[Union[EnrichmentOperation, str]]] = None,
+        priority: Optional[str] = None,
+        force: bool = False,
+    ) -> EnrichmentResult:
+        """
+        Trigger LLM enrichment for a memory with specific operations (async).
+
+        This is a convenience method that accepts EnrichmentOperation enums.
+
+        Args:
+            memory_id: Memory ID
+            operations: List of enrichment operations to trigger (EnrichmentOperation enum or strings)
+            priority: Priority level ('low', 'normal', 'high')
+            force: Force re-processing even if already completed
+
+        Returns:
+            Enrichment result with job info
+        """
+        validate_id(memory_id, "memory")
+        data: Dict[str, Any] = {}
+        if operations:
+            # Convert EnrichmentOperation enums to strings
+            data["types"] = [
+                op.value if isinstance(op, EnrichmentOperation) else op
+                for op in operations
+            ]
+        if priority:
+            data["priority"] = priority
+        if force:
+            data["force"] = force
+
+        response = await self._client._request(
+            "POST", f"/memories/{memory_id}/enrichments", json=data
         )
         return EnrichmentResult.model_validate(response)

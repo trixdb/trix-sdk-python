@@ -108,6 +108,80 @@ class SearchResource(BaseSyncResource):
         response = self._request("GET", "/search/config")
         return SearchConfig.model_validate(response)
 
+    def query(
+        self,
+        query: str,
+        limit: int = 10,
+        threshold: Optional[float] = None,
+        cluster_scale: Optional[str] = None,
+        space_id: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+    ) -> SearchResults:
+        """Search memories with semantic query.
+
+        Args:
+            query: Search query text
+            limit: Maximum number of results
+            threshold: Minimum similarity threshold
+            cluster_scale: Filter by cluster scale ("fine", "medium", "coarse")
+            space_id: Filter by space
+            tags: Filter by tags
+
+        Returns:
+            Search results with similarity scores
+
+        Example:
+            >>> # Basic search
+            >>> results = client.search.query("project deadlines")
+            >>>
+            >>> # Search within coarse clusters
+            >>> results = client.search.query(
+            ...     "project deadlines",
+            ...     cluster_scale="coarse",
+            ...     limit=20
+            ... )
+        """
+        params: Dict[str, Any] = {"q": query, "limit": limit}
+        if threshold is not None:
+            params["threshold"] = str(threshold)
+        if cluster_scale:
+            params["cluster_scale"] = cluster_scale
+        if space_id:
+            params["space_id"] = space_id
+        if tags:
+            params["tags"] = ",".join(tags)
+
+        response = self._request("GET", "/search", params=params)
+        return SearchResults.model_validate(response)
+
+    def by_topic(
+        self,
+        topic: str,
+        limit: int = 10,
+        space_id: Optional[str] = None,
+    ) -> SearchResults:
+        """Search memories by topic.
+
+        Args:
+            topic: Topic name to search for
+            limit: Maximum number of results
+            space_id: Filter by space
+
+        Returns:
+            Search results for memories matching the topic
+
+        Example:
+            >>> results = client.search.by_topic("machine learning")
+            >>> for result in results.data:
+            ...     print(result.memory.content)
+        """
+        params: Dict[str, Any] = {"topic": topic, "limit": limit}
+        if space_id:
+            params["space_id"] = space_id
+
+        response = self._request("GET", "/search/topic", params=params)
+        return SearchResults.model_validate(response)
+
 
 class AsyncSearchResource(BaseAsyncResource):
     """Async resource for search and embeddings.
@@ -169,3 +243,61 @@ class AsyncSearchResource(BaseAsyncResource):
         """
         response = await self._request("GET", "/search/config")
         return SearchConfig.model_validate(response)
+
+    async def query(
+        self,
+        query: str,
+        limit: int = 10,
+        threshold: Optional[float] = None,
+        cluster_scale: Optional[str] = None,
+        space_id: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+    ) -> SearchResults:
+        """Search memories with semantic query (async).
+
+        Args:
+            query: Search query text
+            limit: Maximum number of results
+            threshold: Minimum similarity threshold
+            cluster_scale: Filter by cluster scale ("fine", "medium", "coarse")
+            space_id: Filter by space
+            tags: Filter by tags
+
+        Returns:
+            Search results with similarity scores
+        """
+        params: Dict[str, Any] = {"q": query, "limit": limit}
+        if threshold is not None:
+            params["threshold"] = str(threshold)
+        if cluster_scale:
+            params["cluster_scale"] = cluster_scale
+        if space_id:
+            params["space_id"] = space_id
+        if tags:
+            params["tags"] = ",".join(tags)
+
+        response = await self._request("GET", "/search", params=params)
+        return SearchResults.model_validate(response)
+
+    async def by_topic(
+        self,
+        topic: str,
+        limit: int = 10,
+        space_id: Optional[str] = None,
+    ) -> SearchResults:
+        """Search memories by topic (async).
+
+        Args:
+            topic: Topic name to search for
+            limit: Maximum number of results
+            space_id: Filter by space
+
+        Returns:
+            Search results for memories matching the topic
+        """
+        params: Dict[str, Any] = {"topic": topic, "limit": limit}
+        if space_id:
+            params["space_id"] = space_id
+
+        response = await self._request("GET", "/search/topic", params=params)
+        return SearchResults.model_validate(response)

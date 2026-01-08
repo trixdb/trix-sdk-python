@@ -67,6 +67,7 @@ class ClustersResource:
         sort: Optional[str] = None,
         limit: int = 100,
         cursor: Optional[str] = None,
+        scale: Optional[str] = None,
     ) -> ClusterList:
         """
         List clusters with optional filtering.
@@ -76,12 +77,17 @@ class ClustersResource:
             sort: Sort field
             limit: Maximum number of results
             cursor: Pagination cursor
+            scale: Filter by cluster scale ("fine", "medium", "coarse")
 
         Returns:
             List of clusters with pagination
 
         Example:
+            >>> # List all clusters
             >>> clusters = client.clusters.list(q="work", limit=50)
+            >>>
+            >>> # List only fine-grained clusters
+            >>> clusters = client.clusters.list(scale="fine")
         """
         params: Dict[str, Any] = {"limit": limit}
         if q:
@@ -90,6 +96,8 @@ class ClustersResource:
             params["sort"] = sort
         if cursor:
             params["cursor"] = cursor
+        if scale:
+            params["scale"] = scale
 
         response = self._client._request("GET", "/clusters", params=params)
         return ClusterList.model_validate(response)
@@ -132,21 +140,29 @@ class ClustersResource:
         for item in paginator:
             yield Cluster.model_validate(item)
 
-    def get(self, id: str) -> Cluster:
+    def get(self, id: str, include_memories: bool = False) -> Cluster:
         """
         Get a cluster by ID.
 
         Args:
             id: Cluster ID
+            include_memories: If True, include memories in the cluster
 
         Returns:
-            Cluster object
+            Cluster object (with memories if include_memories=True)
 
         Example:
             >>> cluster = client.clusters.get("cluster_123")
+            >>> # Get cluster with all its memories
+            >>> cluster = client.clusters.get("cluster_123", include_memories=True)
+            >>> for memory in cluster.memories or []:
+            ...     print(memory.content)
         """
         validate_id(id, "cluster")
-        response = self._client._request("GET", f"/clusters/{id}")
+        params: Dict[str, Any] = {}
+        if include_memories:
+            params["include_memories"] = "true"
+        response = self._client._request("GET", f"/clusters/{id}", params=params)
         return Cluster.model_validate(response)
 
     def update(
@@ -417,6 +433,7 @@ class AsyncClustersResource:
         sort: Optional[str] = None,
         limit: int = 100,
         cursor: Optional[str] = None,
+        scale: Optional[str] = None,
     ) -> ClusterList:
         """List clusters with optional filtering (async)."""
         params: Dict[str, Any] = {"limit": limit}
@@ -426,6 +443,8 @@ class AsyncClustersResource:
             params["sort"] = sort
         if cursor:
             params["cursor"] = cursor
+        if scale:
+            params["scale"] = scale
 
         response = await self._client._request("GET", "/clusters", params=params)
         return ClusterList.model_validate(response)
@@ -451,10 +470,13 @@ class AsyncClustersResource:
             max_items=max_items,
         )
 
-    async def get(self, id: str) -> Cluster:
+    async def get(self, id: str, include_memories: bool = False) -> Cluster:
         """Get a cluster by ID (async)."""
         validate_id(id, "cluster")
-        response = await self._client._request("GET", f"/clusters/{id}")
+        params: Dict[str, Any] = {}
+        if include_memories:
+            params["include_memories"] = "true"
+        response = await self._client._request("GET", f"/clusters/{id}", params=params)
         return Cluster.model_validate(response)
 
     async def update(
