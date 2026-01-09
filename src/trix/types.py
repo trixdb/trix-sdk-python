@@ -18,6 +18,7 @@ class MemoryType(str, Enum):
     MARKDOWN = "markdown"
     URL = "url"
     AUDIO = "audio"
+    IMAGE = "image"
 
 
 class SearchMode(str, Enum):
@@ -1720,3 +1721,148 @@ class SessionStats(BaseResponse):
     by_type: Dict[str, int]
     total_messages: int
     total_memories: int
+
+
+# ============================================================================
+# Image Types - Visual Search and Image Processing
+# ============================================================================
+
+
+class VisualSearchResult(BaseResponse):
+    """Result of visual similarity search.
+
+    Attributes:
+        memory: The matching memory object.
+        score: Similarity score (0-1).
+        distance: Distance metric value (lower is more similar).
+    """
+
+    memory: "Memory"
+    score: float
+    distance: Optional[float] = None
+
+
+class VisualSearchResults(BaseResponse):
+    """List of visual search results.
+
+    Attributes:
+        data: List of visual search results.
+        query_type: Type of query performed (image, text).
+    """
+
+    data: List[VisualSearchResult]
+    query_type: Optional[str] = None
+
+
+class ImageCluster(BaseModel):
+    """A cluster of visually similar images.
+
+    Attributes:
+        cluster_id: Unique identifier for the cluster.
+        representative_id: Memory ID of the representative image.
+        memory_ids: List of memory IDs in this cluster.
+        size: Number of images in the cluster.
+        centroid: Optional cluster centroid embedding.
+    """
+
+    cluster_id: int
+    representative_id: Optional[str] = None
+    memory_ids: List[str]
+    size: int
+    centroid: Optional[List[float]] = None
+
+
+class ImageClusterResult(BaseResponse):
+    """Result of image clustering operation.
+
+    Attributes:
+        clusters: List of image clusters.
+        total_images: Total number of images clustered.
+        num_clusters: Number of clusters created.
+        silhouette_score: Optional quality metric for clustering.
+    """
+
+    clusters: List[ImageCluster]
+    total_images: int
+    num_clusters: int
+    silhouette_score: Optional[float] = None
+
+
+class ImageTag(BaseModel):
+    """Auto-generated tag for an image.
+
+    Attributes:
+        name: Tag name/label.
+        confidence: Confidence score (0-1).
+        category: Optional category for the tag.
+    """
+
+    name: str
+    confidence: float
+    category: Optional[str] = None
+
+
+class AutoTagResult(BaseResponse):
+    """Result of auto-tagging an image.
+
+    Attributes:
+        image_id: Memory ID of the tagged image.
+        tags: List of generated tags.
+        applied: Whether tags were applied to the memory.
+    """
+
+    image_id: str
+    tags: List[ImageTag]
+    applied: bool = False
+
+
+class BatchAutoTagResult(BaseResponse):
+    """Result of batch auto-tagging images.
+
+    Attributes:
+        results: List of auto-tag results.
+        success: Number of successfully tagged images.
+        failed: Number of failed images.
+    """
+
+    results: List[AutoTagResult]
+    success: int
+    failed: int
+
+
+class DuplicateCheckResult(BaseResponse):
+    """Result of duplicate image check.
+
+    Attributes:
+        is_duplicate: Whether the image is a duplicate.
+        duplicates: List of potential duplicate memory IDs with scores.
+        threshold: Similarity threshold used.
+    """
+
+    is_duplicate: bool
+    duplicates: List[Dict[str, Any]] = Field(default_factory=list)
+    threshold: float = 0.95
+
+
+class QuerySuggestion(BaseModel):
+    """A suggested search query.
+
+    Attributes:
+        query: The suggested query text.
+        type: Type of suggestion (tag, topic, etc.).
+        count: Number of matching memories.
+    """
+
+    query: str
+    type: str
+    count: Optional[int] = None
+
+
+class QuerySuggestionsResult(BaseResponse):
+    """Result of query suggestions.
+
+    Attributes:
+        suggestions: List of query suggestions.
+    """
+
+    suggestions: List[QuerySuggestion]

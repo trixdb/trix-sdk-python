@@ -16,7 +16,11 @@ from typing import (
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
+    AutoTagResult,
+    BatchAutoTagResult,
     BulkResult,
+    DuplicateCheckResult,
+    ImageClusterResult,
     Memory,
     MemoryConfig,
     MemoryCreate,
@@ -24,7 +28,9 @@ from ..types import (
     MemoryOptions,
     MemoryType,
     MemoryUpdate,
+    QuerySuggestionsResult,
     SearchMode,
+    VisualSearchResults,
 )
 from ..utils.pagination import AsyncPaginator, SyncPaginator
 from ..utils.security import validate_id
@@ -857,6 +863,503 @@ class MemoriesResource:
         response = self._client._request("GET", f"/memories/{id}/topics", params=params)
         return [Topic.model_validate(t) for t in response.get("topics", [])]
 
+    # =========================================================================
+    # Image Support
+    # =========================================================================
+
+    def create_with_image(
+        self,
+        image_file: Union[BinaryIO, Path, str, bytes],
+        filename: Optional[str] = None,
+        content_type: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        space_id: Optional[str] = None,
+        description: Optional[str] = None,
+    ) -> Memory:
+        """
+        Create a memory from an image file.
+
+        Supports image formats: jpg, jpeg, png, gif, webp, bmp, tiff.
+
+        Args:
+            image_file: File object, path, string path, or bytes of the image
+            filename: Override filename (default: extracted from path or "image")
+            content_type: MIME type (e.g., 'image/jpeg', 'image/png').
+                         If not provided, will be inferred from filename.
+            tags: List of tags for categorization
+            metadata: Additional metadata
+            space_id: ID of the space to add memory to
+            description: Optional text description of the image
+
+        Returns:
+            Created memory object
+
+        Example:
+            >>> # Upload image file
+            >>> memory = client.memories.create_with_image(
+            ...     "photo.jpg",
+            ...     tags=["vacation", "beach"],
+            ...     description="Beach sunset photo"
+            ... )
+            >>>
+            >>> # Upload from bytes
+            >>> with open("image.png", "rb") as f:
+            ...     image_bytes = f.read()
+            >>> memory = client.memories.create_with_image(
+            ...     image_bytes,
+            ...     filename="image.png",
+            ...     content_type="image/png"
+            ... )
+        """
+        # Handle different input types
+        file_handle: BinaryIO
+        should_close = False
+
+        if isinstance(image_file, bytes):
+            import io
+            file_handle = io.BytesIO(image_file)
+            filename = filename or "image"
+        elif isinstance(image_file, (str, Path)):
+            path = Path(image_file)
+            filename = filename or path.name
+            file_handle = open(path, "rb")
+            should_close = True
+        else:
+            filename = filename or "image"
+            file_handle = image_file
+
+        # Infer content type from filename if not provided
+        if content_type is None:
+            ext = Path(filename).suffix.lower() if filename else ""
+            content_type_map = {
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".png": "image/png",
+                ".gif": "image/gif",
+                ".webp": "image/webp",
+                ".bmp": "image/bmp",
+                ".tiff": "image/tiff",
+                ".tif": "image/tiff",
+            }
+            content_type = content_type_map.get(ext, "image/jpeg")
+
+        try:
+            # Build form data
+            data: Dict[str, Any] = {"type": "image"}
+            if tags:
+                data["tags"] = ",".join(tags)
+            if metadata:
+                data["metadata"] = json.dumps(metadata)
+            if space_id:
+                data["space_id"] = space_id
+            if description:
+                data["content"] = description
+
+            files: Dict[str, Any] = {"file": (filename, file_handle, content_type)}
+
+            response = self._client._request_multipart("POST", "/memories", data=data, files=files)
+            return Memory.model_validate(response)
+        finally:
+            if should_close:
+                file_handle.close()
+
+    def get_image(self, id: str) -> bytes:
+        """
+        Get original image content for an image memory.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Image data as bytes
+
+        Example:
+            >>> image_data = client.memories.get_image("mem_123")
+            >>> with open("downloaded.jpg", "wb") as f:
+            ...     f.write(image_data)
+        """
+        validate_id(id, "memory")
+        return self._client._request_raw("GET", f"/memories/{id}/image")
+
+    def get_thumbnail(self, id: str) -> bytes:
+        """
+        Get thumbnail image for an image memory.
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Thumbnail image data as bytes
+
+        Example:
+            >>> thumbnail = client.memories.get_thumbnail("mem_123")
+            >>> with open("thumb.jpg", "wb") as f:
+            ...     f.write(thumbnail)
+        """
+        validate_id(id, "memory")
+        return self._client._request_raw("GET", f"/memories/{id}/thumbnail")
+
+    def search_visual(
+        self,
+        image: Union[BinaryIO, Path, str, bytes],
+        filename: Optional[str] = None,
+        content_type: Optional[str] = None,
+        limit: int = 10,
+        threshold: Optional[float] = None,
+        space_id: Optional[str] = None,
+    ) -> VisualSearchResults:
+        """
+        Search for visually similar images by uploading a query image.
+
+        Args:
+            image: Query image as file object, path, string path, or bytes
+            filename: Override filename (default: extracted from path or "query")
+            content_type: MIME type (e.g., 'image/jpeg'). Inferred if not provided.
+            limit: Maximum number of results (default: 10)
+            threshold: Minimum similarity threshold (0-1)
+            space_id: Filter results by space
+
+        Returns:
+            Visual search results with matching memories and scores
+
+        Example:
+            >>> results = client.memories.search_visual(
+            ...     "query_image.jpg",
+            ...     limit=5,
+            ...     threshold=0.8
+            ... )
+            >>> for result in results.data:
+            ...     print(f"{result.memory.id}: {result.score:.2f}")
+        """
+        # Handle different input types
+        file_handle: BinaryIO
+        should_close = False
+
+        if isinstance(image, bytes):
+            import io
+            file_handle = io.BytesIO(image)
+            filename = filename or "query"
+        elif isinstance(image, (str, Path)):
+            path = Path(image)
+            filename = filename or path.name
+            file_handle = open(path, "rb")
+            should_close = True
+        else:
+            filename = filename or "query"
+            file_handle = image
+
+        # Infer content type from filename if not provided
+        if content_type is None:
+            ext = Path(filename).suffix.lower() if filename else ""
+            content_type_map = {
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".png": "image/png",
+                ".gif": "image/gif",
+                ".webp": "image/webp",
+            }
+            content_type = content_type_map.get(ext, "image/jpeg")
+
+        try:
+            data: Dict[str, Any] = {"limit": str(limit)}
+            if threshold is not None:
+                data["threshold"] = str(threshold)
+            if space_id:
+                data["space_id"] = space_id
+
+            files: Dict[str, Any] = {"file": (filename, file_handle, content_type)}
+
+            response = self._client._request_multipart(
+                "POST", "/memories/search/visual", data=data, files=files
+            )
+            return VisualSearchResults.model_validate(response)
+        finally:
+            if should_close:
+                file_handle.close()
+
+    def search_by_text(
+        self,
+        query: str,
+        limit: int = 10,
+        threshold: Optional[float] = None,
+        space_id: Optional[str] = None,
+    ) -> VisualSearchResults:
+        """
+        Search for images using a text query (multi-modal text-to-image search).
+
+        Args:
+            query: Text description to search for
+            limit: Maximum number of results (default: 10)
+            threshold: Minimum similarity threshold (0-1)
+            space_id: Filter results by space
+
+        Returns:
+            Visual search results with matching image memories
+
+        Example:
+            >>> results = client.memories.search_by_text(
+            ...     "sunset on the beach",
+            ...     limit=5
+            ... )
+            >>> for result in results.data:
+            ...     print(f"{result.memory.id}: {result.score:.2f}")
+        """
+        body: Dict[str, Any] = {
+            "query": query,
+            "limit": limit,
+        }
+        if threshold is not None:
+            body["threshold"] = threshold
+        if space_id:
+            body["space_id"] = space_id
+
+        response = self._client._request("POST", "/memories/search/text", json=body)
+        return VisualSearchResults.model_validate(response)
+
+    def find_similar(
+        self,
+        id: str,
+        type: str = "image",
+        limit: int = 10,
+        threshold: Optional[float] = None,
+    ) -> VisualSearchResults:
+        """
+        Find visually similar images to a given memory.
+
+        Args:
+            id: Memory ID to find similar images for
+            type: Similarity type ("image" for visual similarity)
+            limit: Maximum number of results (default: 10)
+            threshold: Minimum similarity threshold (0-1)
+
+        Returns:
+            Visual search results with similar memories
+
+        Example:
+            >>> similar = client.memories.find_similar(
+            ...     "mem_123",
+            ...     type="image",
+            ...     limit=5
+            ... )
+            >>> for result in similar.data:
+            ...     print(f"{result.memory.id}: {result.score:.2f}")
+        """
+        validate_id(id, "memory")
+        params: Dict[str, Any] = {
+            "type": type,
+            "limit": limit,
+        }
+        if threshold is not None:
+            params["threshold"] = threshold
+
+        response = self._client._request("GET", f"/memories/{id}/similar", params=params)
+        return VisualSearchResults.model_validate(response)
+
+    def check_duplicates(
+        self,
+        image: Union[BinaryIO, Path, str, bytes],
+        filename: Optional[str] = None,
+        content_type: Optional[str] = None,
+        threshold: float = 0.95,
+        space_id: Optional[str] = None,
+    ) -> DuplicateCheckResult:
+        """
+        Check if an image has duplicates in the memory store.
+
+        Args:
+            image: Image to check as file object, path, string path, or bytes
+            filename: Override filename (default: extracted from path or "check")
+            content_type: MIME type (e.g., 'image/jpeg'). Inferred if not provided.
+            threshold: Similarity threshold for duplicate detection (default: 0.95)
+            space_id: Filter search within a specific space
+
+        Returns:
+            Duplicate check result with is_duplicate flag and matching memories
+
+        Example:
+            >>> result = client.memories.check_duplicates(
+            ...     "photo.jpg",
+            ...     threshold=0.90
+            ... )
+            >>> if result.is_duplicate:
+            ...     print(f"Found {len(result.duplicates)} duplicates")
+        """
+        # Handle different input types
+        file_handle: BinaryIO
+        should_close = False
+
+        if isinstance(image, bytes):
+            import io
+            file_handle = io.BytesIO(image)
+            filename = filename or "check"
+        elif isinstance(image, (str, Path)):
+            path = Path(image)
+            filename = filename or path.name
+            file_handle = open(path, "rb")
+            should_close = True
+        else:
+            filename = filename or "check"
+            file_handle = image
+
+        # Infer content type from filename if not provided
+        if content_type is None:
+            ext = Path(filename).suffix.lower() if filename else ""
+            content_type_map = {
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".png": "image/png",
+                ".gif": "image/gif",
+                ".webp": "image/webp",
+            }
+            content_type = content_type_map.get(ext, "image/jpeg")
+
+        try:
+            data: Dict[str, Any] = {"threshold": str(threshold)}
+            if space_id:
+                data["space_id"] = space_id
+
+            files: Dict[str, Any] = {"file": (filename, file_handle, content_type)}
+
+            response = self._client._request_multipart(
+                "POST", "/memories/check-duplicates", data=data, files=files
+            )
+            return DuplicateCheckResult.model_validate(response)
+        finally:
+            if should_close:
+                file_handle.close()
+
+    def cluster_images(
+        self,
+        space_id: Optional[str] = None,
+        num_clusters: int = 10,
+        algorithm: str = "kmeans",
+    ) -> ImageClusterResult:
+        """
+        Cluster images by visual similarity.
+
+        Args:
+            space_id: Optional space ID to filter images
+            num_clusters: Target number of clusters (default: 10)
+            algorithm: Clustering algorithm ("kmeans", "hierarchical")
+
+        Returns:
+            Image clustering result with cluster assignments
+
+        Example:
+            >>> result = client.memories.cluster_images(
+            ...     num_clusters=5,
+            ...     algorithm="kmeans"
+            ... )
+            >>> for cluster in result.clusters:
+            ...     print(f"Cluster {cluster.cluster_id}: {cluster.size} images")
+        """
+        body: Dict[str, Any] = {
+            "num_clusters": num_clusters,
+            "algorithm": algorithm,
+        }
+        if space_id:
+            body["space_id"] = space_id
+
+        response = self._client._request("POST", "/memories/images/cluster", json=body)
+        return ImageClusterResult.model_validate(response)
+
+    def auto_tag(
+        self,
+        image_id: str,
+        apply: bool = False,
+        min_confidence: float = 0.5,
+    ) -> AutoTagResult:
+        """
+        Generate automatic tags for a single image.
+
+        Args:
+            image_id: Memory ID of the image to tag
+            apply: Whether to apply generated tags to the memory (default: False)
+            min_confidence: Minimum confidence threshold for tags (default: 0.5)
+
+        Returns:
+            Auto-tag result with generated tags
+
+        Example:
+            >>> result = client.memories.auto_tag("mem_123", apply=True)
+            >>> for tag in result.tags:
+            ...     print(f"{tag.name}: {tag.confidence:.2f}")
+        """
+        validate_id(image_id, "image")
+        body: Dict[str, Any] = {
+            "apply": apply,
+            "min_confidence": min_confidence,
+        }
+
+        response = self._client._request(
+            "POST", f"/memories/images/{image_id}/auto-tag", json=body
+        )
+        return AutoTagResult.model_validate(response)
+
+    def batch_auto_tag(
+        self,
+        image_ids: List[str],
+        apply: bool = False,
+        min_confidence: float = 0.5,
+    ) -> BatchAutoTagResult:
+        """
+        Generate automatic tags for multiple images.
+
+        Args:
+            image_ids: List of memory IDs to auto-tag
+            apply: Whether to apply generated tags to memories (default: False)
+            min_confidence: Minimum confidence threshold for tags (default: 0.5)
+
+        Returns:
+            Batch auto-tag result with individual results
+
+        Example:
+            >>> result = client.memories.batch_auto_tag(
+            ...     ["mem_123", "mem_456", "mem_789"],
+            ...     apply=True
+            ... )
+            >>> print(f"Successfully tagged {result.success} images")
+        """
+        for i, image_id in enumerate(image_ids):
+            validate_id(image_id, f"image[{i}]")
+
+        body: Dict[str, Any] = {
+            "image_ids": image_ids,
+            "apply": apply,
+            "min_confidence": min_confidence,
+        }
+
+        response = self._client._request("POST", "/memories/images/batch-auto-tag", json=body)
+        return BatchAutoTagResult.model_validate(response)
+
+    def suggest_queries(
+        self,
+        space_id: Optional[str] = None,
+        limit: int = 20,
+    ) -> QuerySuggestionsResult:
+        """
+        Get suggested search queries based on image content.
+
+        Args:
+            space_id: Optional space ID to filter suggestions
+            limit: Maximum number of suggestions (default: 20)
+
+        Returns:
+            Query suggestions result with suggested queries
+
+        Example:
+            >>> suggestions = client.memories.suggest_queries(limit=10)
+            >>> for suggestion in suggestions.suggestions:
+            ...     print(f"{suggestion.query} ({suggestion.type})")
+        """
+        params: Dict[str, Any] = {"limit": limit}
+        if space_id:
+            params["space_id"] = space_id
+
+        response = self._client._request("GET", "/memories/images/suggest-queries", params=params)
+        return QuerySuggestionsResult.model_validate(response)
+
 
 class AsyncMemoriesResource:
     """Async resource for managing memories."""
@@ -1519,3 +2022,495 @@ class AsyncMemoriesResource:
 
         response = await self._client._request("GET", f"/memories/{id}/topics", params=params)
         return [Topic.model_validate(t) for t in response.get("topics", [])]
+
+    # =========================================================================
+    # Image Support (async)
+    # =========================================================================
+
+    async def create_with_image(
+        self,
+        image_file: Union[BinaryIO, Path, str, bytes],
+        filename: Optional[str] = None,
+        content_type: Optional[str] = None,
+        tags: Optional[List[str]] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+        space_id: Optional[str] = None,
+        description: Optional[str] = None,
+    ) -> Memory:
+        """
+        Create a memory from an image file (async).
+
+        Supports image formats: jpg, jpeg, png, gif, webp, bmp, tiff.
+
+        Args:
+            image_file: File object, path, string path, or bytes of the image
+            filename: Override filename (default: extracted from path or "image")
+            content_type: MIME type (e.g., 'image/jpeg', 'image/png').
+                         If not provided, will be inferred from filename.
+            tags: List of tags for categorization
+            metadata: Additional metadata
+            space_id: ID of the space to add memory to
+            description: Optional text description of the image
+
+        Returns:
+            Created memory object
+
+        Example:
+            >>> # Upload image file
+            >>> memory = await client.memories.create_with_image(
+            ...     "photo.jpg",
+            ...     tags=["vacation", "beach"],
+            ...     description="Beach sunset photo"
+            ... )
+        """
+        # Handle different input types
+        file_handle: BinaryIO
+        should_close = False
+
+        if isinstance(image_file, bytes):
+            import io
+            file_handle = io.BytesIO(image_file)
+            filename = filename or "image"
+        elif isinstance(image_file, (str, Path)):
+            path = Path(image_file)
+            filename = filename or path.name
+            file_handle = open(path, "rb")
+            should_close = True
+        else:
+            filename = filename or "image"
+            file_handle = image_file
+
+        # Infer content type from filename if not provided
+        if content_type is None:
+            ext = Path(filename).suffix.lower() if filename else ""
+            content_type_map = {
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".png": "image/png",
+                ".gif": "image/gif",
+                ".webp": "image/webp",
+                ".bmp": "image/bmp",
+                ".tiff": "image/tiff",
+                ".tif": "image/tiff",
+            }
+            content_type = content_type_map.get(ext, "image/jpeg")
+
+        try:
+            # Build form data
+            data: Dict[str, Any] = {"type": "image"}
+            if tags:
+                data["tags"] = ",".join(tags)
+            if metadata:
+                data["metadata"] = json.dumps(metadata)
+            if space_id:
+                data["space_id"] = space_id
+            if description:
+                data["content"] = description
+
+            files: Dict[str, Any] = {"file": (filename, file_handle, content_type)}
+
+            response = await self._client._request_multipart(
+                "POST", "/memories", data=data, files=files
+            )
+            return Memory.model_validate(response)
+        finally:
+            if should_close:
+                file_handle.close()
+
+    async def get_image(self, id: str) -> bytes:
+        """
+        Get original image content for an image memory (async).
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Image data as bytes
+
+        Example:
+            >>> image_data = await client.memories.get_image("mem_123")
+            >>> async with aiofiles.open("downloaded.jpg", "wb") as f:
+            ...     await f.write(image_data)
+        """
+        validate_id(id, "memory")
+        return await self._client._request_raw("GET", f"/memories/{id}/image")
+
+    async def get_thumbnail(self, id: str) -> bytes:
+        """
+        Get thumbnail image for an image memory (async).
+
+        Args:
+            id: Memory ID
+
+        Returns:
+            Thumbnail image data as bytes
+
+        Example:
+            >>> thumbnail = await client.memories.get_thumbnail("mem_123")
+            >>> async with aiofiles.open("thumb.jpg", "wb") as f:
+            ...     await f.write(thumbnail)
+        """
+        validate_id(id, "memory")
+        return await self._client._request_raw("GET", f"/memories/{id}/thumbnail")
+
+    async def search_visual(
+        self,
+        image: Union[BinaryIO, Path, str, bytes],
+        filename: Optional[str] = None,
+        content_type: Optional[str] = None,
+        limit: int = 10,
+        threshold: Optional[float] = None,
+        space_id: Optional[str] = None,
+    ) -> VisualSearchResults:
+        """
+        Search for visually similar images by uploading a query image (async).
+
+        Args:
+            image: Query image as file object, path, string path, or bytes
+            filename: Override filename (default: extracted from path or "query")
+            content_type: MIME type (e.g., 'image/jpeg'). Inferred if not provided.
+            limit: Maximum number of results (default: 10)
+            threshold: Minimum similarity threshold (0-1)
+            space_id: Filter results by space
+
+        Returns:
+            Visual search results with matching memories and scores
+
+        Example:
+            >>> results = await client.memories.search_visual(
+            ...     "query_image.jpg",
+            ...     limit=5,
+            ...     threshold=0.8
+            ... )
+            >>> for result in results.data:
+            ...     print(f"{result.memory.id}: {result.score:.2f}")
+        """
+        # Handle different input types
+        file_handle: BinaryIO
+        should_close = False
+
+        if isinstance(image, bytes):
+            import io
+            file_handle = io.BytesIO(image)
+            filename = filename or "query"
+        elif isinstance(image, (str, Path)):
+            path = Path(image)
+            filename = filename or path.name
+            file_handle = open(path, "rb")
+            should_close = True
+        else:
+            filename = filename or "query"
+            file_handle = image
+
+        # Infer content type from filename if not provided
+        if content_type is None:
+            ext = Path(filename).suffix.lower() if filename else ""
+            content_type_map = {
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".png": "image/png",
+                ".gif": "image/gif",
+                ".webp": "image/webp",
+            }
+            content_type = content_type_map.get(ext, "image/jpeg")
+
+        try:
+            data: Dict[str, Any] = {"limit": str(limit)}
+            if threshold is not None:
+                data["threshold"] = str(threshold)
+            if space_id:
+                data["space_id"] = space_id
+
+            files: Dict[str, Any] = {"file": (filename, file_handle, content_type)}
+
+            response = await self._client._request_multipart(
+                "POST", "/memories/search/visual", data=data, files=files
+            )
+            return VisualSearchResults.model_validate(response)
+        finally:
+            if should_close:
+                file_handle.close()
+
+    async def search_by_text(
+        self,
+        query: str,
+        limit: int = 10,
+        threshold: Optional[float] = None,
+        space_id: Optional[str] = None,
+    ) -> VisualSearchResults:
+        """
+        Search for images using a text query (multi-modal text-to-image search) (async).
+
+        Args:
+            query: Text description to search for
+            limit: Maximum number of results (default: 10)
+            threshold: Minimum similarity threshold (0-1)
+            space_id: Filter results by space
+
+        Returns:
+            Visual search results with matching image memories
+
+        Example:
+            >>> results = await client.memories.search_by_text(
+            ...     "sunset on the beach",
+            ...     limit=5
+            ... )
+            >>> for result in results.data:
+            ...     print(f"{result.memory.id}: {result.score:.2f}")
+        """
+        body: Dict[str, Any] = {
+            "query": query,
+            "limit": limit,
+        }
+        if threshold is not None:
+            body["threshold"] = threshold
+        if space_id:
+            body["space_id"] = space_id
+
+        response = await self._client._request("POST", "/memories/search/text", json=body)
+        return VisualSearchResults.model_validate(response)
+
+    async def find_similar(
+        self,
+        id: str,
+        type: str = "image",
+        limit: int = 10,
+        threshold: Optional[float] = None,
+    ) -> VisualSearchResults:
+        """
+        Find visually similar images to a given memory (async).
+
+        Args:
+            id: Memory ID to find similar images for
+            type: Similarity type ("image" for visual similarity)
+            limit: Maximum number of results (default: 10)
+            threshold: Minimum similarity threshold (0-1)
+
+        Returns:
+            Visual search results with similar memories
+
+        Example:
+            >>> similar = await client.memories.find_similar(
+            ...     "mem_123",
+            ...     type="image",
+            ...     limit=5
+            ... )
+            >>> for result in similar.data:
+            ...     print(f"{result.memory.id}: {result.score:.2f}")
+        """
+        validate_id(id, "memory")
+        params: Dict[str, Any] = {
+            "type": type,
+            "limit": limit,
+        }
+        if threshold is not None:
+            params["threshold"] = threshold
+
+        response = await self._client._request("GET", f"/memories/{id}/similar", params=params)
+        return VisualSearchResults.model_validate(response)
+
+    async def check_duplicates(
+        self,
+        image: Union[BinaryIO, Path, str, bytes],
+        filename: Optional[str] = None,
+        content_type: Optional[str] = None,
+        threshold: float = 0.95,
+        space_id: Optional[str] = None,
+    ) -> DuplicateCheckResult:
+        """
+        Check if an image has duplicates in the memory store (async).
+
+        Args:
+            image: Image to check as file object, path, string path, or bytes
+            filename: Override filename (default: extracted from path or "check")
+            content_type: MIME type (e.g., 'image/jpeg'). Inferred if not provided.
+            threshold: Similarity threshold for duplicate detection (default: 0.95)
+            space_id: Filter search within a specific space
+
+        Returns:
+            Duplicate check result with is_duplicate flag and matching memories
+
+        Example:
+            >>> result = await client.memories.check_duplicates(
+            ...     "photo.jpg",
+            ...     threshold=0.90
+            ... )
+            >>> if result.is_duplicate:
+            ...     print(f"Found {len(result.duplicates)} duplicates")
+        """
+        # Handle different input types
+        file_handle: BinaryIO
+        should_close = False
+
+        if isinstance(image, bytes):
+            import io
+            file_handle = io.BytesIO(image)
+            filename = filename or "check"
+        elif isinstance(image, (str, Path)):
+            path = Path(image)
+            filename = filename or path.name
+            file_handle = open(path, "rb")
+            should_close = True
+        else:
+            filename = filename or "check"
+            file_handle = image
+
+        # Infer content type from filename if not provided
+        if content_type is None:
+            ext = Path(filename).suffix.lower() if filename else ""
+            content_type_map = {
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".png": "image/png",
+                ".gif": "image/gif",
+                ".webp": "image/webp",
+            }
+            content_type = content_type_map.get(ext, "image/jpeg")
+
+        try:
+            data: Dict[str, Any] = {"threshold": str(threshold)}
+            if space_id:
+                data["space_id"] = space_id
+
+            files: Dict[str, Any] = {"file": (filename, file_handle, content_type)}
+
+            response = await self._client._request_multipart(
+                "POST", "/memories/check-duplicates", data=data, files=files
+            )
+            return DuplicateCheckResult.model_validate(response)
+        finally:
+            if should_close:
+                file_handle.close()
+
+    async def cluster_images(
+        self,
+        space_id: Optional[str] = None,
+        num_clusters: int = 10,
+        algorithm: str = "kmeans",
+    ) -> ImageClusterResult:
+        """
+        Cluster images by visual similarity (async).
+
+        Args:
+            space_id: Optional space ID to filter images
+            num_clusters: Target number of clusters (default: 10)
+            algorithm: Clustering algorithm ("kmeans", "hierarchical")
+
+        Returns:
+            Image clustering result with cluster assignments
+
+        Example:
+            >>> result = await client.memories.cluster_images(
+            ...     num_clusters=5,
+            ...     algorithm="kmeans"
+            ... )
+            >>> for cluster in result.clusters:
+            ...     print(f"Cluster {cluster.cluster_id}: {cluster.size} images")
+        """
+        body: Dict[str, Any] = {
+            "num_clusters": num_clusters,
+            "algorithm": algorithm,
+        }
+        if space_id:
+            body["space_id"] = space_id
+
+        response = await self._client._request("POST", "/memories/images/cluster", json=body)
+        return ImageClusterResult.model_validate(response)
+
+    async def auto_tag(
+        self,
+        image_id: str,
+        apply: bool = False,
+        min_confidence: float = 0.5,
+    ) -> AutoTagResult:
+        """
+        Generate automatic tags for a single image (async).
+
+        Args:
+            image_id: Memory ID of the image to tag
+            apply: Whether to apply generated tags to the memory (default: False)
+            min_confidence: Minimum confidence threshold for tags (default: 0.5)
+
+        Returns:
+            Auto-tag result with generated tags
+
+        Example:
+            >>> result = await client.memories.auto_tag("mem_123", apply=True)
+            >>> for tag in result.tags:
+            ...     print(f"{tag.name}: {tag.confidence:.2f}")
+        """
+        validate_id(image_id, "image")
+        body: Dict[str, Any] = {
+            "apply": apply,
+            "min_confidence": min_confidence,
+        }
+
+        response = await self._client._request(
+            "POST", f"/memories/images/{image_id}/auto-tag", json=body
+        )
+        return AutoTagResult.model_validate(response)
+
+    async def batch_auto_tag(
+        self,
+        image_ids: List[str],
+        apply: bool = False,
+        min_confidence: float = 0.5,
+    ) -> BatchAutoTagResult:
+        """
+        Generate automatic tags for multiple images (async).
+
+        Args:
+            image_ids: List of memory IDs to auto-tag
+            apply: Whether to apply generated tags to memories (default: False)
+            min_confidence: Minimum confidence threshold for tags (default: 0.5)
+
+        Returns:
+            Batch auto-tag result with individual results
+
+        Example:
+            >>> result = await client.memories.batch_auto_tag(
+            ...     ["mem_123", "mem_456", "mem_789"],
+            ...     apply=True
+            ... )
+            >>> print(f"Successfully tagged {result.success} images")
+        """
+        for i, image_id in enumerate(image_ids):
+            validate_id(image_id, f"image[{i}]")
+
+        body: Dict[str, Any] = {
+            "image_ids": image_ids,
+            "apply": apply,
+            "min_confidence": min_confidence,
+        }
+
+        response = await self._client._request("POST", "/memories/images/batch-auto-tag", json=body)
+        return BatchAutoTagResult.model_validate(response)
+
+    async def suggest_queries(
+        self,
+        space_id: Optional[str] = None,
+        limit: int = 20,
+    ) -> QuerySuggestionsResult:
+        """
+        Get suggested search queries based on image content (async).
+
+        Args:
+            space_id: Optional space ID to filter suggestions
+            limit: Maximum number of suggestions (default: 20)
+
+        Returns:
+            Query suggestions result with suggested queries
+
+        Example:
+            >>> suggestions = await client.memories.suggest_queries(limit=10)
+            >>> for suggestion in suggestions.suggestions:
+            ...     print(f"{suggestion.query} ({suggestion.type})")
+        """
+        params: Dict[str, Any] = {"limit": limit}
+        if space_id:
+            params["space_id"] = space_id
+
+        response = await self._client._request(
+            "GET", "/memories/images/suggest-queries", params=params
+        )
+        return QuerySuggestionsResult.model_validate(response)
