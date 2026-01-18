@@ -26,11 +26,14 @@ class SpacesResource(BaseSyncResource):
         >>> space = client.spaces.get("space_123")
     """
 
-    def create(self, name: str, description: Optional[str] = None) -> Space:
+    def create(
+        self, name: str, slug: Optional[str] = None, description: Optional[str] = None
+    ) -> Space:
         """Create a new space.
 
         Args:
             name: Space name
+            slug: Optional URL-friendly identifier (auto-generated if not provided)
             description: Optional description
 
         Returns:
@@ -39,10 +42,11 @@ class SpacesResource(BaseSyncResource):
         Example:
             >>> space = client.spaces.create(
             ...     name="Personal",
+            ...     slug="personal",
             ...     description="Personal memories"
             ... )
         """
-        data = SpaceCreate(name=name, description=description)
+        data = SpaceCreate(name=name, slug=slug, description=description)
         response = self._request("POST", "/spaces", json=data.model_dump(exclude_none=True))
         return Space.model_validate(response)
 
@@ -78,14 +82,40 @@ class SpacesResource(BaseSyncResource):
         response = self._request("GET", f"/spaces/{id}")
         return Space.model_validate(response)
 
+    def get_by_slug(self, slug: str) -> Space:
+        """Get a space by its slug.
+
+        Args:
+            slug: Space slug (URL-friendly identifier)
+
+        Returns:
+            Space object
+
+        Raises:
+            ValueError: If slug is empty
+            NotFoundError: If space doesn't exist
+
+        Example:
+            >>> space = client.spaces.get_by_slug("my-project")
+        """
+        if not slug:
+            raise ValueError("Slug must be a non-empty string")
+        response = self._request("GET", f"/spaces/{slug}")
+        return Space.model_validate(response)
+
     def update(
-        self, id: str, name: Optional[str] = None, description: Optional[str] = None
+        self,
+        id: str,
+        name: Optional[str] = None,
+        slug: Optional[str] = None,
+        description: Optional[str] = None,
     ) -> Space:
         """Update a space.
 
         Args:
             id: Space ID
             name: New name
+            slug: New slug (URL-friendly identifier)
             description: New description
 
         Returns:
@@ -98,11 +128,12 @@ class SpacesResource(BaseSyncResource):
         Example:
             >>> space = client.spaces.update(
             ...     "space_123",
-            ...     name="Updated Name"
+            ...     name="Updated Name",
+            ...     slug="updated-slug"
             ... )
         """
         validate_id(id, "space")
-        data = SpaceUpdate(name=name, description=description)
+        data = SpaceUpdate(name=name, slug=slug, description=description)
         response = self._request("PATCH", f"/spaces/{id}", json=data.model_dump(exclude_none=True))
         return Space.model_validate(response)
 
@@ -136,17 +167,20 @@ class AsyncSpacesResource(BaseAsyncResource):
         ... )
     """
 
-    async def create(self, name: str, description: Optional[str] = None) -> Space:
+    async def create(
+        self, name: str, slug: Optional[str] = None, description: Optional[str] = None
+    ) -> Space:
         """Create a new space (async).
 
         Args:
             name: Space name
+            slug: Optional URL-friendly identifier (auto-generated if not provided)
             description: Optional description
 
         Returns:
             Created space object
         """
-        data = SpaceCreate(name=name, description=description)
+        data = SpaceCreate(name=name, slug=slug, description=description)
         response = await self._request("POST", "/spaces", json=data.model_dump(exclude_none=True))
         return Space.model_validate(response)
 
@@ -172,21 +206,44 @@ class AsyncSpacesResource(BaseAsyncResource):
         response = await self._request("GET", f"/spaces/{id}")
         return Space.model_validate(response)
 
+    async def get_by_slug(self, slug: str) -> Space:
+        """Get a space by its slug (async).
+
+        Args:
+            slug: Space slug (URL-friendly identifier)
+
+        Returns:
+            Space object
+
+        Raises:
+            ValueError: If slug is empty
+            NotFoundError: If space doesn't exist
+        """
+        if not slug:
+            raise ValueError("Slug must be a non-empty string")
+        response = await self._request("GET", f"/spaces/{slug}")
+        return Space.model_validate(response)
+
     async def update(
-        self, id: str, name: Optional[str] = None, description: Optional[str] = None
+        self,
+        id: str,
+        name: Optional[str] = None,
+        slug: Optional[str] = None,
+        description: Optional[str] = None,
     ) -> Space:
         """Update a space (async).
 
         Args:
             id: Space ID
             name: New name
+            slug: New slug (URL-friendly identifier)
             description: New description
 
         Returns:
             Updated space object
         """
         validate_id(id, "space")
-        data = SpaceUpdate(name=name, description=description)
+        data = SpaceUpdate(name=name, slug=slug, description=description)
         response = await self._request(
             "PATCH", f"/spaces/{id}", json=data.model_dump(exclude_none=True)
         )
