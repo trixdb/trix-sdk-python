@@ -9,7 +9,7 @@ from .feedback import FeedbackResource
 from .graph import GraphResource
 from .highlights import HighlightsResource
 from .jobs import JobsResource
-from .memories import MemoriesResource
+from .memories import MemoriesResource, AsyncMemoriesResource
 from .relationships import RelationshipsResource
 from .resources import ResourcesResource, AsyncResourcesResource
 from .search import SearchResource
@@ -22,6 +22,7 @@ __all__ = [
     "AsyncEnrichmentsResource",
     "AsyncEntitiesResource",
     "AsyncFactsResource",
+    "AsyncMemoriesResource",
     "AsyncResourcesResource",
     "AsyncSessionsResource",
     "ClustersResource",

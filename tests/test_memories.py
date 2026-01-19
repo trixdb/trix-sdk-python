@@ -163,29 +163,31 @@ class TestMemoriesBulkOperations:
     def test_bulk_create(self, mock_memory_data):
         """Test bulk memory creation."""
         with patch.object(Trix, "_request") as mock_request:
-            mock_request.return_value = {"data": [mock_memory_data, mock_memory_data]}
+            mock_request.return_value = {"success": 2, "failed": 0, "errors": []}
             client = Trix(api_key="test_key")
 
-            memories = client.memories.bulk_create(
+            result = client.memories.bulk_create(
                 [
                     MemoryCreate(content="First"),
                     MemoryCreate(content="Second"),
                 ]
             )
 
-            assert len(memories) == 2
+            assert result.success == 2
+            assert result.failed == 0
             client.close()
 
     def test_bulk_delete(self):
         """Test bulk memory deletion."""
         with patch.object(Trix, "_request") as mock_request:
-            mock_request.return_value = {}
+            mock_request.return_value = {"success": 2, "failed": 0, "errors": []}
             client = Trix(api_key="test_key")
 
-            client.memories.bulk_delete(["mem_123", "mem_456"])
+            result = client.memories.bulk_delete(["mem_123", "mem_456"])
 
             call_args = mock_request.call_args
             assert call_args[1]["json"]["ids"] == ["mem_123", "mem_456"]
+            assert result.success == 2
             client.close()
 
 
