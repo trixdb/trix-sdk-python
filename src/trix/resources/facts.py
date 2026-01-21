@@ -177,7 +177,7 @@ class FactsResource(BaseSyncResource):
             page=page,
             offset=offset,
         )
-        response = self._request("GET", "/facts", params=params if params else None)
+        response = self._request("GET", "/knowledge/facts", params=params if params else None)
         return FactList.model_validate(response)
 
     def update(
@@ -417,7 +417,7 @@ class AsyncFactsResource(BaseAsyncResource):
             page=page,
             offset=offset,
         )
-        response = await self._request("GET", "/facts", params=params if params else None)
+        response = await self._request("GET", "/knowledge/facts", params=params if params else None)
         return FactList.model_validate(response)
 
     async def update(

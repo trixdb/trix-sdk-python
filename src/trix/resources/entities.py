@@ -119,7 +119,7 @@ class EntitiesResource(BaseSyncResource):
             NotFoundError: If entity doesn't exist
         """
         validate_id(id, "entity")
-        response = self._request("GET", f"/entities/{id}")
+        response = self._request("GET", f"/knowledge/entities/{id}")
         return Entity.model_validate(response)
 
     def list(
@@ -149,7 +149,7 @@ class EntitiesResource(BaseSyncResource):
             page=page,
             offset=offset,
         )
-        response = self._request("GET", "/entities", params=params if params else None)
+        response = self._request("GET", "/knowledge/entities", params=params if params else None)
         return EntityList.model_validate(response)
 
     def update(
@@ -429,7 +429,7 @@ class AsyncEntitiesResource(BaseAsyncResource):
     async def get(self, id: str) -> Entity:
         """Get an entity by ID (async)."""
         validate_id(id, "entity")
-        response = await self._request("GET", f"/entities/{id}")
+        response = await self._request("GET", f"/knowledge/entities/{id}")
         return Entity.model_validate(response)
 
     async def list(
@@ -448,7 +448,7 @@ class AsyncEntitiesResource(BaseAsyncResource):
             page=page,
             offset=offset,
         )
-        response = await self._request("GET", "/entities", params=params if params else None)
+        response = await self._request("GET", "/knowledge/entities", params=params if params else None)
         return EntityList.model_validate(response)
 
     async def update(

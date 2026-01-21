@@ -115,7 +115,7 @@ class FeedbackResource(BaseSyncResource):
             create_relationships=create_relationships,
         )
         response = self._request(
-            "POST", "/feedback/submit", json=data.model_dump(exclude_none=True)
+            "POST", "/feedback", json=data.model_dump(exclude_none=True)
         )
         return FeedbackResponse.model_validate(response)
 
@@ -205,7 +205,7 @@ class AsyncFeedbackResource(BaseAsyncResource):
             create_relationships=create_relationships,
         )
         response = await self._request(
-            "POST", "/feedback/submit", json=data.model_dump(exclude_none=True)
+            "POST", "/feedback", json=data.model_dump(exclude_none=True)
         )
         return FeedbackResponse.model_validate(response)
 

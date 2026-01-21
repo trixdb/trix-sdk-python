@@ -67,7 +67,7 @@ class HighlightsResource:
         )
         response = self._client._request(
             "POST",
-            f"/highlights/{memory_id}",
+            f"/memories/{memory_id}/highlights",
             json=data.model_dump(exclude_none=True),
         )
         return Highlight.model_validate(response)
@@ -88,7 +88,7 @@ class HighlightsResource:
         """
         validate_id(memory_id, "memory")
         params = {"limit": limit}
-        response = self._client._request("GET", f"/highlights/{memory_id}", params=params)
+        response = self._client._request("GET", f"/memories/{memory_id}/highlights", params=params)
         return HighlightList.model_validate(response)
 
     def get(self, highlight_id: str) -> Highlight:
@@ -105,7 +105,7 @@ class HighlightsResource:
             >>> highlight = client.highlights.get("highlight_123")
         """
         validate_id(highlight_id, "highlight")
-        response = self._client._request("GET", f"/highlights/item/{highlight_id}")
+        response = self._client._request("GET", f"/highlights/{highlight_id}")
         return Highlight.model_validate(response)
 
     def update(
@@ -147,7 +147,7 @@ class HighlightsResource:
         )
         response = self._client._request(
             "PATCH",
-            f"/highlights/item/{highlight_id}",
+            f"/highlights/{highlight_id}",
             json=data.model_dump(exclude_none=True),
         )
         return Highlight.model_validate(response)
@@ -163,7 +163,7 @@ class HighlightsResource:
             >>> client.highlights.delete("highlight_123")
         """
         validate_id(highlight_id, "highlight")
-        self._client._request("DELETE", f"/highlights/item/{highlight_id}")
+        self._client._request("DELETE", f"/highlights/{highlight_id}")
 
     def extract(
         self,
@@ -193,7 +193,7 @@ class HighlightsResource:
         if extraction_types:
             data["extraction_types"] = [et.value for et in extraction_types]
 
-        response = self._client._request("POST", f"/highlights/{memory_id}/extract", json=data)
+        response = self._client._request("POST", f"/memories/{memory_id}/extract-highlights", json=data)
         return [ExtractedHighlights.model_validate(e) for e in response.get("extractions", [])]
 
     def list_global(self, limit: int = 100, offset: int = 0) -> HighlightList:
@@ -313,7 +313,7 @@ class AsyncHighlightsResource:
         )
         response = await self._client._request(
             "POST",
-            f"/highlights/{memory_id}",
+            f"/memories/{memory_id}/highlights",
             json=data.model_dump(exclude_none=True),
         )
         return Highlight.model_validate(response)
@@ -322,13 +322,13 @@ class AsyncHighlightsResource:
         """List highlights for a memory (async)."""
         validate_id(memory_id, "memory")
         params = {"limit": limit}
-        response = await self._client._request("GET", f"/highlights/{memory_id}", params=params)
+        response = await self._client._request("GET", f"/memories/{memory_id}/highlights", params=params)
         return HighlightList.model_validate(response)
 
     async def get(self, highlight_id: str) -> Highlight:
         """Get a highlight by ID (async)."""
         validate_id(highlight_id, "highlight")
-        response = await self._client._request("GET", f"/highlights/item/{highlight_id}")
+        response = await self._client._request("GET", f"/highlights/{highlight_id}")
         return Highlight.model_validate(response)
 
     async def update(
@@ -351,7 +351,7 @@ class AsyncHighlightsResource:
         )
         response = await self._client._request(
             "PATCH",
-            f"/highlights/item/{highlight_id}",
+            f"/highlights/{highlight_id}",
             json=data.model_dump(exclude_none=True),
         )
         return Highlight.model_validate(response)
@@ -359,7 +359,7 @@ class AsyncHighlightsResource:
     async def delete(self, highlight_id: str) -> None:
         """Delete a highlight (async)."""
         validate_id(highlight_id, "highlight")
-        await self._client._request("DELETE", f"/highlights/item/{highlight_id}")
+        await self._client._request("DELETE", f"/highlights/{highlight_id}")
 
     async def extract(
         self,
@@ -374,7 +374,7 @@ class AsyncHighlightsResource:
             data["extraction_types"] = [et.value for et in extraction_types]
 
         response = await self._client._request(
-            "POST", f"/highlights/{memory_id}/extract", json=data
+            "POST", f"/memories/{memory_id}/extract-highlights", json=data
         )
         return [ExtractedHighlights.model_validate(e) for e in response.get("extractions", [])]
 
