@@ -22,6 +22,7 @@ Example:
 from __future__ import annotations
 
 import functools
+from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import (
@@ -166,46 +167,94 @@ def is_telemetry_enabled() -> bool:
     return _global_config.tracer is not None
 
 
-class RequestSpan:
-    """Request span wrapper interface."""
+class RequestSpan(ABC):
+    """Abstract base class for request span wrappers.
 
+    This class defines the interface for request spans used in telemetry.
+    Implementations include:
+    - NoOpRequestSpan: Does nothing when telemetry is disabled
+    - ActiveRequestSpan: Delegates to OpenTelemetry span when enabled
+    """
+
+    @abstractmethod
     def set_request_body(self, body: Any) -> None:
         """Set request body attribute (if enabled in config)."""
-        pass
+        ...
 
+    @abstractmethod
     def set_status_code(self, code: int) -> None:
         """Set response status code."""
-        pass
+        ...
 
+    @abstractmethod
     def set_response_body(self, body: Any) -> None:
         """Set response body attribute (if enabled in config)."""
-        pass
+        ...
 
+    @abstractmethod
     def set_response_size(self, size: int) -> None:
         """Set response size in bytes."""
-        pass
+        ...
 
+    @abstractmethod
     def record_error(self, error: BaseException) -> None:
         """Record an error."""
-        pass
+        ...
 
+    @abstractmethod
     def success(self) -> None:
         """Mark span as successful and end it."""
-        pass
+        ...
 
+    @abstractmethod
     def failure(self, message: Optional[str] = None) -> None:
         """Mark span as failed and end it."""
-        pass
+        ...
 
+    @abstractmethod
     def set_attribute(self, key: str, value: Union[str, int, float, bool]) -> None:
         """Add custom attribute."""
-        pass
+        ...
 
 
 class NoOpRequestSpan(RequestSpan):
-    """No-op span implementation when telemetry is disabled."""
+    """No-op span implementation when telemetry is disabled.
 
-    pass
+    All methods are intentionally empty - this span does nothing when
+    telemetry is not configured.
+    """
+
+    def set_request_body(self, body: Any) -> None:
+        """No-op: telemetry disabled."""
+        pass
+
+    def set_status_code(self, code: int) -> None:
+        """No-op: telemetry disabled."""
+        pass
+
+    def set_response_body(self, body: Any) -> None:
+        """No-op: telemetry disabled."""
+        pass
+
+    def set_response_size(self, size: int) -> None:
+        """No-op: telemetry disabled."""
+        pass
+
+    def record_error(self, error: BaseException) -> None:
+        """No-op: telemetry disabled."""
+        pass
+
+    def success(self) -> None:
+        """No-op: telemetry disabled."""
+        pass
+
+    def failure(self, message: Optional[str] = None) -> None:
+        """No-op: telemetry disabled."""
+        pass
+
+    def set_attribute(self, key: str, value: Union[str, int, float, bool]) -> None:
+        """No-op: telemetry disabled."""
+        pass
 
 
 class ActiveRequestSpan(RequestSpan):
