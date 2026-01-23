@@ -37,6 +37,14 @@ from .metrics import (
     set_metrics_collector,
     timed_request,
 )
+from .metrics_impl import (
+    Counter,
+    Gauge,
+    Histogram,
+    HistogramBucket,
+    MetricValue,
+    SimpleMetricsCollector,
+)
 from .telemetry import (
     TelemetryConfig,
     SpanStatusCode,
@@ -80,10 +88,16 @@ __all__ = [
     # Metrics utilities
     "CallbackCollector",
     "CompositeCollector",
+    "Counter",
+    "Gauge",
+    "Histogram",
+    "HistogramBucket",
     "InMemoryCollector",
+    "MetricValue",
     "MetricsCollector",
     "NoOpCollector",
     "RequestMetrics",
+    "SimpleMetricsCollector",
     "get_metrics_collector",
     "record_retry",
     "set_metrics_collector",
