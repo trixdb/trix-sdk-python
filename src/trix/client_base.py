@@ -5,7 +5,7 @@ This module contains shared types and utilities used by both sync and async clie
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Awaitable, Callable, Dict, Optional
 
 import httpx
 
@@ -64,10 +64,10 @@ RequestInterceptor = Callable[[RequestContext], Optional[RequestContext]]
 ResponseInterceptor = Callable[[ResponseContext], Optional[ResponseContext]]
 ErrorInterceptor = Callable[[Exception, RequestContext], Exception]
 
-# Async interceptor type aliases (same signature for simplicity)
-AsyncRequestInterceptor = Callable[[RequestContext], "Optional[RequestContext]"]
-AsyncResponseInterceptor = Callable[[ResponseContext], "Optional[ResponseContext]"]
-AsyncErrorInterceptor = Callable[[Exception, RequestContext], Exception]
+# Async interceptor type aliases
+AsyncRequestInterceptor = Callable[[RequestContext], Awaitable[Optional[RequestContext]]]
+AsyncResponseInterceptor = Callable[[ResponseContext], Awaitable[Optional[ResponseContext]]]
+AsyncErrorInterceptor = Callable[[Exception, RequestContext], Awaitable[Exception]]
 
 
 @dataclass

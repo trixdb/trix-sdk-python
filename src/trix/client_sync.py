@@ -30,7 +30,6 @@ from .resources import (
     FeedbackResource,
     GraphResource,
     HighlightsResource,
-    JobsResource,
     MemoriesResource,
     RelationshipsResource,
     ResourcesResource,
@@ -173,7 +172,6 @@ class Trix:
         self.agent = AgentResource(self)
         self.feedback = FeedbackResource(self)
         self.highlights = HighlightsResource(self)
-        self.jobs = JobsResource(self)
         self.facts = FactsResource(self)
         self.entities = EntitiesResource(self)
         self.enrichments = EnrichmentsResource(self)

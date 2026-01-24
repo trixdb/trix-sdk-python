@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from .base import BaseResponse
 from .memory import Memory
@@ -44,16 +44,6 @@ class SessionList(BaseResponse):
     data: List[AgentSession]
 
 
-class ConsolidationResult(BaseResponse):
-    """Result of memory consolidation."""
-
-    consolidated_count: int
-    new_memories: List[Memory]
-    removed_memory_ids: List[str]
-    relationships_created: int
-    dry_run: bool
-
-
 class AgentContext(BaseResponse):
     """Contextual information for agent."""
 
@@ -61,26 +51,3 @@ class AgentContext(BaseResponse):
     memories: List[Memory]
     session_memories: List[SessionMemory]
     relevance_scores: Dict[str, float] = Field(default_factory=dict)
-
-
-class CoreMemoryBlock(BaseModel):
-    """Core memory block."""
-
-    type: str
-    content: str
-    metadata: Optional[Dict[str, Any]] = None
-    updated_at: datetime
-
-
-class CoreMemory(BaseResponse):
-    """Core memory."""
-
-    blocks: List[CoreMemoryBlock]
-    updated_at: datetime
-
-
-class CoreMemoryContext(BaseResponse):
-    """Formatted core memory context."""
-
-    formatted: str
-    blocks: List[CoreMemoryBlock]

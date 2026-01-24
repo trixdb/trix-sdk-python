@@ -8,7 +8,6 @@ from .facts import FactsResource, AsyncFactsResource
 from .feedback import FeedbackResource
 from .graph import GraphResource
 from .highlights import HighlightsResource
-from .jobs import JobsResource
 from .memories import MemoriesResource, AsyncMemoriesResource
 from .relationships import RelationshipsResource
 from .resources import ResourcesResource, AsyncResourcesResource
@@ -32,7 +31,6 @@ __all__ = [
     "FeedbackResource",
     "GraphResource",
     "HighlightsResource",
-    "JobsResource",
     "MemoriesResource",
     "RelationshipsResource",
     "ResourcesResource",

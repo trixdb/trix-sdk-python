@@ -6,7 +6,6 @@ from .base import BaseAsyncResource, BaseSyncResource
 from ..types import (
     Session,
     SessionsResponse,
-    SessionStats,
     SessionType,
     SessionStatus,
     RetentionPolicy,
@@ -256,21 +255,6 @@ class SessionsResource(BaseSyncResource):
         """
         response = self._request("GET", "/cli-sessions/active")
         return SessionsResponse.model_validate(response)
-
-    def get_stats(self) -> SessionStats:
-        """Get session statistics.
-
-        Returns:
-            Session statistics including counts by status and type.
-
-        Example:
-            >>> stats = client.sessions.get_stats()
-            >>> print(f"Total sessions: {stats.total}")
-            >>> print(f"Active: {stats.active}, Paused: {stats.paused}")
-            >>> print(f"By type: {stats.by_type}")
-        """
-        response = self._request("GET", "/cli-sessions/stats")
-        return SessionStats.model_validate(response)
 
     def pause(self, id: str) -> Session:
         """Pause an active session.
@@ -564,15 +548,6 @@ class AsyncSessionsResource(BaseAsyncResource):
         """
         response = await self._request("GET", "/cli-sessions/active")
         return SessionsResponse.model_validate(response)
-
-    async def get_stats(self) -> SessionStats:
-        """Get session statistics (async).
-
-        Returns:
-            Session statistics including counts by status and type.
-        """
-        response = await self._request("GET", "/cli-sessions/stats")
-        return SessionStats.model_validate(response)
 
     async def pause(self, id: str) -> Session:
         """Pause an active session (async).

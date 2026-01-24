@@ -6,64 +6,19 @@ from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
     AgentContext,
     AgentSession,
-    ConsolidationResult,
-    ConsolidationStrategy,
-    CoreMemory,
-    CoreMemoryBlock,
-    CoreMemoryContext,
     SessionMemory,
     SessionMemoryList,
     SessionList,
 )
-from ..utils.security import validate_id, validate_limit, validate_threshold, validate_offset
+from ..utils.security import validate_id, validate_limit, validate_offset
 
 
 class AgentResource:
-    """Resource for agent sessions and memory consolidation."""
+    """Resource for agent sessions."""
 
     def __init__(self, client: SyncClientProtocol) -> None:
         """Initialize agent resource with client."""
         self._client = client
-
-    def consolidate(
-        self,
-        space_id: Optional[str] = None,
-        strategy: ConsolidationStrategy = ConsolidationStrategy.SIMILARITY,
-        threshold: float = 0.8,
-        dry_run: bool = False,
-    ) -> ConsolidationResult:
-        """
-        Consolidate similar memories to reduce redundancy.
-
-        Args:
-            space_id: Optional space to limit consolidation
-            strategy: Consolidation strategy
-            threshold: Similarity threshold (0.0-1.0)
-            dry_run: Preview changes without applying them
-
-        Returns:
-            Consolidation result
-
-        Example:
-            >>> result = client.agent.consolidate(
-            ...     strategy=ConsolidationStrategy.SIMILARITY,
-            ...     threshold=0.85,
-            ...     dry_run=True
-            ... )
-        """
-        validate_threshold(threshold)
-        if space_id:
-            validate_id(space_id, "space")
-        data: Dict[str, Any] = {
-            "strategy": strategy.value,
-            "threshold": threshold,
-            "dry_run": dry_run,
-        }
-        if space_id:
-            data["space_id"] = space_id
-
-        response = self._client._request("POST", "/agent/consolidate", json=data)
-        return ConsolidationResult.model_validate(response)
 
     def create_session(
         self,
@@ -248,204 +203,13 @@ class AgentResource:
         response = self._client._request("POST", f"/agent/sessions/{session_id}/end", json=data)
         return AgentSession.model_validate(response)
 
-    def get_core_memory(self, session_id: Optional[str] = None) -> CoreMemory:
-        """
-        Get core memory for a session or globally.
-
-        Args:
-            session_id: Optional session ID (global if not provided)
-
-        Returns:
-            Core memory object
-
-        Example:
-            >>> core = client.agent.get_core_memory("chat_123")
-            >>> for block in core.blocks:
-            ...     print(f"{block.key}: {block.value}")
-        """
-        if session_id:
-            validate_id(session_id, "session")
-        params = {}
-        if session_id:
-            params["session_id"] = session_id
-
-        response = self._client._request("GET", "/agent/core-memory", params=params)
-        return CoreMemory.model_validate(response)
-
-    def update_core_memory(
-        self,
-        blocks: List[Dict[str, Any]],
-        session_id: Optional[str] = None,
-    ) -> CoreMemory:
-        """
-        Update core memory blocks.
-
-        Args:
-            blocks: List of memory blocks to update
-            session_id: Optional session ID (global if not provided)
-
-        Returns:
-            Updated core memory
-
-        Example:
-            >>> core = client.agent.update_core_memory(
-            ...     blocks=[{"key": "user_name", "value": "Alice"}],
-            ...     session_id="chat_123"
-            ... )
-        """
-        if session_id:
-            validate_id(session_id, "session")
-        data: Dict[str, Any] = {"blocks": blocks}
-        if session_id:
-            data["session_id"] = session_id
-
-        response = self._client._request("PUT", "/agent/core-memory", json=data)
-        return CoreMemory.model_validate(response)
-
-    def format_core_memory(self, session_id: Optional[str] = None) -> str:
-        """
-        Get formatted string representation of core memory.
-
-        Args:
-            session_id: Optional session ID (global if not provided)
-
-        Returns:
-            Formatted core memory string
-
-        Example:
-            >>> formatted = client.agent.format_core_memory("chat_123")
-            >>> print(formatted)
-        """
-        if session_id:
-            validate_id(session_id, "session")
-        params = {}
-        if session_id:
-            params["session_id"] = session_id
-
-        response = self._client._request("GET", "/agent/core-memory/format", params=params)
-        return str(response.get("formatted", ""))
-
-    def get_block(self, block_type: str) -> CoreMemoryBlock:
-        """
-        Get a specific core memory block.
-
-        Args:
-            block_type: The type of block (e.g., "persona", "human")
-
-        Returns:
-            Core memory block
-
-        Example:
-            >>> block = client.agent.get_block("persona")
-            >>> print(block.content)
-        """
-        response = self._client._request("GET", f"/agent/memory/core/{block_type}")
-        return CoreMemoryBlock.model_validate(response)
-
-    def update_block(
-        self,
-        block_type: str,
-        content: str,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> CoreMemoryBlock:
-        """
-        Create or replace a core memory block.
-
-        Args:
-            block_type: The type of block
-            content: Block content
-            metadata: Optional metadata
-
-        Returns:
-            Updated core memory block
-
-        Example:
-            >>> block = client.agent.update_block(
-            ...     "persona",
-            ...     "I am a helpful assistant."
-            ... )
-        """
-        data: Dict[str, Any] = {"content": content}
-        if metadata:
-            data["metadata"] = metadata
-
-        response = self._client._request("PUT", f"/agent/memory/core/{block_type}", json=data)
-        return CoreMemoryBlock.model_validate(response)
-
-    def append_block(self, block_type: str, content: str) -> CoreMemoryBlock:
-        """
-        Append content to a core memory block.
-
-        Args:
-            block_type: The type of block
-            content: Content to append
-
-        Returns:
-            Updated core memory block
-
-        Example:
-            >>> block = client.agent.append_block("persona", "\\nI also like cats.")
-        """
-        response = self._client._request(
-            "PATCH", f"/agent/memory/core/{block_type}", json={"content": content}
-        )
-        return CoreMemoryBlock.model_validate(response)
-
-    def delete_block(self, block_type: str) -> None:
-        """
-        Delete a core memory block.
-
-        Args:
-            block_type: The type of block
-
-        Example:
-            >>> client.agent.delete_block("persona")
-        """
-        self._client._request("DELETE", f"/agent/memory/core/{block_type}")
-
-    def get_formatted_context(self) -> CoreMemoryContext:
-        """
-        Get formatted core memory context.
-
-        Returns:
-            Formatted context
-
-        Example:
-            >>> context = client.agent.get_formatted_context()
-            >>> print(context.formatted)
-        """
-        response = self._client._request("GET", "/agent/memory/core/context")
-        return CoreMemoryContext.model_validate(response)
-
 
 class AsyncAgentResource:
-    """Async resource for agent sessions and memory consolidation."""
+    """Async resource for agent sessions."""
 
     def __init__(self, client: AsyncClientProtocol) -> None:
         """Initialize async agent resource with client."""
         self._client = client
-
-    async def consolidate(
-        self,
-        space_id: Optional[str] = None,
-        strategy: ConsolidationStrategy = ConsolidationStrategy.SIMILARITY,
-        threshold: float = 0.8,
-        dry_run: bool = False,
-    ) -> ConsolidationResult:
-        """Consolidate similar memories to reduce redundancy (async)."""
-        validate_threshold(threshold)
-        if space_id:
-            validate_id(space_id, "space")
-        data: Dict[str, Any] = {
-            "strategy": strategy.value,
-            "threshold": threshold,
-            "dry_run": dry_run,
-        }
-        if space_id:
-            data["space_id"] = space_id
-
-        response = await self._client._request("POST", "/agent/consolidate", json=data)
-        return ConsolidationResult.model_validate(response)
 
     async def create_session(
         self,
@@ -543,75 +307,3 @@ class AsyncAgentResource:
             "POST", f"/agent/sessions/{session_id}/end", json=data
         )
         return AgentSession.model_validate(response)
-
-    async def get_core_memory(self, session_id: Optional[str] = None) -> CoreMemory:
-        """Get core memory for a session or globally (async)."""
-        if session_id:
-            validate_id(session_id, "session")
-        params = {}
-        if session_id:
-            params["session_id"] = session_id
-
-        response = await self._client._request("GET", "/agent/core-memory", params=params)
-        return CoreMemory.model_validate(response)
-
-    async def update_core_memory(
-        self,
-        blocks: List[Dict[str, Any]],
-        session_id: Optional[str] = None,
-    ) -> CoreMemory:
-        """Update core memory blocks (async)."""
-        if session_id:
-            validate_id(session_id, "session")
-        data: Dict[str, Any] = {"blocks": blocks}
-        if session_id:
-            data["session_id"] = session_id
-
-        response = await self._client._request("PUT", "/agent/core-memory", json=data)
-        return CoreMemory.model_validate(response)
-
-    async def format_core_memory(self, session_id: Optional[str] = None) -> str:
-        """Get formatted string representation of core memory (async)."""
-        if session_id:
-            validate_id(session_id, "session")
-        params = {}
-        if session_id:
-            params["session_id"] = session_id
-
-        response = await self._client._request("GET", "/agent/core-memory/format", params=params)
-        return str(response.get("formatted", ""))
-
-    async def get_block(self, block_type: str) -> CoreMemoryBlock:
-        """Get a specific core memory block (async)."""
-        response = await self._client._request("GET", f"/agent/memory/core/{block_type}")
-        return CoreMemoryBlock.model_validate(response)
-
-    async def update_block(
-        self,
-        block_type: str,
-        content: str,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> CoreMemoryBlock:
-        """Create or replace a core memory block (async)."""
-        data: Dict[str, Any] = {"content": content}
-        if metadata:
-            data["metadata"] = metadata
-
-        response = await self._client._request("PUT", f"/agent/memory/core/{block_type}", json=data)
-        return CoreMemoryBlock.model_validate(response)
-
-    async def append_block(self, block_type: str, content: str) -> CoreMemoryBlock:
-        """Append content to a core memory block (async)."""
-        response = await self._client._request(
-            "PATCH", f"/agent/memory/core/{block_type}", json={"content": content}
-        )
-        return CoreMemoryBlock.model_validate(response)
-
-    async def delete_block(self, block_type: str) -> None:
-        """Delete a core memory block (async)."""
-        await self._client._request("DELETE", f"/agent/memory/core/{block_type}")
-
-    async def get_formatted_context(self) -> CoreMemoryContext:
-        """Get formatted core memory context (async)."""
-        response = await self._client._request("GET", "/agent/memory/core/context")
-        return CoreMemoryContext.model_validate(response)

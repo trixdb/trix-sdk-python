@@ -3,11 +3,10 @@
 Provides audio upload, transcription, and streaming operations.
 """
 
-import json
 from pathlib import Path
 from typing import Any, BinaryIO, Dict, Iterator, List, Optional, Union
 
-from ...types import Job, Memory, Transcript
+from ...types import Memory, Transcript
 from ...utils.file_handling import build_multipart_data, prepare_file_upload
 from ...utils.security import validate_id
 from .base import build_transcribe_body
@@ -77,7 +76,7 @@ class AudioOperationsMixin:
         enable_auto_chapters: Optional[bool] = None,
         enable_auto_summarization: Optional[bool] = None,
         speakers_expected: Optional[int] = None,
-    ) -> Job:
+    ) -> Dict[str, Any]:
         """Transcribe or re-transcribe an audio memory with advanced options."""
         validate_id(id, "memory")
         body = build_transcribe_body(
@@ -92,7 +91,7 @@ class AudioOperationsMixin:
             speakers_expected=speakers_expected,
         )
         response = self._client._request("POST", f"/memories/{id}/transcribe", json=body)
-        return Job.model_validate(response)
+        return dict(response)
 
 
 class AsyncAudioOperationsMixin:
@@ -163,7 +162,7 @@ class AsyncAudioOperationsMixin:
         enable_auto_chapters: Optional[bool] = None,
         enable_auto_summarization: Optional[bool] = None,
         speakers_expected: Optional[int] = None,
-    ) -> Job:
+    ) -> Dict[str, Any]:
         """Transcribe or re-transcribe an audio memory with advanced options (async)."""
         validate_id(id, "memory")
         body = build_transcribe_body(
@@ -178,4 +177,4 @@ class AsyncAudioOperationsMixin:
             speakers_expected=speakers_expected,
         )
         response = await self._client._request("POST", f"/memories/{id}/transcribe", json=body)
-        return Job.model_validate(response)
+        return dict(response)

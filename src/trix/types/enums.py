@@ -57,14 +57,6 @@ class Direction(str, Enum):
     BOTH = "both"
 
 
-class ConsolidationStrategy(str, Enum):
-    """Memory consolidation strategies."""
-
-    SIMILARITY = "similarity"
-    TEMPORAL = "temporal"
-    IMPORTANCE = "importance"
-
-
 class WebhookEvent(str, Enum):
     """Webhook event types."""
 
@@ -108,16 +100,6 @@ class ResourceRelationshipType(str, Enum):
     RELATED = "related"
     MENTIONED = "mentioned"
     DERIVED = "derived"
-
-
-class JobStatus(str, Enum):
-    """Job processing status."""
-
-    WAITING = "waiting"
-    ACTIVE = "active"
-    COMPLETED = "completed"
-    FAILED = "failed"
-    DELAYED = "delayed"
 
 
 class ExtractionType(str, Enum):

@@ -29,7 +29,6 @@ from .resources.facts import AsyncFactsResource
 from .resources.feedback import AsyncFeedbackResource
 from .resources.graph import AsyncGraphResource
 from .resources.highlights import AsyncHighlightsResource
-from .resources.jobs import AsyncJobsResource
 from .resources.memories import AsyncMemoriesResource
 from .resources.relationships import AsyncRelationshipsResource
 from .resources.resources import AsyncResourcesResource
@@ -168,7 +167,6 @@ class AsyncTrix:
         self.agent = AsyncAgentResource(self)
         self.feedback = AsyncFeedbackResource(self)
         self.highlights = AsyncHighlightsResource(self)
-        self.jobs = AsyncJobsResource(self)
         self.facts = AsyncFactsResource(self)
         self.entities = AsyncEntitiesResource(self)
         self.enrichments = AsyncEnrichmentsResource(self)

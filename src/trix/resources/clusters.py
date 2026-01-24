@@ -14,7 +14,7 @@ from ..utils.pagination import AsyncPaginator, SyncPaginator
 from ..utils.security import validate_id, validate_limit, validate_threshold
 
 if TYPE_CHECKING:
-    from ..types import ClusterQuality, ClusterStats, ClusterTopics, IncrementalClusterResult
+    from ..types import ClusterQuality, ClusterTopics
 
 
 class ClustersResource:
@@ -346,44 +346,6 @@ class ClustersResource:
         response = self._client._request("POST", f"/clusters/{cluster_id}/expand", params=params)
         return list(response.get("suggestions", []))
 
-    def get_stats(self) -> "ClusterStats":
-        """Get cluster statistics."""
-        from ..types import ClusterStats
-
-        response = self._client._request("GET", "/clusters/stats")
-        return ClusterStats.model_validate(response)
-
-    def incremental_clustering(
-        self,
-        space_id: Optional[str] = None,
-        threshold: Optional[float] = None,
-        max_new_clusters: Optional[int] = None,
-    ) -> "IncrementalClusterResult":
-        """Trigger incremental clustering."""
-        from ..types import IncrementalClusterResult
-
-        params: Dict[str, Any] = {}
-        if space_id:
-            params["space_id"] = space_id
-        if threshold is not None:
-            params["threshold"] = threshold
-        if max_new_clusters is not None:
-            params["max_new_clusters"] = max_new_clusters
-        response = self._client._request("POST", "/clusters/incremental", json=params)
-        return IncrementalClusterResult.model_validate(response)
-
-    def refresh_metrics(self, cluster_id: str) -> Cluster:
-        """Refresh quality metrics for a cluster."""
-        validate_id(cluster_id, "cluster")
-        response = self._client._request("POST", f"/clusters/{cluster_id}/refresh-metrics")
-        return Cluster.model_validate(response)
-
-    def recompute_centroid(self, cluster_id: str) -> Cluster:
-        """Recompute centroid for a cluster."""
-        validate_id(cluster_id, "cluster")
-        response = self._client._request("POST", f"/clusters/{cluster_id}/recompute-centroid")
-        return Cluster.model_validate(response)
-
     def get_quality(self, cluster_id: str) -> "ClusterQuality":
         """Get quality metrics for a cluster."""
         from ..types import ClusterQuality
@@ -560,44 +522,6 @@ class AsyncClustersResource:
             "POST", f"/clusters/{cluster_id}/expand", params=params
         )
         return list(response.get("suggestions", []))
-
-    async def get_stats(self) -> "ClusterStats":
-        """Get cluster statistics (async)."""
-        from ..types import ClusterStats
-
-        response = await self._client._request("GET", "/clusters/stats")
-        return ClusterStats.model_validate(response)
-
-    async def incremental_clustering(
-        self,
-        space_id: Optional[str] = None,
-        threshold: Optional[float] = None,
-        max_new_clusters: Optional[int] = None,
-    ) -> "IncrementalClusterResult":
-        """Trigger incremental clustering (async)."""
-        from ..types import IncrementalClusterResult
-
-        params: Dict[str, Any] = {}
-        if space_id:
-            params["space_id"] = space_id
-        if threshold is not None:
-            params["threshold"] = threshold
-        if max_new_clusters is not None:
-            params["max_new_clusters"] = max_new_clusters
-        response = await self._client._request("POST", "/clusters/incremental", json=params)
-        return IncrementalClusterResult.model_validate(response)
-
-    async def refresh_metrics(self, cluster_id: str) -> Cluster:
-        """Refresh quality metrics for a cluster (async)."""
-        validate_id(cluster_id, "cluster")
-        response = await self._client._request("POST", f"/clusters/{cluster_id}/refresh-metrics")
-        return Cluster.model_validate(response)
-
-    async def recompute_centroid(self, cluster_id: str) -> Cluster:
-        """Recompute centroid for a cluster (async)."""
-        validate_id(cluster_id, "cluster")
-        response = await self._client._request("POST", f"/clusters/{cluster_id}/recompute-centroid")
-        return Cluster.model_validate(response)
 
     async def get_quality(self, cluster_id: str) -> "ClusterQuality":
         """Get quality metrics for a cluster (async)."""

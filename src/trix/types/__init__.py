@@ -16,7 +16,6 @@ Types are organized into logical submodules for better maintainability:
 - feedback: Feedback types
 - highlight: Highlight types
 - transcript: Transcript types
-- job: Job types
 - fact: Fact types
 - entity: Entity types
 - enrichment: Enrichment types
@@ -35,7 +34,6 @@ T = TypeVar("T")
 # =============================================================================
 from .enums import (
     ClusterScale,
-    ConsolidationStrategy,
     Direction,
     EnrichmentOperation,
     EnrichmentStatus,
@@ -43,7 +41,6 @@ from .enums import (
     ExtractionType,
     FactNodeType,
     FactSourceMethod,
-    JobStatus,
     MemoryType,
     OriginType,
     ProtectionLevel,
@@ -174,10 +171,6 @@ from .webhook import (
 from .agent import (
     AgentContext,
     AgentSession,
-    ConsolidationResult,
-    CoreMemory,
-    CoreMemoryBlock,
-    CoreMemoryContext,
     SessionList,
     SessionMemory,
     SessionMemoryList,
@@ -233,14 +226,6 @@ from .transcript import (
     WordTimestamp,
 )
 
-# =============================================================================
-# Job Models
-# =============================================================================
-from .job import (
-    Job,
-    JobList,
-    JobStats,
-)
 
 # =============================================================================
 # Fact Models
@@ -331,7 +316,6 @@ __all__ = [
     "T",
     # Enums
     "ClusterScale",
-    "ConsolidationStrategy",
     "Direction",
     "EnrichmentOperation",
     "EnrichmentStatus",
@@ -339,7 +323,6 @@ __all__ = [
     "ExtractionType",
     "FactNodeType",
     "FactSourceMethod",
-    "JobStatus",
     "MemoryType",
     "OriginType",
     "ProtectionLevel",
@@ -425,10 +408,6 @@ __all__ = [
     # Agent
     "AgentContext",
     "AgentSession",
-    "ConsolidationResult",
-    "CoreMemory",
-    "CoreMemoryBlock",
-    "CoreMemoryContext",
     "SessionList",
     "SessionMemory",
     "SessionMemoryList",
@@ -462,10 +441,6 @@ __all__ = [
     "TranscriptEntity",
     "TranscriptSegment",
     "WordTimestamp",
-    # Job
-    "Job",
-    "JobList",
-    "JobStats",
     # Fact
     "ExtractedFact",
     "Fact",
