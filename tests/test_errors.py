@@ -85,83 +85,83 @@ class TestErrorResponseHandling:
 
     def test_401_raises_authentication_error(self):
         """Test 401 response raises AuthenticationError."""
-        from trix.client import _handle_response
+        from trix.client_base import handle_response
 
         response = self._create_mock_response(401, {"message": "Invalid credentials"})
 
         with pytest.raises(AuthenticationError) as exc_info:
-            _handle_response(response)
+            handle_response(response)
         assert "Invalid credentials" in str(exc_info.value)
 
     def test_403_raises_permission_error(self):
         """Test 403 response raises PermissionError."""
-        from trix.client import _handle_response
+        from trix.client_base import handle_response
 
         response = self._create_mock_response(403, {"message": "Access denied"})
 
         with pytest.raises(PermissionError) as exc_info:
-            _handle_response(response)
+            handle_response(response)
         assert "Access denied" in str(exc_info.value)
 
     def test_404_raises_not_found_error(self):
         """Test 404 response raises NotFoundError."""
-        from trix.client import _handle_response
+        from trix.client_base import handle_response
 
         response = self._create_mock_response(404, {"message": "Memory not found"})
 
         with pytest.raises(NotFoundError) as exc_info:
-            _handle_response(response)
+            handle_response(response)
         assert "Memory not found" in str(exc_info.value)
 
     def test_422_raises_validation_error(self):
         """Test 422 response raises ValidationError."""
-        from trix.client import _handle_response
+        from trix.client_base import handle_response
 
         response = self._create_mock_response(422, {"message": "Invalid input"})
 
         with pytest.raises(ValidationError) as exc_info:
-            _handle_response(response)
+            handle_response(response)
         assert "Invalid input" in str(exc_info.value)
 
     def test_429_raises_rate_limit_error(self):
         """Test 429 response raises RateLimitError."""
-        from trix.client import _handle_response
+        from trix.client_base import handle_response
 
         response = self._create_mock_response(
             429, {"message": "Too many requests"}, headers={"Retry-After": "60"}
         )
 
         with pytest.raises(RateLimitError) as exc_info:
-            _handle_response(response)
+            handle_response(response)
         assert exc_info.value.retry_after == 60
 
     def test_500_raises_server_error(self):
         """Test 500 response raises ServerError."""
-        from trix.client import _handle_response
+        from trix.client_base import handle_response
 
         response = self._create_mock_response(500, {"message": "Internal error"})
 
         with pytest.raises(ServerError) as exc_info:
-            _handle_response(response)
+            handle_response(response)
         assert "Internal error" in str(exc_info.value)
 
     def test_502_raises_server_error(self):
         """Test 502 response raises ServerError."""
-        from trix.client import _handle_response
+        from trix.client_base import handle_response
 
         response = self._create_mock_response(502, {"message": "Bad gateway"})
 
         with pytest.raises(ServerError):
-            _handle_response(response)
+            handle_response(response)
 
     def test_unknown_error_raises_api_error(self):
         """Test unknown status code raises APIError."""
-        from trix.client import _handle_response
+        from trix.client_base import handle_response
 
         response = self._create_mock_response(418, {"message": "I'm a teapot"})
 
         with pytest.raises(APIError) as exc_info:
-            _handle_response(response)
+            handle_response(response)
         assert exc_info.value.status_code == 418
 
 
@@ -178,38 +178,38 @@ class TestVersionChecking:
 
     def test_compatible_version_passes(self):
         """Test compatible API version doesn't raise."""
-        from trix.client import _check_api_version
+        from trix.client_base import check_api_version
 
         response = self._create_mock_response_with_version("v1")
         # Should not raise
-        _check_api_version(response)
+        check_api_version(response)
 
     def test_incompatible_version_raises(self):
         """Test incompatible API version raises APIVersionMismatchError."""
-        from trix.client import _check_api_version
+        from trix.client_base import check_api_version
 
         response = self._create_mock_response_with_version("v99")
 
         with pytest.raises(APIVersionMismatchError) as exc_info:
-            _check_api_version(response)
+            check_api_version(response)
         assert "v99" in str(exc_info.value)
         assert exc_info.value.api_version == "v99"
 
     def test_no_version_header_passes(self):
         """Test missing version header doesn't raise."""
-        from trix.client import _check_api_version
+        from trix.client_base import check_api_version
 
         response = self._create_mock_response_with_version(None)
         # Should not raise
-        _check_api_version(response)
+        check_api_version(response)
 
     def test_invalid_version_format_logs_warning(self):
         """Test invalid version format logs warning but doesn't raise."""
-        from trix.client import _check_api_version
+        from trix.client_base import check_api_version
 
         response = self._create_mock_response_with_version("invalid")
         # Should not raise, just log warning
-        _check_api_version(response)
+        check_api_version(response)
 
 
 class TestCredentialClearing:

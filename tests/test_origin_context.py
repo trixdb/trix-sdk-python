@@ -17,7 +17,7 @@ import pytest
 from datetime import datetime
 from unittest.mock import MagicMock, patch, AsyncMock
 
-from trix import TrixClient
+from trix import Trix
 from trix.types import (
     OriginType,
     SourceType,
@@ -261,14 +261,14 @@ class TestMemoryResourceLink:
         assert link.relationship_type == ResourceRelationshipType.RELATED
 
 
-class TestTrixClientOriginContext:
-    """Test TrixClient with origin/context features."""
+class TestTrixOriginContext:
+    """Test Trix with origin/context features."""
 
     @pytest.fixture
     def mock_client(self):
-        """Create a mock TrixClient."""
-        with patch("trix.TrixClient._make_request") as mock_request:
-            client = TrixClient(api_key="test-api-key")
+        """Create a mock Trix."""
+        with patch("trix.Trix._make_request") as mock_request:
+            client = Trix(api_key="test-api-key")
             client._make_request = mock_request
             yield client, mock_request
 
@@ -345,13 +345,13 @@ class TestTrixClientOriginContext:
 
 
 class TestResourceMethods:
-    """Test resource-related methods on TrixClient."""
+    """Test resource-related methods on Trix."""
 
     @pytest.fixture
     def mock_client(self):
-        """Create a mock TrixClient."""
-        with patch.object(TrixClient, "_make_request") as mock_request:
-            client = TrixClient(api_key="test-api-key")
+        """Create a mock Trix."""
+        with patch.object(Trix, "_make_request") as mock_request:
+            client = Trix(api_key="test-api-key")
             yield client, mock_request
 
     def test_create_resource(self, mock_client):
@@ -452,9 +452,9 @@ class TestMemoryListFilters:
 
     @pytest.fixture
     def mock_client(self):
-        """Create a mock TrixClient."""
-        with patch.object(TrixClient, "_make_request") as mock_request:
-            client = TrixClient(api_key="test-api-key")
+        """Create a mock Trix."""
+        with patch.object(Trix, "_make_request") as mock_request:
+            client = Trix(api_key="test-api-key")
             yield client, mock_request
 
     def test_filter_by_resource_id(self, mock_client):
