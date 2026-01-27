@@ -14,6 +14,8 @@ from .resources import ResourcesResource, AsyncResourcesResource
 from .search import SearchResource
 from .sessions import SessionsResource, AsyncSessionsResource
 from .spaces import SpacesResource
+from .tasks import TasksResource
+from .tasks_async import AsyncTasksResource
 from .webhooks import WebhooksResource
 
 __all__ = [
@@ -24,6 +26,7 @@ __all__ = [
     "AsyncMemoriesResource",
     "AsyncResourcesResource",
     "AsyncSessionsResource",
+    "AsyncTasksResource",
     "ClustersResource",
     "EnrichmentsResource",
     "EntitiesResource",
@@ -37,5 +40,6 @@ __all__ = [
     "SearchResource",
     "SessionsResource",
     "SpacesResource",
+    "TasksResource",
     "WebhooksResource",
 ]

@@ -36,6 +36,7 @@ from .resources import (
     SearchResource,
     SessionsResource,
     SpacesResource,
+    TasksResource,
     WebhooksResource,
 )
 from .utils.retry import RetryConfig
@@ -175,6 +176,7 @@ class Trix:
         self.facts = FactsResource(self)
         self.entities = EntitiesResource(self)
         self.enrichments = EnrichmentsResource(self)
+        self.tasks = TasksResource(self)
 
     def add_request_interceptor(self, interceptor: RequestInterceptor) -> Callable[[], None]:
         """Add a request interceptor.

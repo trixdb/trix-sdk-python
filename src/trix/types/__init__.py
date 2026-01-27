@@ -311,6 +311,28 @@ from .image import (
     VisualSearchResults,
 )
 
+# =============================================================================
+# Task Models
+# =============================================================================
+from .task import (
+    AssigneeType,
+    BulkTaskCreate,
+    BulkTaskResult,
+    BulkTaskUpdate,
+    Label,
+    SubtaskCreate,
+    SuggestedTask,
+    SuggestedTasksResult,
+    Task,
+    TaskCreate,
+    TaskLink,
+    TaskLinkCreate,
+    TaskLinkType,
+    TaskList,
+    TaskStatus,
+    TaskUpdate,
+)
+
 __all__ = [
     # Type variable
     "T",
@@ -495,4 +517,21 @@ __all__ = [
     "QuerySuggestionsResult",
     "VisualSearchResult",
     "VisualSearchResults",
+    # Task
+    "AssigneeType",
+    "BulkTaskCreate",
+    "BulkTaskResult",
+    "BulkTaskUpdate",
+    "Label",
+    "SubtaskCreate",
+    "SuggestedTask",
+    "SuggestedTasksResult",
+    "Task",
+    "TaskCreate",
+    "TaskLink",
+    "TaskLinkCreate",
+    "TaskLinkType",
+    "TaskList",
+    "TaskStatus",
+    "TaskUpdate",
 ]

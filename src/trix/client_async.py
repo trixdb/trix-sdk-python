@@ -35,6 +35,7 @@ from .resources.resources import AsyncResourcesResource
 from .resources.search import AsyncSearchResource
 from .resources.sessions import AsyncSessionsResource
 from .resources.spaces import AsyncSpacesResource
+from .resources.tasks_async import AsyncTasksResource
 from .resources.webhooks import AsyncWebhooksResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
@@ -170,6 +171,7 @@ class AsyncTrix:
         self.facts = AsyncFactsResource(self)
         self.entities = AsyncEntitiesResource(self)
         self.enrichments = AsyncEnrichmentsResource(self)
+        self.tasks = AsyncTasksResource(self)
 
     def add_request_interceptor(self, interceptor: RequestInterceptor) -> Callable[[], None]:
         """Add a request interceptor."""
