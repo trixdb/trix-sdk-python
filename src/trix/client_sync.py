@@ -39,6 +39,7 @@ from .resources import (
     TasksResource,
     WebhooksResource,
 )
+from .resources.personas import PersonasResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
 
@@ -142,6 +143,7 @@ class Trix:
         self._timeout = timeout
         self._retry_config = retry_config or RetryConfig(max_retries=max_retries)
         self._pool_config = pool_config or PoolConfig()
+        self._persona_id: Optional[str] = None
 
         # Initialize interceptors
         self._request_interceptors: List[RequestInterceptor] = list(request_interceptors or [])
@@ -165,6 +167,7 @@ class Trix:
         self.relationships = RelationshipsResource(self)
         self.clusters = ClustersResource(self)
         self.spaces = SpacesResource(self)
+        self.personas = PersonasResource(self)
         self.sessions = SessionsResource(self)
         self.resources = ResourcesResource(self)
         self.graph = GraphResource(self)
@@ -177,6 +180,14 @@ class Trix:
         self.entities = EntitiesResource(self)
         self.enrichments = EnrichmentsResource(self)
         self.tasks = TasksResource(self)
+
+    def set_persona(self, persona_id: str) -> None:
+        """Set the active persona for all subsequent requests."""
+        self._persona_id = persona_id
+
+    def clear_persona(self) -> None:
+        """Clear the active persona."""
+        self._persona_id = None
 
     def add_request_interceptor(self, interceptor: RequestInterceptor) -> Callable[[], None]:
         """Add a request interceptor.
@@ -250,6 +261,8 @@ class Trix:
             "X-API-Version": __api_version__,
         }
         headers.update(self._auth.get_headers())
+        if self._persona_id:
+            headers["X-Persona-Id"] = self._persona_id
         return headers
 
     def _request(

@@ -119,6 +119,19 @@ from .space import (
 )
 
 # =============================================================================
+# Persona Models
+# =============================================================================
+from .persona import (
+    Persona,
+    PersonaAddSpace,
+    PersonaCreate,
+    PersonaGoal,
+    PersonaList,
+    PersonaSpace,
+    PersonaUpdate,
+)
+
+# =============================================================================
 # Graph Models
 # =============================================================================
 from .graph import (
@@ -395,6 +408,14 @@ __all__ = [
     "SpaceCreate",
     "SpaceList",
     "SpaceUpdate",
+    # Persona
+    "Persona",
+    "PersonaAddSpace",
+    "PersonaCreate",
+    "PersonaGoal",
+    "PersonaList",
+    "PersonaSpace",
+    "PersonaUpdate",
     # Graph
     "GraphContext",
     "GraphExpansionResult",

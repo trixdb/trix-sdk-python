@@ -35,6 +35,7 @@ from .resources.resources import AsyncResourcesResource
 from .resources.search import AsyncSearchResource
 from .resources.sessions import AsyncSessionsResource
 from .resources.spaces import AsyncSpacesResource
+from .resources.personas import AsyncPersonasResource
 from .resources.tasks_async import AsyncTasksResource
 from .resources.webhooks import AsyncWebhooksResource
 from .utils.retry import RetryConfig
@@ -137,6 +138,7 @@ class AsyncTrix:
         self._timeout = timeout
         self._retry_config = retry_config or RetryConfig(max_retries=max_retries)
         self._pool_config = pool_config or PoolConfig()
+        self._persona_id: Optional[str] = None
 
         # Initialize interceptors
         self._request_interceptors: List[RequestInterceptor] = list(request_interceptors or [])
@@ -160,6 +162,7 @@ class AsyncTrix:
         self.relationships = AsyncRelationshipsResource(self)
         self.clusters = AsyncClustersResource(self)
         self.spaces = AsyncSpacesResource(self)
+        self.personas = AsyncPersonasResource(self)
         self.sessions = AsyncSessionsResource(self)
         self.resources = AsyncResourcesResource(self)
         self.graph = AsyncGraphResource(self)
@@ -172,6 +175,14 @@ class AsyncTrix:
         self.entities = AsyncEntitiesResource(self)
         self.enrichments = AsyncEnrichmentsResource(self)
         self.tasks = AsyncTasksResource(self)
+
+    def set_persona(self, persona_id: str) -> None:
+        """Set the active persona for all subsequent requests."""
+        self._persona_id = persona_id
+
+    def clear_persona(self) -> None:
+        """Clear the active persona."""
+        self._persona_id = None
 
     def add_request_interceptor(self, interceptor: RequestInterceptor) -> Callable[[], None]:
         """Add a request interceptor."""
@@ -238,6 +249,8 @@ class AsyncTrix:
             "X-API-Version": __api_version__,
         }
         headers.update(self._auth.get_headers())
+        if self._persona_id:
+            headers["X-Persona-Id"] = self._persona_id
         return headers
 
     async def _request(
