@@ -39,6 +39,7 @@ from .resources import (
     TasksResource,
     WebhooksResource,
 )
+from .resources.bots import BotsResource
 from .resources.personas import PersonasResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
@@ -180,6 +181,7 @@ class Trix:
         self.entities = EntitiesResource(self)
         self.enrichments = EnrichmentsResource(self)
         self.tasks = TasksResource(self)
+        self.bots = BotsResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""

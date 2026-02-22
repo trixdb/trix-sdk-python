@@ -17,9 +17,11 @@ from .spaces import SpacesResource
 from .tasks import TasksResource
 from .tasks_async import AsyncTasksResource
 from .webhooks import WebhooksResource
+from .bots import BotsResource, AsyncBotsResource
 
 __all__ = [
     "AgentResource",
+    "AsyncBotsResource",
     "AsyncEnrichmentsResource",
     "AsyncEntitiesResource",
     "AsyncFactsResource",

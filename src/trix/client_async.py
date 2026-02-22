@@ -22,6 +22,7 @@ from .client_base import (
 )
 from .exceptions import APIError, ConnectionError, RateLimitError, ServerError, TimeoutError
 from .resources.agent import AsyncAgentResource
+from .resources.bots import AsyncBotsResource
 from .resources.clusters import AsyncClustersResource
 from .resources.enrichments import AsyncEnrichmentsResource
 from .resources.entities import AsyncEntitiesResource
@@ -175,6 +176,7 @@ class AsyncTrix:
         self.entities = AsyncEntitiesResource(self)
         self.enrichments = AsyncEnrichmentsResource(self)
         self.tasks = AsyncTasksResource(self)
+        self.bots = AsyncBotsResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""

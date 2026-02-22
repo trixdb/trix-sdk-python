@@ -346,6 +346,25 @@ from .task import (
     TaskUpdate,
 )
 
+# =============================================================================
+# Bot Models
+# =============================================================================
+from .bot import (
+    Bot,
+    BotAction,
+    BotAddSpace,
+    BotCreate,
+    BotList,
+    BotRun,
+    BotRunList,
+    BotRunRequest,
+    BotSpace,
+    BotTool,
+    BotTrigger,
+    BotTriggerCreate,
+    BotUpdate,
+)
+
 __all__ = [
     # Type variable
     "T",
@@ -555,4 +574,18 @@ __all__ = [
     "TaskList",
     "TaskStatus",
     "TaskUpdate",
+    # Bot
+    "Bot",
+    "BotAction",
+    "BotAddSpace",
+    "BotCreate",
+    "BotList",
+    "BotRun",
+    "BotRunList",
+    "BotRunRequest",
+    "BotSpace",
+    "BotTool",
+    "BotTrigger",
+    "BotTriggerCreate",
+    "BotUpdate",
 ]
