@@ -329,7 +329,9 @@ from .image import (
 # =============================================================================
 from .task import (
     AssigneeType,
+    BulkDeleteResult,
     BulkTaskCreate,
+    BulkTaskFailure,
     BulkTaskResult,
     BulkTaskUpdate,
     Label,
@@ -338,6 +340,8 @@ from .task import (
     SuggestedTasksResult,
     Task,
     TaskCreate,
+    TaskHandoffParams,
+    TaskHandoffResult,
     TaskLink,
     TaskLinkCreate,
     TaskLinkType,
@@ -559,7 +563,9 @@ __all__ = [
     "VisualSearchResults",
     # Task
     "AssigneeType",
+    "BulkDeleteResult",
     "BulkTaskCreate",
+    "BulkTaskFailure",
     "BulkTaskResult",
     "BulkTaskUpdate",
     "Label",
@@ -568,6 +574,8 @@ __all__ = [
     "SuggestedTasksResult",
     "Task",
     "TaskCreate",
+    "TaskHandoffParams",
+    "TaskHandoffResult",
     "TaskLink",
     "TaskLinkCreate",
     "TaskLinkType",

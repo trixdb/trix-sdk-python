@@ -79,7 +79,7 @@ class TaskCreate(BaseModel):
     """Request to create a task."""
 
     title: str
-    space_id: Optional[str] = None
+    space_id: str
     section_id: Optional[str] = None
     description: Optional[str] = None
     status: Optional[str] = None
@@ -200,6 +200,24 @@ class BulkTaskResult(BaseResponse):
     updated: List[Task] = Field(default_factory=list)
 
 
+class BulkTaskFailure(BaseModel):
+    """Details of a failed bulk task operation."""
+
+    index: int
+    id: Optional[str] = None
+    error: str
+    suggestion: Optional[str] = None
+
+
+class BulkDeleteResult(BaseResponse):
+    """Result of a bulk delete operation."""
+
+    success: bool
+    deleted_count: int = Field(alias="deletedCount")
+    deleted_ids: List[str] = Field(default_factory=list, alias="deletedIds")
+    failed: List[BulkTaskFailure] = Field(default_factory=list)
+
+
 class SuggestedTask(BaseResponse):
     """A task with priority score for suggestions."""
 
@@ -213,3 +231,21 @@ class SuggestedTasksResult(BaseResponse):
 
     data: List[SuggestedTask]
     context: Optional[str] = None
+
+
+class TaskHandoffParams(BaseModel):
+    """Parameters for handing off a task to another agent."""
+
+    target_agent_id: str
+    handoff_notes: Optional[str] = None
+    checkpoint_data: Optional[Dict[str, Any]] = None
+
+
+class TaskHandoffResult(BaseResponse):
+    """Result of a task handoff operation."""
+
+    handoff_id: str
+    task: Task
+    previous_assignee_id: Optional[str] = None
+    new_assignee_id: str
+    checkpoint_stored: bool = False
