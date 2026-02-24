@@ -40,7 +40,9 @@ from .resources import (
     WebhooksResource,
 )
 from .resources.bots import BotsResource
+from .resources.habits import HabitsResource
 from .resources.personas import PersonasResource
+from .resources.space_config import SpaceConfigResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
 
@@ -181,7 +183,9 @@ class Trix:
         self.entities = EntitiesResource(self)
         self.enrichments = EnrichmentsResource(self)
         self.tasks = TasksResource(self)
+        self.habits = HabitsResource(self)
         self.bots = BotsResource(self)
+        self.space_config = SpaceConfigResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""
@@ -274,14 +278,18 @@ class Trix:
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> Any:
         """Make HTTP request to Trix API with retry logic."""
         last_exception: Optional[Exception] = None
         config = self._retry_config
         request_timeout = timeout if timeout is not None else self._timeout
 
+        merged_headers = self._get_headers()
+        if headers:
+            merged_headers.update(headers)
         request_context = RequestContext(
-            method=method, path=path, params=params, json=json, headers=self._get_headers()
+            method=method, path=path, params=params, json=json, headers=merged_headers
         )
         request_context = self._run_request_interceptors(request_context)
 
@@ -310,7 +318,12 @@ class Trix:
         """Execute the HTTP request."""
         logger.debug(f"Request: {ctx.method} {ctx.path} params={_safe_log_params(ctx.params)}")
         return self._client.request(
-            method=ctx.method, url=ctx.path, params=ctx.params, json=ctx.json, timeout=timeout
+            method=ctx.method,
+            url=ctx.path,
+            params=ctx.params,
+            json=ctx.json,
+            headers=ctx.headers,
+            timeout=timeout,
         )
 
     def _process_response(self, response: httpx.Response, ctx: RequestContext) -> Any:

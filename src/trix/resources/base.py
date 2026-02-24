@@ -151,6 +151,7 @@ class BaseSyncResource(BaseResource):
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> Any:
         """Make an HTTP request through the client.
 
@@ -160,11 +161,14 @@ class BaseSyncResource(BaseResource):
             params: Optional query parameters
             json: Optional JSON body
             timeout: Optional timeout override
+            headers: Optional extra headers to merge into the request
 
         Returns:
             Response data from API
         """
-        return self._client._request(method, path, params=params, json=json, timeout=timeout)
+        return self._client._request(
+            method, path, params=params, json=json, timeout=timeout, headers=headers
+        )
 
 
 class BaseAsyncResource(BaseResource):
@@ -199,6 +203,7 @@ class BaseAsyncResource(BaseResource):
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> Any:
         """Make an async HTTP request through the client.
 
@@ -208,8 +213,11 @@ class BaseAsyncResource(BaseResource):
             params: Optional query parameters
             json: Optional JSON body
             timeout: Optional timeout override
+            headers: Optional extra headers to merge into the request
 
         Returns:
             Response data from API
         """
-        return await self._client._request(method, path, params=params, json=json, timeout=timeout)
+        return await self._client._request(
+            method, path, params=params, json=json, timeout=timeout, headers=headers
+        )

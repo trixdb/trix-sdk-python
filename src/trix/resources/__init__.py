@@ -16,8 +16,11 @@ from .sessions import SessionsResource, AsyncSessionsResource
 from .spaces import SpacesResource
 from .tasks import TasksResource
 from .tasks_async import AsyncTasksResource
+from .habits import HabitsResource
+from .habits_async import AsyncHabitsResource
 from .webhooks import WebhooksResource
 from .bots import BotsResource, AsyncBotsResource
+from .space_config import SpaceConfigResource, AsyncSpaceConfigResource
 
 __all__ = [
     "AgentResource",
@@ -29,6 +32,8 @@ __all__ = [
     "AsyncResourcesResource",
     "AsyncSessionsResource",
     "AsyncTasksResource",
+    "HabitsResource",
+    "AsyncHabitsResource",
     "ClustersResource",
     "EnrichmentsResource",
     "EntitiesResource",
@@ -44,4 +49,6 @@ __all__ = [
     "SpacesResource",
     "TasksResource",
     "WebhooksResource",
+    "SpaceConfigResource",
+    "AsyncSpaceConfigResource",
 ]

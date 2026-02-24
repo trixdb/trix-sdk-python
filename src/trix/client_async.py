@@ -23,6 +23,7 @@ from .client_base import (
 from .exceptions import APIError, ConnectionError, RateLimitError, ServerError, TimeoutError
 from .resources.agent import AsyncAgentResource
 from .resources.bots import AsyncBotsResource
+from .resources.habits_async import AsyncHabitsResource
 from .resources.clusters import AsyncClustersResource
 from .resources.enrichments import AsyncEnrichmentsResource
 from .resources.entities import AsyncEntitiesResource
@@ -37,6 +38,7 @@ from .resources.search import AsyncSearchResource
 from .resources.sessions import AsyncSessionsResource
 from .resources.spaces import AsyncSpacesResource
 from .resources.personas import AsyncPersonasResource
+from .resources.space_config import AsyncSpaceConfigResource
 from .resources.tasks_async import AsyncTasksResource
 from .resources.webhooks import AsyncWebhooksResource
 from .utils.retry import RetryConfig
@@ -176,7 +178,9 @@ class AsyncTrix:
         self.entities = AsyncEntitiesResource(self)
         self.enrichments = AsyncEnrichmentsResource(self)
         self.tasks = AsyncTasksResource(self)
+        self.habits = AsyncHabitsResource(self)
         self.bots = AsyncBotsResource(self)
+        self.space_config = AsyncSpaceConfigResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""
@@ -262,14 +266,18 @@ class AsyncTrix:
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> Any:
         """Make async HTTP request to Trix API with retry logic."""
         last_exception: Optional[Exception] = None
         config = self._retry_config
         request_timeout = timeout if timeout is not None else self._timeout
 
+        merged_headers = self._get_headers()
+        if headers:
+            merged_headers.update(headers)
         request_context = RequestContext(
-            method=method, path=path, params=params, json=json, headers=self._get_headers()
+            method=method, path=path, params=params, json=json, headers=merged_headers
         )
         request_context = self._run_request_interceptors(request_context)
 
@@ -298,7 +306,12 @@ class AsyncTrix:
         """Execute the async HTTP request."""
         logger.debug(f"Request: {ctx.method} {ctx.path} params={_safe_log_params(ctx.params)}")
         return await self._client.request(
-            method=ctx.method, url=ctx.path, params=ctx.params, json=ctx.json, timeout=timeout
+            method=ctx.method,
+            url=ctx.path,
+            params=ctx.params,
+            json=ctx.json,
+            headers=ctx.headers,
+            timeout=timeout,
         )
 
     def _process_response(self, response: httpx.Response, ctx: RequestContext) -> Any:

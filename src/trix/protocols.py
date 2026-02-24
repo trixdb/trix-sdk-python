@@ -30,6 +30,7 @@ class SyncClientProtocol(Protocol):
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> Any:
         """Make an HTTP request and return parsed response."""
         ...
@@ -84,6 +85,7 @@ class AsyncClientProtocol(Protocol):
         params: Optional[Dict[str, Any]] = None,
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
+        headers: Optional[Dict[str, str]] = None,
     ) -> Any:
         """Make an async HTTP request and return parsed response."""
         ...

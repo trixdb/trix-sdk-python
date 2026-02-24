@@ -369,6 +369,18 @@ from .bot import (
     BotUpdate,
 )
 
+# =============================================================================
+# Space Config Models
+# =============================================================================
+from .space_config import (
+    SpaceConfigAuditEvent,
+    SpaceConfigAuditResponse,
+    SpaceConfigCategory,
+    SpaceConfigPatch,
+    SpaceConfigResponse,
+    SpaceConfigValidation,
+)
+
 __all__ = [
     # Type variable
     "T",
@@ -596,4 +608,11 @@ __all__ = [
     "BotTrigger",
     "BotTriggerCreate",
     "BotUpdate",
+    # Space Config
+    "SpaceConfigAuditEvent",
+    "SpaceConfigAuditResponse",
+    "SpaceConfigCategory",
+    "SpaceConfigPatch",
+    "SpaceConfigResponse",
+    "SpaceConfigValidation",
 ]
