@@ -40,6 +40,7 @@ from .resources import (
     WebhooksResource,
 )
 from .resources.bots import BotsResource
+from .resources.goals import GoalsResource
 from .resources.habits import HabitsResource
 from .resources.personas import PersonasResource
 from .resources.space_config import SpaceConfigResource
@@ -183,6 +184,7 @@ class Trix:
         self.entities = EntitiesResource(self)
         self.enrichments = EnrichmentsResource(self)
         self.tasks = TasksResource(self)
+        self.goals = GoalsResource(self)
         self.habits = HabitsResource(self)
         self.bots = BotsResource(self)
         self.space_config = SpaceConfigResource(self)

@@ -29,6 +29,7 @@ from .resources.enrichments import AsyncEnrichmentsResource
 from .resources.entities import AsyncEntitiesResource
 from .resources.facts import AsyncFactsResource
 from .resources.feedback import AsyncFeedbackResource
+from .resources.goals_async import AsyncGoalsResource
 from .resources.graph import AsyncGraphResource
 from .resources.highlights import AsyncHighlightsResource
 from .resources.memories import AsyncMemoriesResource
@@ -178,6 +179,7 @@ class AsyncTrix:
         self.entities = AsyncEntitiesResource(self)
         self.enrichments = AsyncEnrichmentsResource(self)
         self.tasks = AsyncTasksResource(self)
+        self.goals = AsyncGoalsResource(self)
         self.habits = AsyncHabitsResource(self)
         self.bots = AsyncBotsResource(self)
         self.space_config = AsyncSpaceConfigResource(self)

@@ -8,6 +8,7 @@ from ..types.habit import (
     CheckInResult,
     DueHabitsResult,
     Habit,
+    HabitAnalytics,
     HabitCreate,
     HabitHistoryResult,
     HabitList,
@@ -167,6 +168,12 @@ class AsyncHabitsResource(BaseAsyncResource):
             "GET", "/habits/due", params=params if params else None
         )
         return DueHabitsResult.model_validate(response)
+
+    async def analytics(self, habit_id: str) -> HabitAnalytics:
+        """Get analytics for a habit (async)."""
+        validate_id(habit_id, "habit")
+        response = await self._request("GET", f"/habits/{habit_id}/analytics")
+        return HabitAnalytics.model_validate(response)
 
     async def pause(self, habit_id: str) -> Habit:
         """Pause a habit (async)."""

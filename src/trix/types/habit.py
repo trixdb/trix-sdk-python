@@ -145,3 +145,30 @@ class DueHabitsResult(BaseModel):
 
     habits: List[Habit] = Field(default_factory=list)
     date: str
+
+
+class BestDay(BaseModel):
+    """Best day of week for completions."""
+
+    day: str
+    count: int
+
+
+class WeeklyTrendEntry(BaseModel):
+    """Weekly completion count."""
+
+    week_start: str
+    count: int
+
+
+class HabitAnalytics(BaseModel):
+    """Analytics for a single habit."""
+
+    habit_id: str
+    completion_rate: Optional[float] = None
+    current_streak: int = 0
+    longest_streak: int = 0
+    total_completions: int = 0
+    best_day: Optional[BestDay] = None
+    consistency_score: float = 0
+    weekly_trend: List[WeeklyTrendEntry] = Field(default_factory=list)

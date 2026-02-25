@@ -6,6 +6,8 @@ from .enrichments import EnrichmentsResource, AsyncEnrichmentsResource
 from .entities import EntitiesResource, AsyncEntitiesResource
 from .facts import FactsResource, AsyncFactsResource
 from .feedback import FeedbackResource
+from .goals import GoalsResource
+from .goals_async import AsyncGoalsResource
 from .graph import GraphResource
 from .highlights import HighlightsResource
 from .memories import MemoriesResource, AsyncMemoriesResource
@@ -28,6 +30,7 @@ __all__ = [
     "AsyncEnrichmentsResource",
     "AsyncEntitiesResource",
     "AsyncFactsResource",
+    "AsyncGoalsResource",
     "AsyncMemoriesResource",
     "AsyncResourcesResource",
     "AsyncSessionsResource",
@@ -39,6 +42,7 @@ __all__ = [
     "EntitiesResource",
     "FactsResource",
     "FeedbackResource",
+    "GoalsResource",
     "GraphResource",
     "HighlightsResource",
     "MemoriesResource",

@@ -239,6 +239,24 @@ from .transcript import (
     WordTimestamp,
 )
 
+# =============================================================================
+# Goal Models
+# =============================================================================
+from .goal import (
+    Goal,
+    GoalContributor,
+    GoalContributorCreate,
+    GoalContributorUpdate,
+    GoalCreate,
+    GoalList,
+    GoalMemoryLink,
+    GoalMemoryListResponse,
+    GoalProgressUpdate,
+    GoalStatusTransition,
+    GoalUpdate,
+    ProgressHistoryEntry,
+    ProgressHistoryList,
+)
 
 # =============================================================================
 # Fact Models
@@ -519,6 +537,20 @@ __all__ = [
     "TranscriptEntity",
     "TranscriptSegment",
     "WordTimestamp",
+    # Goal
+    "Goal",
+    "GoalContributor",
+    "GoalContributorCreate",
+    "GoalContributorUpdate",
+    "GoalCreate",
+    "GoalList",
+    "GoalMemoryLink",
+    "GoalMemoryListResponse",
+    "GoalProgressUpdate",
+    "GoalStatusTransition",
+    "GoalUpdate",
+    "ProgressHistoryEntry",
+    "ProgressHistoryList",
     # Fact
     "ExtractedFact",
     "Fact",

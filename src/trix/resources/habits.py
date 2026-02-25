@@ -8,6 +8,7 @@ from ..types.habit import (
     CheckInResult,
     DueHabitsResult,
     Habit,
+    HabitAnalytics,
     HabitCreate,
     HabitHistoryResult,
     HabitList,
@@ -163,6 +164,12 @@ class HabitsResource(BaseSyncResource):
             params["date"] = date
         response = self._request("GET", "/habits/due", params=params if params else None)
         return DueHabitsResult.model_validate(response)
+
+    def analytics(self, habit_id: str) -> HabitAnalytics:
+        """Get analytics for a habit."""
+        validate_id(habit_id, "habit")
+        response = self._request("GET", f"/habits/{habit_id}/analytics")
+        return HabitAnalytics.model_validate(response)
 
     def pause(self, habit_id: str) -> Habit:
         """Pause a habit."""
