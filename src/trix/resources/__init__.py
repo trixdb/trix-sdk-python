@@ -23,6 +23,8 @@ from .habits_async import AsyncHabitsResource
 from .webhooks import WebhooksResource
 from .bots import BotsResource, AsyncBotsResource
 from .space_config import SpaceConfigResource, AsyncSpaceConfigResource
+from .workflows import WorkflowsResource
+from .workflows_async import AsyncWorkflowsResource
 
 __all__ = [
     "AgentResource",
@@ -55,4 +57,6 @@ __all__ = [
     "WebhooksResource",
     "SpaceConfigResource",
     "AsyncSpaceConfigResource",
+    "WorkflowsResource",
+    "AsyncWorkflowsResource",
 ]

@@ -42,6 +42,7 @@ from .resources.personas import AsyncPersonasResource
 from .resources.space_config import AsyncSpaceConfigResource
 from .resources.tasks_async import AsyncTasksResource
 from .resources.webhooks import AsyncWebhooksResource
+from .resources.workflows_async import AsyncWorkflowsResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
 
@@ -183,6 +184,7 @@ class AsyncTrix:
         self.habits = AsyncHabitsResource(self)
         self.bots = AsyncBotsResource(self)
         self.space_config = AsyncSpaceConfigResource(self)
+        self.workflows = AsyncWorkflowsResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""
@@ -302,9 +304,7 @@ class AsyncTrix:
             raise last_exception
         raise RuntimeError("Retry logic failed unexpectedly")
 
-    async def _execute_request(
-        self, ctx: RequestContext, timeout: float
-    ) -> httpx.Response:
+    async def _execute_request(self, ctx: RequestContext, timeout: float) -> httpx.Response:
         """Execute the async HTTP request."""
         logger.debug(f"Request: {ctx.method} {ctx.path} params={_safe_log_params(ctx.params)}")
         return await self._client.request(
@@ -329,7 +329,10 @@ class AsyncTrix:
 
         response_data: Any = {} if response.status_code == 204 else response.json()
         response_context = ResponseContext(
-            request=ctx, status_code=response.status_code, headers=dict(response.headers), data=response_data
+            request=ctx,
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            data=response_data,
         )
         response_context = self._run_response_interceptors(response_context)
         return response_context.data

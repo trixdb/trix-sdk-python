@@ -44,6 +44,7 @@ from .resources.goals import GoalsResource
 from .resources.habits import HabitsResource
 from .resources.personas import PersonasResource
 from .resources.space_config import SpaceConfigResource
+from .resources.workflows import WorkflowsResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
 
@@ -188,6 +189,7 @@ class Trix:
         self.habits = HabitsResource(self)
         self.bots = BotsResource(self)
         self.space_config = SpaceConfigResource(self)
+        self.workflows = WorkflowsResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""
@@ -314,9 +316,7 @@ class Trix:
             raise last_exception
         raise RuntimeError("Retry logic failed unexpectedly")
 
-    def _execute_request(
-        self, ctx: RequestContext, timeout: float
-    ) -> httpx.Response:
+    def _execute_request(self, ctx: RequestContext, timeout: float) -> httpx.Response:
         """Execute the HTTP request."""
         logger.debug(f"Request: {ctx.method} {ctx.path} params={_safe_log_params(ctx.params)}")
         return self._client.request(
@@ -341,7 +341,10 @@ class Trix:
 
         response_data: Any = {} if response.status_code == 204 else response.json()
         response_context = ResponseContext(
-            request=ctx, status_code=response.status_code, headers=dict(response.headers), data=response_data
+            request=ctx,
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            data=response_data,
         )
         response_context = self._run_response_interceptors(response_context)
         return response_context.data

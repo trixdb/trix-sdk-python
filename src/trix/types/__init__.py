@@ -388,6 +388,21 @@ from .bot import (
 )
 
 # =============================================================================
+# Workflow Models
+# =============================================================================
+from .workflow import (
+    TriggerCreate,
+    TriggerUpdate,
+    Workflow,
+    WorkflowCreate,
+    WorkflowList,
+    WorkflowRun,
+    WorkflowRunList,
+    WorkflowTrigger,
+    WorkflowUpdate,
+)
+
+# =============================================================================
 # Space Config Models
 # =============================================================================
 from .space_config import (
@@ -640,6 +655,16 @@ __all__ = [
     "BotTrigger",
     "BotTriggerCreate",
     "BotUpdate",
+    # Workflow
+    "TriggerCreate",
+    "TriggerUpdate",
+    "Workflow",
+    "WorkflowCreate",
+    "WorkflowList",
+    "WorkflowRun",
+    "WorkflowRunList",
+    "WorkflowTrigger",
+    "WorkflowUpdate",
     # Space Config
     "SpaceConfigAuditEvent",
     "SpaceConfigAuditResponse",
