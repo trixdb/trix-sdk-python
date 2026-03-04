@@ -277,7 +277,7 @@ class AsyncGoalsResource(BaseAsyncResource):
         )
         response = await self._request(
             "POST",
-            f"/v1/goals/{goal_id}/key-results",
+            f"/goals/{goal_id}/key-results",
             json=data.model_dump(exclude_none=True),
         )
         return Goal.model_validate(response)
@@ -285,19 +285,19 @@ class AsyncGoalsResource(BaseAsyncResource):
     async def get_tree(self, goal_id: str) -> List[Goal]:
         """Get the full goal hierarchy tree (async)."""
         validate_id(goal_id, "goal")
-        response = await self._request("GET", f"/v1/goals/{goal_id}/tree")
+        response = await self._request("GET", f"/goals/{goal_id}/tree")
         return [Goal.model_validate(g) for g in response]
 
     async def get_children(self, goal_id: str) -> List[Goal]:
         """Get direct children of a goal (async)."""
         validate_id(goal_id, "goal")
-        response = await self._request("GET", f"/v1/goals/{goal_id}/children")
+        response = await self._request("GET", f"/goals/{goal_id}/children")
         return [Goal.model_validate(g) for g in response]
 
     async def get_pace(self, goal_id: str) -> PaceAnalysis:
         """Get pace analysis for a goal (async)."""
         validate_id(goal_id, "goal")
-        response = await self._request("GET", f"/v1/goals/{goal_id}/pace")
+        response = await self._request("GET", f"/goals/{goal_id}/pace")
         return PaceAnalysis.model_validate(response)
 
     async def link_memory(
@@ -311,7 +311,7 @@ class AsyncGoalsResource(BaseAsyncResource):
         validate_id(memory_id, "memory")
         response = await self._request(
             "POST",
-            f"/v1/goals/{goal_id}/memories",
+            f"/goals/{goal_id}/memories",
             json={"memory_id": memory_id, "link_type": link_type},
         )
         return GoalMemoryLink.model_validate(response)
@@ -320,7 +320,7 @@ class AsyncGoalsResource(BaseAsyncResource):
         """Unlink a memory from a goal (async)."""
         validate_id(goal_id, "goal")
         validate_id(memory_id, "memory")
-        await self._request("DELETE", f"/v1/goals/{goal_id}/memories/{memory_id}")
+        await self._request("DELETE", f"/goals/{goal_id}/memories/{memory_id}")
 
     async def get_memories(
         self,
@@ -331,5 +331,5 @@ class AsyncGoalsResource(BaseAsyncResource):
         """Get memories linked to a goal (async)."""
         validate_id(goal_id, "goal")
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
-        response = await self._request("GET", f"/v1/goals/{goal_id}/memories", params=params)
+        response = await self._request("GET", f"/goals/{goal_id}/memories", params=params)
         return GoalMemoryListResponse.model_validate(response)

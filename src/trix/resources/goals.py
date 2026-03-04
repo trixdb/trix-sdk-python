@@ -277,7 +277,7 @@ class GoalsResource(BaseSyncResource):
         )
         response = self._request(
             "POST",
-            f"/v1/goals/{goal_id}/key-results",
+            f"/goals/{goal_id}/key-results",
             json=data.model_dump(exclude_none=True),
         )
         return Goal.model_validate(response)
@@ -285,19 +285,19 @@ class GoalsResource(BaseSyncResource):
     def get_tree(self, goal_id: str) -> List[Goal]:
         """Get the full goal hierarchy tree."""
         validate_id(goal_id, "goal")
-        response = self._request("GET", f"/v1/goals/{goal_id}/tree")
+        response = self._request("GET", f"/goals/{goal_id}/tree")
         return [Goal.model_validate(g) for g in response]
 
     def get_children(self, goal_id: str) -> List[Goal]:
         """Get direct children of a goal."""
         validate_id(goal_id, "goal")
-        response = self._request("GET", f"/v1/goals/{goal_id}/children")
+        response = self._request("GET", f"/goals/{goal_id}/children")
         return [Goal.model_validate(g) for g in response]
 
     def get_pace(self, goal_id: str) -> PaceAnalysis:
         """Get pace analysis for a goal."""
         validate_id(goal_id, "goal")
-        response = self._request("GET", f"/v1/goals/{goal_id}/pace")
+        response = self._request("GET", f"/goals/{goal_id}/pace")
         return PaceAnalysis.model_validate(response)
 
     def link_memory(
@@ -311,7 +311,7 @@ class GoalsResource(BaseSyncResource):
         validate_id(memory_id, "memory")
         response = self._request(
             "POST",
-            f"/v1/goals/{goal_id}/memories",
+            f"/goals/{goal_id}/memories",
             json={"memory_id": memory_id, "link_type": link_type},
         )
         return GoalMemoryLink.model_validate(response)
@@ -320,7 +320,7 @@ class GoalsResource(BaseSyncResource):
         """Unlink a memory from a goal."""
         validate_id(goal_id, "goal")
         validate_id(memory_id, "memory")
-        self._request("DELETE", f"/v1/goals/{goal_id}/memories/{memory_id}")
+        self._request("DELETE", f"/goals/{goal_id}/memories/{memory_id}")
 
     def get_memories(
         self,
@@ -331,5 +331,5 @@ class GoalsResource(BaseSyncResource):
         """Get memories linked to a goal."""
         validate_id(goal_id, "goal")
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
-        response = self._request("GET", f"/v1/goals/{goal_id}/memories", params=params)
+        response = self._request("GET", f"/goals/{goal_id}/memories", params=params)
         return GoalMemoryListResponse.model_validate(response)
