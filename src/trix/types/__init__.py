@@ -403,6 +403,21 @@ from .workflow import (
 )
 
 # =============================================================================
+# Note Models
+# =============================================================================
+from .note import (
+    Note,
+    NoteBlock,
+    NoteBlockCreate,
+    NoteBlockUpdate,
+    NoteCollaborator,
+    NoteCollaboratorCreate,
+    NoteCreate,
+    NoteList,
+    NoteUpdate,
+)
+
+# =============================================================================
 # Space Config Models
 # =============================================================================
 from .space_config import (
@@ -665,6 +680,16 @@ __all__ = [
     "WorkflowRunList",
     "WorkflowTrigger",
     "WorkflowUpdate",
+    # Note
+    "Note",
+    "NoteBlock",
+    "NoteBlockCreate",
+    "NoteBlockUpdate",
+    "NoteCollaborator",
+    "NoteCollaboratorCreate",
+    "NoteCreate",
+    "NoteList",
+    "NoteUpdate",
     # Space Config
     "SpaceConfigAuditEvent",
     "SpaceConfigAuditResponse",

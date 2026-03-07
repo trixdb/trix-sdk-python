@@ -45,6 +45,7 @@ from .resources.habits import HabitsResource
 from .resources.personas import PersonasResource
 from .resources.space_config import SpaceConfigResource
 from .resources.workflows import WorkflowsResource
+from .resources.notes import NotesResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
 
@@ -190,6 +191,7 @@ class Trix:
         self.bots = BotsResource(self)
         self.space_config = SpaceConfigResource(self)
         self.workflows = WorkflowsResource(self)
+        self.notes = NotesResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""

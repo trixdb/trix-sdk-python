@@ -25,6 +25,7 @@ from .bots import BotsResource, AsyncBotsResource
 from .space_config import SpaceConfigResource, AsyncSpaceConfigResource
 from .workflows import WorkflowsResource
 from .workflows_async import AsyncWorkflowsResource
+from .notes import NotesResource
 
 __all__ = [
     "AgentResource",
@@ -59,4 +60,5 @@ __all__ = [
     "AsyncSpaceConfigResource",
     "WorkflowsResource",
     "AsyncWorkflowsResource",
+    "NotesResource",
 ]
