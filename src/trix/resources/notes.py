@@ -293,3 +293,64 @@ class NotesResource(BaseSyncResource):
         validate_id(note_id, "note")
         validate_id(memory_id, "memory")
         self._request("DELETE", f"/notes/{note_id}/memories/{memory_id}")
+
+    # Daily Notes (Phase 4)
+
+    def get_daily(self, date: str) -> Note:
+        """Get or create a daily note for a date (YYYY-MM-DD)."""
+        response = self._request("GET", f"/notes/daily/{date}")
+        return Note.model_validate(response)
+
+    def create_daily(self, date: Optional[str] = None) -> Note:
+        """Create today's daily note (or for a specific date)."""
+        data: Dict[str, Any] = {}
+        if date is not None:
+            data["date"] = date
+        response = self._request("POST", "/notes/daily", json=data)
+        return Note.model_validate(response)
+
+    # Templates (Phase 4)
+
+    def list_templates(self, limit: int = 20, offset: int = 0) -> NoteList:
+        """List note templates."""
+        params: Dict[str, Any] = {"limit": limit, "offset": offset}
+        response = self._request("GET", "/notes/templates", params=params)
+        return NoteList.model_validate(response)
+
+    def create_from_template(
+        self,
+        template_id: str,
+        title: Optional[str] = None,
+        space_id: Optional[str] = None,
+        visibility: Optional[str] = None,
+    ) -> Note:
+        """Create a note from a template."""
+        validate_id(template_id, "template")
+        data: Dict[str, Any] = {}
+        if title is not None:
+            data["title"] = title
+        if space_id is not None:
+            data["space_id"] = space_id
+        if visibility is not None:
+            data["visibility"] = visibility
+        response = self._request(
+            "POST", f"/notes/from-template/{template_id}", json=data
+        )
+        return Note.model_validate(response)
+
+    # AI Features (Phase 4)
+
+    def summarize(self, note_id: str) -> Dict[str, Any]:
+        """AI-summarize a note."""
+        validate_id(note_id, "note")
+        return self._request("POST", f"/notes/{note_id}/ai/summarize")
+
+    def extract_tasks(self, note_id: str) -> Dict[str, Any]:
+        """AI-extract action items from a note."""
+        validate_id(note_id, "note")
+        return self._request("POST", f"/notes/{note_id}/ai/extract-tasks")
+
+    def suggest_links(self, note_id: str) -> Dict[str, Any]:
+        """AI-suggest related notes to link."""
+        validate_id(note_id, "note")
+        return self._request("POST", f"/notes/{note_id}/ai/suggest-links")
