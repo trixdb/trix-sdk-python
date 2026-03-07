@@ -413,7 +413,12 @@ from .note import (
     NoteCollaborator,
     NoteCollaboratorCreate,
     NoteCreate,
+    NoteLink,
+    NoteLinkCreate,
     NoteList,
+    NoteMemoryLink,
+    NoteMemoryLinkCreate,
+    NoteMemoryList,
     NoteUpdate,
 )
 
@@ -688,7 +693,12 @@ __all__ = [
     "NoteCollaborator",
     "NoteCollaboratorCreate",
     "NoteCreate",
+    "NoteLink",
+    "NoteLinkCreate",
     "NoteList",
+    "NoteMemoryLink",
+    "NoteMemoryLinkCreate",
+    "NoteMemoryList",
     "NoteUpdate",
     # Space Config
     "SpaceConfigAuditEvent",

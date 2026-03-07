@@ -11,7 +11,12 @@ from ..types.note import (
     NoteCollaborator,
     NoteCollaboratorCreate,
     NoteCreate,
+    NoteLink,
+    NoteLinkCreate,
     NoteList,
+    NoteMemoryLink,
+    NoteMemoryLinkCreate,
+    NoteMemoryList,
     NoteUpdate,
 )
 from ..utils.security import validate_id
@@ -207,3 +212,84 @@ class NotesResource(BaseSyncResource):
         validate_id(note_id, "note")
         validate_id(collaborator_id, "collaborator")
         self._request("DELETE", f"/notes/{note_id}/collaborators/{collaborator_id}")
+
+    # Links (Phase 3)
+
+    def create_link(
+        self,
+        note_id: str,
+        target_note_id: str,
+        source_block_id: Optional[str] = None,
+        target_block_id: Optional[str] = None,
+        link_type: Optional[str] = None,
+    ) -> NoteLink:
+        """Create a link from this note to another."""
+        validate_id(note_id, "note")
+        validate_id(target_note_id, "target_note")
+        data = NoteLinkCreate(
+            target_note_id=target_note_id,
+            source_block_id=source_block_id,
+            target_block_id=target_block_id,
+            link_type=link_type,
+        )
+        response = self._request(
+            "POST", f"/notes/{note_id}/links", json=data.model_dump(exclude_none=True)
+        )
+        return NoteLink.model_validate(response)
+
+    def get_links(self, note_id: str) -> List[NoteLink]:
+        """Get outgoing links from a note."""
+        validate_id(note_id, "note")
+        response = self._request("GET", f"/notes/{note_id}/links")
+        return [NoteLink.model_validate(link) for link in response]
+
+    def get_backlinks(self, note_id: str) -> List[NoteLink]:
+        """Get backlinks to a note."""
+        validate_id(note_id, "note")
+        response = self._request("GET", f"/notes/{note_id}/backlinks")
+        return [NoteLink.model_validate(link) for link in response]
+
+    def remove_link(self, note_id: str, link_id: str) -> None:
+        """Remove a link from a note."""
+        validate_id(note_id, "note")
+        validate_id(link_id, "link")
+        self._request("DELETE", f"/notes/{note_id}/links/{link_id}")
+
+    # Memories (Phase 3)
+
+    def link_memory(
+        self,
+        note_id: str,
+        memory_id: str,
+        block_id: Optional[str] = None,
+        link_type: Optional[str] = None,
+        relevance_score: Optional[float] = None,
+    ) -> NoteMemoryLink:
+        """Link a memory to a note."""
+        validate_id(note_id, "note")
+        validate_id(memory_id, "memory")
+        data = NoteMemoryLinkCreate(
+            memory_id=memory_id,
+            block_id=block_id,
+            link_type=link_type,
+            relevance_score=relevance_score,
+        )
+        response = self._request(
+            "POST", f"/notes/{note_id}/memories", json=data.model_dump(exclude_none=True)
+        )
+        return NoteMemoryLink.model_validate(response)
+
+    def list_memories(
+        self, note_id: str, limit: int = 50, offset: int = 0
+    ) -> NoteMemoryList:
+        """List memories linked to a note."""
+        validate_id(note_id, "note")
+        params: Dict[str, Any] = {"limit": limit, "offset": offset}
+        response = self._request("GET", f"/notes/{note_id}/memories", params=params)
+        return NoteMemoryList.model_validate(response)
+
+    def unlink_memory(self, note_id: str, memory_id: str) -> None:
+        """Unlink a memory from a note."""
+        validate_id(note_id, "note")
+        validate_id(memory_id, "memory")
+        self._request("DELETE", f"/notes/{note_id}/memories/{memory_id}")

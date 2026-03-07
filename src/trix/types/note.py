@@ -113,3 +113,67 @@ class NoteCollaboratorCreate(BaseModel):
     actor_type: str
     actor_id: str
     permission: Optional[str] = None
+
+
+# =============================================================================
+# Links (Phase 3)
+# =============================================================================
+
+
+class NoteLink(BaseResponse):
+    """A link between two notes."""
+
+    id: str
+    source_note_id: str
+    source_block_id: Optional[str] = None
+    target_note_id: str
+    target_block_id: Optional[str] = None
+    link_type: str = "reference"
+    target_title: Optional[str] = None
+    target_note_type: Optional[str] = None
+    source_title: Optional[str] = None
+    source_note_type: Optional[str] = None
+    created_at: str
+
+
+class NoteLinkCreate(BaseModel):
+    """Request to create a note link."""
+
+    target_note_id: str
+    source_block_id: Optional[str] = None
+    target_block_id: Optional[str] = None
+    link_type: Optional[str] = None
+
+
+# =============================================================================
+# Memories (Phase 3)
+# =============================================================================
+
+
+class NoteMemoryLink(BaseResponse):
+    """A link between a note and a memory."""
+
+    note_id: str
+    memory_id: str
+    block_id: Optional[str] = None
+    link_type: str = "manual"
+    relevance_score: Optional[float] = None
+    created_at: str
+
+
+class NoteMemoryLinkCreate(BaseModel):
+    """Request to link a memory to a note."""
+
+    memory_id: str
+    block_id: Optional[str] = None
+    link_type: Optional[str] = None
+    relevance_score: Optional[float] = None
+
+
+class NoteMemoryList(BaseResponse):
+    """List of note-memory links with pagination."""
+
+    memories: List[NoteMemoryLink]
+    total: int
+    limit: int = 50
+    offset: int = 0
