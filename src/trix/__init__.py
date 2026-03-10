@@ -94,6 +94,22 @@ from .exceptions import (
     ValidationError,
 )
 from .types import (
+    # New ADR-067 Phase 5 types
+    BotRunStep,
+    BotRunStreamRequest,
+    Crew,
+    CrewCreate,
+    CrewList,
+    CrewMember,
+    CrewUpdate,
+    Template,
+    TemplateCreate,
+    TemplateInstallResult,
+    TemplateList,
+    TemplateReview,
+    TemplateReviewCreate,
+    TemplateUpdate,
+    # Existing types
     AgentContext,
     AgentSession,
     AutoTagResult,
@@ -260,6 +276,23 @@ __all__ = [
     "ServerError",
     "ConnectionError",
     "TimeoutError",
+    # Types - Template
+    "Template",
+    "TemplateCreate",
+    "TemplateInstallResult",
+    "TemplateList",
+    "TemplateReview",
+    "TemplateReviewCreate",
+    "TemplateUpdate",
+    # Types - Crew
+    "Crew",
+    "CrewCreate",
+    "CrewList",
+    "CrewMember",
+    "CrewUpdate",
+    # Types - Bot Run Step
+    "BotRunStep",
+    "BotRunStreamRequest",
     # Types - Memory
     "Memory",
     "MemoryCreate",

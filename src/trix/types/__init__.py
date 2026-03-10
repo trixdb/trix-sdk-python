@@ -379,6 +379,8 @@ from .bot import (
     BotList,
     BotRun,
     BotRunList,
+    BotRunBatchRequest,
+    BotRunBatchResult,
     BotRunRequest,
     BotSpace,
     BotTool,
@@ -423,6 +425,58 @@ from .note import (
 )
 
 # =============================================================================
+# Template Models
+# =============================================================================
+from .template import (
+    Template,
+    TemplateCreate,
+    TemplateInstallResult,
+    TemplateList,
+    TemplateReview,
+    TemplateReviewCreate,
+    TemplateUpdate,
+)
+
+# =============================================================================
+# Hub Models
+# =============================================================================
+from .hub import (
+    AddConversationMemberParams,
+    AddHubMemberParams,
+    ConversationMember,
+    ConversationMemberList,
+    ConvRoleOverride,
+    ConvRoleOverrideList,
+    CreateRoleParams,
+    HubCustomRole,
+    HubCustomRoleList,
+    HubMember,
+    HubMemberList,
+    UpdateConversationMemberParams,
+    UpdateHubMemberParams,
+    UpdateRoleParams,
+)
+
+# =============================================================================
+# Crew Models
+# =============================================================================
+from .crew import (
+    Crew,
+    CrewCreate,
+    CrewList,
+    CrewMember,
+    CrewUpdate,
+)
+
+# =============================================================================
+# Bot Run Step Models
+# =============================================================================
+from .bot_run_step import (
+    BotRunStep,
+    BotRunStreamRequest,
+)
+
+# =============================================================================
 # Space Config Models
 # =============================================================================
 from .space_config import (
@@ -432,6 +486,17 @@ from .space_config import (
     SpaceConfigPatch,
     SpaceConfigResponse,
     SpaceConfigValidation,
+)
+
+# =============================================================================
+# File Models (ADR-068)
+# =============================================================================
+from .file import (
+    ChatFile,
+    FileDownloadInfo,
+    FileListResult,
+    FileQuota,
+    FileUploadBase64,
 )
 
 __all__ = [
@@ -669,6 +734,8 @@ __all__ = [
     "BotList",
     "BotRun",
     "BotRunList",
+    "BotRunBatchRequest",
+    "BotRunBatchResult",
     "BotRunRequest",
     "BotSpace",
     "BotTool",
@@ -700,6 +767,38 @@ __all__ = [
     "NoteMemoryLinkCreate",
     "NoteMemoryList",
     "NoteUpdate",
+    # Template
+    "Template",
+    "TemplateCreate",
+    "TemplateInstallResult",
+    "TemplateList",
+    "TemplateReview",
+    "TemplateReviewCreate",
+    "TemplateUpdate",
+    # Hub
+    "AddConversationMemberParams",
+    "AddHubMemberParams",
+    "ConversationMember",
+    "ConversationMemberList",
+    "ConvRoleOverride",
+    "ConvRoleOverrideList",
+    "CreateRoleParams",
+    "HubCustomRole",
+    "HubCustomRoleList",
+    "HubMember",
+    "HubMemberList",
+    "UpdateConversationMemberParams",
+    "UpdateHubMemberParams",
+    "UpdateRoleParams",
+    # Crew
+    "Crew",
+    "CrewCreate",
+    "CrewList",
+    "CrewMember",
+    "CrewUpdate",
+    # Bot Run Step
+    "BotRunStep",
+    "BotRunStreamRequest",
     # Space Config
     "SpaceConfigAuditEvent",
     "SpaceConfigAuditResponse",
@@ -707,4 +806,10 @@ __all__ = [
     "SpaceConfigPatch",
     "SpaceConfigResponse",
     "SpaceConfigValidation",
+    # File
+    "ChatFile",
+    "FileDownloadInfo",
+    "FileListResult",
+    "FileQuota",
+    "FileUploadBase64",
 ]

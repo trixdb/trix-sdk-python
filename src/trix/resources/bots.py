@@ -1,8 +1,16 @@
 """Bots resource for Trix SDK."""
 
-from typing import Any, Dict, List, Optional
+import asyncio
+import logging
+import time
+from typing import Any, AsyncIterator, Dict, Iterator, Optional
+
+import httpx
+
+from concurrent.futures import ThreadPoolExecutor
 
 from .base import BaseAsyncResource, BaseSyncResource
+from ..exceptions import TimeoutError
 from ..types.bot import (
     Bot,
     BotCreate,
@@ -10,13 +18,19 @@ from ..types.bot import (
     BotRun,
     BotRunList,
     BotRunRequest,
+    BotRunBatchRequest,
+    BotRunBatchResult,
     BotUpdate,
     BotAddSpace,
     BotSpace,
     BotTrigger,
     BotTriggerCreate,
 )
+from ..types.bot_run_step import BotRunStep, BotRunStreamRequest
 from ..utils.security import validate_id
+from ..utils.sse import iter_sse_lines, parse_sse_line
+
+logger = logging.getLogger(__name__)
 
 
 class BotsResource(BaseSyncResource):
@@ -28,12 +42,14 @@ class BotsResource(BaseSyncResource):
         response = self._request("POST", "/bots", json=data.model_dump(exclude_none=True))
         return Bot.model_validate(response)
 
-    def list(self, status: Optional[str] = None) -> BotList:
+    def list(
+        self, status: Optional[str] = None, limit: int = 100, offset: int = 0,
+    ) -> BotList:
         """List all bots."""
-        params: Dict[str, Any] = {}
+        params: Dict[str, Any] = {"limit": limit, "offset": offset}
         if status:
             params["status"] = status
-        response = self._request("GET", "/bots", params=params or None)
+        response = self._request("GET", "/bots", params=params)
         return BotList.model_validate(response)
 
     def get(self, id_or_slug: str) -> Bot:
@@ -92,9 +108,82 @@ class BotsResource(BaseSyncResource):
         )
         return BotRun.model_validate(response)
 
-    def list_runs(
-        self, bot_id: str, limit: int = 20, offset: int = 0
-    ) -> BotRunList:
+    def run_stream(
+        self,
+        bot_id: str,
+        message: Optional[str] = None,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> Iterator[BotRunStep]:
+        """Trigger a bot run with streaming SSE events.
+
+        Yields typed BotRunStep events as they arrive from the server.
+
+        Args:
+            bot_id: Bot ID to run
+            message: Optional input message
+            context: Optional context dict
+
+        Yields:
+            BotRunStep events from the streaming response
+        """
+        data = BotRunStreamRequest(message=message, context=context)
+        headers = {"Accept": "text/event-stream"}
+        client: httpx.Client = self._client._client
+        with client.stream(
+            "POST",
+            f"/bots/{bot_id}/run",
+            json=data.model_dump(exclude_none=True),
+            headers=headers,
+        ) as response:
+            for line in iter_sse_lines(response.iter_bytes(chunk_size=1024)):
+                parsed = parse_sse_line(line)
+                if parsed is not None:
+                    yield BotRunStep.model_validate(parsed)
+
+    def run_and_wait(
+        self,
+        bot_id: str,
+        message: Optional[str] = None,
+        context: Optional[Dict[str, Any]] = None,
+        poll_interval: float = 1.0,
+        timeout: float = 300.0,
+    ) -> BotRun:
+        """Trigger a bot run and poll until complete.
+
+        Args:
+            bot_id: Bot ID to run
+            message: Optional input message
+            context: Optional context dict
+            poll_interval: Seconds between poll requests (default: 1.0)
+            timeout: Maximum seconds to wait (default: 300.0)
+
+        Returns:
+            Completed BotRun
+
+        Raises:
+            TimeoutError: If run does not complete within timeout
+        """
+        bot_run = self.run(bot_id, message=message, context=context)
+        return self._poll_run(bot_id, bot_run.id, poll_interval, timeout)
+
+    def _poll_run(
+        self, bot_id: str, run_id: str, poll_interval: float, timeout: float
+    ) -> BotRun:
+        """Poll a bot run until it reaches a terminal status."""
+        start = time.monotonic()
+        terminal_statuses = {"completed", "failed", "cancelled"}
+        while True:
+            run = self.get_run(bot_id, run_id)
+            if run.status in terminal_statuses:
+                return run
+            elapsed = time.monotonic() - start
+            if elapsed + poll_interval > timeout:
+                raise TimeoutError(
+                    f"Bot run {run_id} did not complete within {timeout}s"
+                )
+            time.sleep(poll_interval)
+
+    def list_runs(self, bot_id: str, limit: int = 20, offset: int = 0) -> BotRunList:
         """List bot runs."""
         response = self._request(
             "GET", f"/bots/{bot_id}/runs", params={"limit": limit, "offset": offset}
@@ -106,6 +195,56 @@ class BotsResource(BaseSyncResource):
         response = self._request("GET", f"/bots/{bot_id}/runs/{run_id}")
         return BotRun.model_validate(response)
 
+    def run_batch(self, requests: list[BotRunBatchRequest]) -> list[BotRunBatchResult]:
+        """Run multiple bots in parallel using threads.
+
+        Args:
+            requests: List of batch run requests.
+
+        Returns:
+            List of results (one per request, in order).
+        """
+        def _run_one(req: BotRunBatchRequest) -> BotRunBatchResult:
+            try:
+                run = self.run(req.bot_id, message=req.message, context=req.context)
+                return BotRunBatchResult(bot_id=req.bot_id, run=run)
+            except Exception as e:
+                return BotRunBatchResult(bot_id=req.bot_id, error=str(e))
+
+        with ThreadPoolExecutor(max_workers=min(len(requests), 10)) as pool:
+            return list(pool.map(_run_one, requests))
+
+    def list_all(self, **params: Any) -> Iterator[Bot]:
+        """Iterate over all bots using offset-based pagination."""
+        limit = 100
+        offset = 0
+        while True:
+            result = self.list(limit=limit, offset=offset, **params)
+            for bot in result.bots:
+                yield bot
+            if len(result.bots) < limit:
+                break
+            offset += limit
+
+    def list_runs_all(self, bot_id: str, **params: Any) -> Iterator[BotRun]:
+        """Iterate over all runs for a bot using offset-based pagination.
+
+        Args:
+            bot_id: Bot ID.
+
+        Yields:
+            Individual BotRun objects.
+        """
+        limit = params.pop("limit", 100)
+        offset = params.pop("offset", 0)
+        while True:
+            result = self.list_runs(bot_id, limit=limit, offset=offset)
+            for run in result.runs:
+                yield run
+            if len(result.runs) < limit:
+                break
+            offset += limit
+
 
 class AsyncBotsResource(BaseAsyncResource):
     """Async resource for managing bots."""
@@ -116,12 +255,14 @@ class AsyncBotsResource(BaseAsyncResource):
         response = await self._request("POST", "/bots", json=data.model_dump(exclude_none=True))
         return Bot.model_validate(response)
 
-    async def list(self, status: Optional[str] = None) -> BotList:
+    async def list(
+        self, status: Optional[str] = None, limit: int = 100, offset: int = 0,
+    ) -> BotList:
         """List all bots (async)."""
-        params: Dict[str, Any] = {}
+        params: Dict[str, Any] = {"limit": limit, "offset": offset}
         if status:
             params["status"] = status
-        response = await self._request("GET", "/bots", params=params or None)
+        response = await self._request("GET", "/bots", params=params)
         return BotList.model_validate(response)
 
     async def get(self, id_or_slug: str) -> Bot:
@@ -180,9 +321,63 @@ class AsyncBotsResource(BaseAsyncResource):
         )
         return BotRun.model_validate(response)
 
-    async def list_runs(
-        self, bot_id: str, limit: int = 20, offset: int = 0
-    ) -> BotRunList:
+    async def run_stream(
+        self,
+        bot_id: str,
+        message: Optional[str] = None,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> AsyncIterator[BotRunStep]:
+        """Stream bot run events via SSE (async)."""
+        data = BotRunStreamRequest(message=message, context=context)
+        headers = {"Accept": "text/event-stream"}
+        client: httpx.AsyncClient = self._client._client
+        async with client.stream(
+            "POST",
+            f"/bots/{bot_id}/run",
+            json=data.model_dump(exclude_none=True),
+            headers=headers,
+        ) as response:
+            buffer = ""
+            async for chunk in response.aiter_bytes(chunk_size=1024):
+                buffer += chunk.decode("utf-8", errors="replace")
+                while "\n" in buffer:
+                    line, buffer = buffer.split("\n", 1)
+                    if not line.strip():
+                        continue
+                    parsed = parse_sse_line(line)
+                    if parsed is not None:
+                        yield BotRunStep.model_validate(parsed)
+
+    async def run_and_wait(
+        self,
+        bot_id: str,
+        message: Optional[str] = None,
+        context: Optional[Dict[str, Any]] = None,
+        poll_interval: float = 1.0,
+        timeout: float = 300.0,
+    ) -> BotRun:
+        """Trigger a bot run and poll until complete (async)."""
+        bot_run = await self.run(bot_id, message=message, context=context)
+        return await self._poll_run(bot_id, bot_run.id, poll_interval, timeout)
+
+    async def _poll_run(
+        self, bot_id: str, run_id: str, poll_interval: float, timeout: float
+    ) -> BotRun:
+        """Poll a bot run until it reaches a terminal status (async)."""
+        start = time.monotonic()
+        terminal_statuses = {"completed", "failed", "cancelled"}
+        while True:
+            run = await self.get_run(bot_id, run_id)
+            if run.status in terminal_statuses:
+                return run
+            elapsed = time.monotonic() - start
+            if elapsed + poll_interval > timeout:
+                raise TimeoutError(
+                    f"Bot run {run_id} did not complete within {timeout}s"
+                )
+            await asyncio.sleep(poll_interval)
+
+    async def list_runs(self, bot_id: str, limit: int = 20, offset: int = 0) -> BotRunList:
         """List bot runs (async)."""
         response = await self._request(
             "GET", f"/bots/{bot_id}/runs", params={"limit": limit, "offset": offset}
@@ -193,3 +388,38 @@ class AsyncBotsResource(BaseAsyncResource):
         """Get a specific bot run (async)."""
         response = await self._request("GET", f"/bots/{bot_id}/runs/{run_id}")
         return BotRun.model_validate(response)
+
+    async def run_batch(self, requests: list[BotRunBatchRequest]) -> list[BotRunBatchResult]:
+        """Run multiple bots in parallel using asyncio.gather (async)."""
+        async def _run_one(req: BotRunBatchRequest) -> BotRunBatchResult:
+            try:
+                run = await self.run(req.bot_id, message=req.message, context=req.context)
+                return BotRunBatchResult(bot_id=req.bot_id, run=run)
+            except Exception as e:
+                return BotRunBatchResult(bot_id=req.bot_id, error=str(e))
+
+        return list(await asyncio.gather(*[_run_one(r) for r in requests]))
+
+    async def list_all(self, **params: Any) -> AsyncIterator[Bot]:
+        """Iterate over all bots with auto-pagination (async)."""
+        limit = 100
+        offset = 0
+        while True:
+            result = await self.list(limit=limit, offset=offset, **params)
+            for bot in result.bots:
+                yield bot
+            if len(result.bots) < limit:
+                break
+            offset += limit
+
+    async def list_runs_all(self, bot_id: str, **params: Any) -> AsyncIterator[BotRun]:
+        """Iterate over all runs with auto-pagination (async)."""
+        limit = params.pop("limit", 100)
+        offset = params.pop("offset", 0)
+        while True:
+            result = await self.list_runs(bot_id, limit=limit, offset=offset)
+            for run in result.runs:
+                yield run
+            if len(result.runs) < limit:
+                break
+            offset += limit

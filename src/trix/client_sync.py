@@ -46,6 +46,11 @@ from .resources.personas import PersonasResource
 from .resources.space_config import SpaceConfigResource
 from .resources.workflows import WorkflowsResource
 from .resources.notes import NotesResource
+from .resources.templates import TemplatesResource
+from .resources.crews import CrewsResource
+from .resources.hubs import HubsResource
+from .resources.hubs_roles import HubRolesResource
+from .resources.files import FilesResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
 
@@ -192,6 +197,11 @@ class Trix:
         self.space_config = SpaceConfigResource(self)
         self.workflows = WorkflowsResource(self)
         self.notes = NotesResource(self)
+        self.templates = TemplatesResource(self)
+        self.crews = CrewsResource(self)
+        self.hubs = HubsResource(self)
+        self.hub_roles = HubRolesResource(self)
+        self.files = FilesResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""

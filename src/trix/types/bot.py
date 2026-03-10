@@ -181,3 +181,19 @@ class BotRunRequest(BaseModel):
 
     message: Optional[str] = None
     context: Optional[Dict[str, Any]] = None
+
+
+class BotRunBatchRequest(BaseModel):
+    """Single request in a batch run."""
+
+    bot_id: str
+    message: str
+    context: Optional[Dict[str, Any]] = None
+
+
+class BotRunBatchResult(BaseModel):
+    """Result of a single batch run item."""
+
+    bot_id: str
+    run: Optional[BotRun] = None
+    error: Optional[str] = None
