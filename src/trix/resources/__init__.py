@@ -31,6 +31,8 @@ from .crews import CrewsResource, AsyncCrewsResource
 from .hubs import HubsResource, AsyncHubsResource
 from .hubs_roles import HubRolesResource, AsyncHubRolesResource
 from .files import FilesResource, AsyncFilesResource
+from .presets import PresetsResource
+from .presets_async import AsyncPresetsResource
 
 __all__ = [
     "AgentResource",
@@ -76,4 +78,6 @@ __all__ = [
     "AsyncHubRolesResource",
     "FilesResource",
     "AsyncFilesResource",
+    "PresetsResource",
+    "AsyncPresetsResource",
 ]

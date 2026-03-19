@@ -47,6 +47,7 @@ from .resources.crews import AsyncCrewsResource
 from .resources.hubs import AsyncHubsResource
 from .resources.hubs_roles import AsyncHubRolesResource
 from .resources.files import AsyncFilesResource
+from .resources.presets_async import AsyncPresetsResource
 from .resources.templates import AsyncTemplatesResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
@@ -195,6 +196,7 @@ class AsyncTrix:
         self.hubs = AsyncHubsResource(self)
         self.hub_roles = AsyncHubRolesResource(self)
         self.files = AsyncFilesResource(self)
+        self.presets = AsyncPresetsResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""
