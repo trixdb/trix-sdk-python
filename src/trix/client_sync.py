@@ -45,7 +45,9 @@ from .resources.habits import HabitsResource
 from .resources.personas import PersonasResource
 from .resources.space_config import SpaceConfigResource
 from .resources.workflows import WorkflowsResource
+from .resources.invites import InvitesResource
 from .resources.notes import NotesResource
+from .resources.skills import SkillsResource
 from .resources.templates import TemplatesResource
 from .resources.crews import CrewsResource
 from .resources.hubs import HubsResource
@@ -197,7 +199,9 @@ class Trix:
         self.bots = BotsResource(self)
         self.space_config = SpaceConfigResource(self)
         self.workflows = WorkflowsResource(self)
+        self.invites = InvitesResource(self)
         self.notes = NotesResource(self)
+        self.skills = SkillsResource(self)
         self.templates = TemplatesResource(self)
         self.crews = CrewsResource(self)
         self.hubs = HubsResource(self)

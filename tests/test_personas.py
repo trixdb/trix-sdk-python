@@ -226,6 +226,48 @@ class TestPersonaGet:
             await client.close()
 
 
+class TestPersonaGetBySlug:
+    """Tests for getting a persona by slug."""
+
+    def test_get_by_slug(self, mock_persona_data):
+        """Test getting a persona by slug."""
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = mock_persona_data
+            client = Trix(api_key="test_key")
+
+            persona = client.personas.get_by_slug("research")
+
+            assert isinstance(persona, Persona)
+            assert persona.slug == "research"
+            call_args = mock_request.call_args
+            assert call_args[0][0] == "GET"
+            assert call_args[0][1] == "/personas/slug/research"
+            client.close()
+
+    def test_get_by_slug_validates_empty(self):
+        """Test that get_by_slug raises ValueError for empty slug."""
+        with patch.object(Trix, "_request"):
+            client = Trix(api_key="test_key")
+
+            with pytest.raises(ValueError, match="persona slug cannot be empty"):
+                client.personas.get_by_slug("")
+
+            client.close()
+
+    @pytest.mark.asyncio
+    async def test_get_by_slug_async(self, mock_persona_data):
+        """Test getting a persona by slug with the async client."""
+        with patch.object(AsyncTrix, "_request") as mock_request:
+            mock_request.return_value = mock_persona_data
+            client = AsyncTrix(api_key="test_key")
+
+            persona = await client.personas.get_by_slug("research")
+
+            assert isinstance(persona, Persona)
+            assert persona.slug == "research"
+            await client.close()
+
+
 class TestPersonaUpdate:
     """Tests for updating personas."""
 

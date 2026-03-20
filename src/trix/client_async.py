@@ -47,7 +47,10 @@ from .resources.crews import AsyncCrewsResource
 from .resources.hubs import AsyncHubsResource
 from .resources.hubs_roles import AsyncHubRolesResource
 from .resources.files import AsyncFilesResource
+from .resources.invites import AsyncInvitesResource
+from .resources.notes_async import AsyncNotesResource
 from .resources.presets_async import AsyncPresetsResource
+from .resources.skills import AsyncSkillsResource
 from .resources.templates import AsyncTemplatesResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url
@@ -191,6 +194,9 @@ class AsyncTrix:
         self.bots = AsyncBotsResource(self)
         self.space_config = AsyncSpaceConfigResource(self)
         self.workflows = AsyncWorkflowsResource(self)
+        self.invites = AsyncInvitesResource(self)
+        self.notes = AsyncNotesResource(self)
+        self.skills = AsyncSkillsResource(self)
         self.templates = AsyncTemplatesResource(self)
         self.crews = AsyncCrewsResource(self)
         self.hubs = AsyncHubsResource(self)

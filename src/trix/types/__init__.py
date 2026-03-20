@@ -490,6 +490,30 @@ from .space_config import (
 )
 
 # =============================================================================
+# Invite Models
+# =============================================================================
+from .invite import (
+    Invite,
+    InviteAccept,
+    InviteAcceptResult,
+    InviteCreate,
+    InviteCreateResult,
+    InviteList,
+    InviteRevokeResult,
+)
+
+# =============================================================================
+# Skill Models
+# =============================================================================
+from .skill import (
+    BotSkillAttachment,
+    Skill,
+    SkillCreate,
+    SkillList,
+    SkillUpdate,
+)
+
+# =============================================================================
 # File Models (ADR-068)
 # =============================================================================
 from .file import (
@@ -808,6 +832,20 @@ __all__ = [
     "SpaceConfigPatch",
     "SpaceConfigResponse",
     "SpaceConfigValidation",
+    # Invite
+    "Invite",
+    "InviteAccept",
+    "InviteAcceptResult",
+    "InviteCreate",
+    "InviteCreateResult",
+    "InviteList",
+    "InviteRevokeResult",
+    # Skill
+    "BotSkillAttachment",
+    "Skill",
+    "SkillCreate",
+    "SkillList",
+    "SkillUpdate",
     # File
     "ChatFile",
     "FileDownloadInfo",

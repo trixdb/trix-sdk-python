@@ -25,7 +25,10 @@ from .bots import BotsResource, AsyncBotsResource
 from .space_config import SpaceConfigResource, AsyncSpaceConfigResource
 from .workflows import WorkflowsResource
 from .workflows_async import AsyncWorkflowsResource
+from .invites import InvitesResource, AsyncInvitesResource
 from .notes import NotesResource
+from .notes_async import AsyncNotesResource
+from .skills import SkillsResource, AsyncSkillsResource
 from .templates import TemplatesResource, AsyncTemplatesResource
 from .crews import CrewsResource, AsyncCrewsResource
 from .hubs import HubsResource, AsyncHubsResource
@@ -67,7 +70,12 @@ __all__ = [
     "AsyncSpaceConfigResource",
     "WorkflowsResource",
     "AsyncWorkflowsResource",
+    "InvitesResource",
+    "AsyncInvitesResource",
     "NotesResource",
+    "AsyncNotesResource",
+    "SkillsResource",
+    "AsyncSkillsResource",
     "TemplatesResource",
     "AsyncTemplatesResource",
     "CrewsResource",

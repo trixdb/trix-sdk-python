@@ -59,6 +59,13 @@ class PersonasResource(BaseSyncResource):
         response = self._request("GET", f"/personas/{id}")
         return Persona.model_validate(response)
 
+    def get_by_slug(self, slug: str) -> Persona:
+        """Get a persona by slug."""
+        if not slug:
+            raise ValueError("persona slug cannot be empty")
+        response = self._request("GET", f"/personas/slug/{slug}")
+        return Persona.model_validate(response)
+
     def update(
         self,
         id: str,
@@ -151,6 +158,13 @@ class AsyncPersonasResource(BaseAsyncResource):
         """Get a persona by ID (async)."""
         validate_id(id, "persona")
         response = await self._request("GET", f"/personas/{id}")
+        return Persona.model_validate(response)
+
+    async def get_by_slug(self, slug: str) -> Persona:
+        """Get a persona by slug (async)."""
+        if not slug:
+            raise ValueError("persona slug cannot be empty")
+        response = await self._request("GET", f"/personas/slug/{slug}")
         return Persona.model_validate(response)
 
     async def update(

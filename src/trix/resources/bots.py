@@ -3,7 +3,7 @@
 import asyncio
 import logging
 import time
-from typing import Any, AsyncIterator, Dict, Iterator, Optional
+from typing import Any, AsyncIterator, Dict, Iterator, List, Optional
 
 import httpx
 
@@ -195,7 +195,7 @@ class BotsResource(BaseSyncResource):
         response = self._request("GET", f"/bots/{bot_id}/runs/{run_id}")
         return BotRun.model_validate(response)
 
-    def run_batch(self, requests: list[BotRunBatchRequest]) -> list[BotRunBatchResult]:
+    def run_batch(self, requests: List[BotRunBatchRequest]) -> List[BotRunBatchResult]:
         """Run multiple bots in parallel using threads.
 
         Args:
@@ -389,7 +389,7 @@ class AsyncBotsResource(BaseAsyncResource):
         response = await self._request("GET", f"/bots/{bot_id}/runs/{run_id}")
         return BotRun.model_validate(response)
 
-    async def run_batch(self, requests: list[BotRunBatchRequest]) -> list[BotRunBatchResult]:
+    async def run_batch(self, requests: List[BotRunBatchRequest]) -> List[BotRunBatchResult]:
         """Run multiple bots in parallel using asyncio.gather (async)."""
         async def _run_one(req: BotRunBatchRequest) -> BotRunBatchResult:
             try:
