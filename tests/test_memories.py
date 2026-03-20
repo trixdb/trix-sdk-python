@@ -72,6 +72,23 @@ class TestMemoriesCreate:
             assert call_args[0][1] == "/memories"
             client.close()
 
+    def test_create_with_session_id(self, mock_memory_data):
+        """Test memory creation with session_id."""
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = mock_memory_data
+            client = Trix(api_key="test_key")
+
+            memory = client.memories.create(
+                content="Test content",
+                session_id="sess_abc123",
+            )
+
+            assert isinstance(memory, Memory)
+            call_args = mock_request.call_args
+            body = call_args[1]["json"]
+            assert body["session_id"] == "sess_abc123"
+            client.close()
+
 
 class TestMemoriesList:
     """Tests for memories.list()."""
@@ -107,6 +124,19 @@ class TestMemoriesList:
             assert params["q"] == "test query"
             assert params["limit"] == 50
             assert params["offset"] == 10
+            client.close()
+
+    def test_list_with_session_id(self, mock_memory_list_data):
+        """Test memory listing filtered by session_id."""
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = mock_memory_list_data
+            client = Trix(api_key="test_key")
+
+            client.memories.list(session_id="sess_abc123")
+
+            call_args = mock_request.call_args
+            params = call_args[1]["params"]
+            assert params["session_id"] == "sess_abc123"
             client.close()
 
 

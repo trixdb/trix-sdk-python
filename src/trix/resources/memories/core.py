@@ -67,6 +67,7 @@ class MemoriesResource(
         options: Optional[Dict[str, Any]] = None,
         is_pinned: bool = False,
         protection_level: str = "none",
+        session_id: Optional[str] = None,
     ) -> Memory:
         """Create a new memory.
 
@@ -80,12 +81,14 @@ class MemoriesResource(
             options: Additional options (transcribe_audio, language, skip_embedding)
             is_pinned: Whether to pin the memory (prevents decay)
             protection_level: Protection level ("none", "soft", "hard")
+            session_id: Session ID to associate with this memory
 
         Returns:
             Created memory object
         """
         data = build_create_data(
-            content, type, tags, metadata, priority, space_id, options, is_pinned, protection_level
+            content, type, tags, metadata, priority, space_id, options,
+            is_pinned, protection_level, session_id,
         )
         response = self._client._request(
             "POST", "/memories", json=data.model_dump(exclude_none=True)
@@ -104,6 +107,7 @@ class MemoriesResource(
         protected: Optional[bool] = None,
         min_quality: Optional[float] = None,
         include_deleted: bool = False,
+        session_id: Optional[str] = None,
     ) -> MemoryList:
         """List memories with optional filtering.
 
@@ -118,12 +122,14 @@ class MemoriesResource(
             protected: Filter by protection status
             min_quality: Minimum quality score (0-1)
             include_deleted: Include soft-deleted memories
+            session_id: Filter by session ID
 
         Returns:
             List of memories with pagination info
         """
         params = build_list_params(
-            q, mode, limit, offset, tags, space_id, pinned, protected, min_quality, include_deleted
+            q, mode, limit, offset, tags, space_id, pinned, protected,
+            min_quality, include_deleted, session_id,
         )
         response = self._client._request("GET", "/memories", params=params)
         return MemoryList.model_validate(response)
@@ -326,10 +332,12 @@ class AsyncMemoriesResource(
         options: Optional[Dict[str, Any]] = None,
         is_pinned: bool = False,
         protection_level: str = "none",
+        session_id: Optional[str] = None,
     ) -> Memory:
         """Create a new memory (async)."""
         data = build_create_data(
-            content, type, tags, metadata, priority, space_id, options, is_pinned, protection_level
+            content, type, tags, metadata, priority, space_id, options,
+            is_pinned, protection_level, session_id,
         )
         response = await self._client._request(
             "POST", "/memories", json=data.model_dump(exclude_none=True)
@@ -348,10 +356,12 @@ class AsyncMemoriesResource(
         protected: Optional[bool] = None,
         min_quality: Optional[float] = None,
         include_deleted: bool = False,
+        session_id: Optional[str] = None,
     ) -> MemoryList:
         """List memories with optional filtering (async)."""
         params = build_list_params(
-            q, mode, limit, offset, tags, space_id, pinned, protected, min_quality, include_deleted
+            q, mode, limit, offset, tags, space_id, pinned, protected,
+            min_quality, include_deleted, session_id,
         )
         response = await self._client._request("GET", "/memories", params=params)
         return MemoryList.model_validate(response)

@@ -33,6 +33,7 @@ def build_list_params(
     protected: Optional[bool] = None,
     min_quality: Optional[float] = None,
     include_deleted: bool = False,
+    session_id: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Build query parameters for list operation."""
     params: Dict[str, Any] = {"limit": limit, "offset": offset}
@@ -52,6 +53,8 @@ def build_list_params(
         params["min_quality"] = str(min_quality)
     if include_deleted:
         params["include_deleted"] = "true"
+    if session_id:
+        params["session_id"] = session_id
     return params
 
 
@@ -84,6 +87,7 @@ def build_create_data(
     options: Optional[Dict[str, Any]] = None,
     is_pinned: bool = False,
     protection_level: str = "none",
+    session_id: Optional[str] = None,
 ) -> MemoryCreate:
     """Build MemoryCreate data object."""
     return MemoryCreate(
@@ -96,6 +100,7 @@ def build_create_data(
         options=MemoryOptions(**options) if options else None,
         is_pinned=is_pinned if is_pinned else None,
         protection_level=protection_level if protection_level != "none" else None,
+        session_id=session_id,
     )
 
 
