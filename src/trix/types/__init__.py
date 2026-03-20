@@ -187,6 +187,7 @@ from .agent import (
     SessionList,
     SessionMemory,
     SessionMemoryList,
+    SessionMessage,
 )
 
 # =============================================================================
@@ -607,6 +608,7 @@ __all__ = [
     "SessionList",
     "SessionMemory",
     "SessionMemoryList",
+    "SessionMessage",
     # Session
     "CompleteSessionParams",
     "CreateSessionParams",

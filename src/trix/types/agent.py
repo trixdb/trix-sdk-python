@@ -31,6 +31,17 @@ class SessionMemory(BaseResponse):
     created_at: datetime
 
 
+class SessionMessage(BaseResponse):
+    """Message added to an agent session."""
+
+    id: str
+    session_id: str
+    role: str
+    content: str
+    created_at: datetime
+    turn_number: int
+
+
 class SessionMemoryList(BaseResponse):
     """List of session memories."""
 

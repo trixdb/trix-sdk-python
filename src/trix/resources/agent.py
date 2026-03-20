@@ -8,6 +8,7 @@ from ..types import (
     AgentSession,
     SessionMemory,
     SessionMemoryList,
+    SessionMessage,
     SessionList,
 )
 from ..utils.security import validate_id, validate_limit, validate_offset
@@ -93,6 +94,40 @@ class AgentResource:
             "POST", f"/agent/sessions/{session_id}/memories", json=data
         )
         return SessionMemory.model_validate(response)
+
+    def add_session_message(
+        self,
+        session_id: str,
+        content: str,
+        role: str = "user",
+    ) -> SessionMessage:
+        """
+        Add a simple message to an agent session.
+
+        This is a simpler alternative to add_session_memory for basic chat messages.
+
+        Args:
+            session_id: Session ID
+            content: Message content
+            role: Role (e.g., "user", "assistant")
+
+        Returns:
+            Created session message with turn number
+
+        Example:
+            >>> msg = client.agent.add_session_message(
+            ...     session_id="chat_123",
+            ...     content="What is the weather today?",
+            ...     role="user"
+            ... )
+        """
+        validate_id(session_id, "session")
+        data: Dict[str, Any] = {"content": content, "role": role}
+
+        response = self._client._request(
+            "POST", f"/agent/sessions/{session_id}/message", json=data
+        )
+        return SessionMessage.model_validate(response)
 
     def get_session(self, session_id: str, limit: int = 100, offset: int = 0) -> SessionMemoryList:
         """
@@ -249,6 +284,21 @@ class AsyncAgentResource:
             "POST", f"/agent/sessions/{session_id}/memories", json=data
         )
         return SessionMemory.model_validate(response)
+
+    async def add_session_message(
+        self,
+        session_id: str,
+        content: str,
+        role: str = "user",
+    ) -> SessionMessage:
+        """Add a simple message to an agent session (async)."""
+        validate_id(session_id, "session")
+        data: Dict[str, Any] = {"content": content, "role": role}
+
+        response = await self._client._request(
+            "POST", f"/agent/sessions/{session_id}/message", json=data
+        )
+        return SessionMessage.model_validate(response)
 
     async def get_session(
         self, session_id: str, limit: int = 100, offset: int = 0
