@@ -165,9 +165,15 @@ def handle_response(response: httpx.Response) -> None:
         raise ValidationError(message, response.status_code, error_data)
     elif response.status_code == 429:
         retry_after = response.headers.get("Retry-After")
+        retry_after_value = None
+        if retry_after:
+            try:
+                retry_after_value = min(int(retry_after), 60)  # Cap at 60 seconds
+            except (ValueError, TypeError):
+                retry_after_value = None
         raise RateLimitError(
             message,
-            retry_after=int(retry_after) if retry_after else None,
+            retry_after=retry_after_value,
             status_code=response.status_code,
             response=error_data,
         )
