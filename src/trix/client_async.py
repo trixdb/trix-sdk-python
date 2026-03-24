@@ -55,7 +55,7 @@ from .resources.presets_async import AsyncPresetsResource
 from .resources.skills import AsyncSkillsResource
 from .resources.templates import AsyncTemplatesResource
 from .utils.retry import RetryConfig
-from .utils.security import get_env_credential, validate_base_url
+from .utils.security import get_env_credential, validate_base_url, validate_id
 
 
 logger = logging.getLogger(__name__)
@@ -224,6 +224,7 @@ class AsyncTrix:
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""
+        validate_id(persona_id, "persona")
         self._persona_id = persona_id
 
     def clear_persona(self) -> None:

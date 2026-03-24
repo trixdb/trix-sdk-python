@@ -57,7 +57,7 @@ from .resources.hubs_roles import HubRolesResource
 from .resources.files import FilesResource
 from .resources.presets import PresetsResource
 from .utils.retry import RetryConfig
-from .utils.security import get_env_credential, validate_base_url
+from .utils.security import get_env_credential, validate_base_url, validate_id
 
 
 logger = logging.getLogger(__name__)
@@ -218,6 +218,7 @@ class Trix:
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""
+        validate_id(persona_id, "persona")
         self._persona_id = persona_id
 
     def clear_persona(self) -> None:
@@ -374,7 +375,10 @@ class Trix:
             k: v if k.lower() != "authorization" else "[REDACTED]"
             for k, v in response.headers.items()
         }
-        logger.debug(f"Response: {response.status_code} headers={safe_headers}")
+        elapsed = response.elapsed.total_seconds()
+        logger.debug(
+            f"Response: {response.status_code} ({elapsed:.3f}s) headers={safe_headers}"
+        )
 
         content_length = response.headers.get("content-length")
         if content_length and int(content_length) > self.MAX_RESPONSE_SIZE:
