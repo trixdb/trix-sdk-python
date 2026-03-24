@@ -3,15 +3,16 @@
 Provides operations to link and unlink resources to memories.
 """
 
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
+from ...protocols import AsyncClientProtocol, SyncClientProtocol
 from ...utils.security import validate_id
 
 
 class ResourceLinksMixin:
     """Mixin providing resource linking operations for sync memories resource."""
 
-    _client: Any  # Type hint for the client
+    _client: SyncClientProtocol
 
     def link_resource(
         self,
@@ -44,7 +45,7 @@ class ResourceLinksMixin:
 class AsyncResourceLinksMixin:
     """Mixin providing resource linking operations for async memories resource."""
 
-    _client: Any  # Type hint for the client
+    _client: AsyncClientProtocol
 
     async def link_resource(
         self,
