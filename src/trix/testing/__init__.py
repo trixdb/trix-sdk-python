@@ -23,18 +23,9 @@ Example:
 """
 
 from .mock_client import (
-    # Main mock client
+    # Main mock clients
     MockTrix,
     MockAsyncTrix,
-    # Mock resource classes
-    MockMemoriesResource,
-    MockAsyncMemoriesResource,
-    MockClustersResource,
-    MockAsyncClustersResource,
-    MockEntitiesResource,
-    MockAsyncEntitiesResource,
-    MockFactsResource,
-    MockAsyncFactsResource,
     # Factory functions
     create_mock_memory,
     create_mock_cluster,
@@ -44,6 +35,17 @@ from .mock_client import (
     create_mock_paginated_response,
     create_mock_bulk_result,
     random_id,
+)
+from .mock_resources import (
+    # Mock resource classes
+    MockMemoriesResource,
+    MockAsyncMemoriesResource,
+    MockClustersResource,
+    MockAsyncClustersResource,
+    MockEntitiesResource,
+    MockAsyncEntitiesResource,
+    MockFactsResource,
+    MockAsyncFactsResource,
 )
 
 __all__ = [
