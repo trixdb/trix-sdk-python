@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import threading
+import uuid
 from types import TracebackType
 from typing import Any, AsyncIterator, BinaryIO, Callable, Dict, List, Optional, Tuple, Type, Union
 
@@ -363,6 +364,8 @@ class AsyncTrix:
             timeout=timeout,
         )
 
+    MAX_RESPONSE_SIZE = 50 * 1024 * 1024  # 50MB
+
     def _process_response(self, response: httpx.Response, ctx: RequestContext) -> Any:
         """Process and validate the HTTP response."""
         safe_headers = {
@@ -370,6 +373,12 @@ class AsyncTrix:
             for k, v in response.headers.items()
         }
         logger.debug(f"Response: {response.status_code} headers={safe_headers}")
+
+        content_length = response.headers.get("content-length")
+        if content_length and int(content_length) > self.MAX_RESPONSE_SIZE:
+            raise ValueError(
+                f"Response too large: {content_length} bytes (max {self.MAX_RESPONSE_SIZE})"
+            )
 
         check_api_version(response)
         handle_response(response)

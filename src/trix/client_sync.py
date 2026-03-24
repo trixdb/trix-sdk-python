@@ -308,6 +308,7 @@ class Trix:
             "X-API-Version": __api_version__,
         }
         headers.update(self._auth.get_headers())
+        headers["X-Correlation-Id"] = uuid.uuid4().hex[:16]
         if self._persona_id:
             headers["X-Persona-Id"] = self._persona_id
         return headers
