@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import threading
 from types import TracebackType
 from typing import Any, AsyncIterator, BinaryIO, Callable, Dict, List, Optional, Tuple, Type, Union
 
@@ -155,6 +156,7 @@ class AsyncTrix:
         self._persona_id: Optional[str] = None
 
         # Initialize interceptors
+        self._interceptor_lock = threading.Lock()
         self._request_interceptors: List[RequestInterceptor] = list(request_interceptors or [])
         self._response_interceptors: List[ResponseInterceptor] = list(response_interceptors or [])
         self._error_interceptors: List[ErrorInterceptor] = list(error_interceptors or [])
@@ -214,38 +216,46 @@ class AsyncTrix:
 
     def add_request_interceptor(self, interceptor: RequestInterceptor) -> Callable[[], None]:
         """Add a request interceptor."""
-        self._request_interceptors.append(interceptor)
+        with self._interceptor_lock:
+            self._request_interceptors.append(interceptor)
 
         def remove() -> None:
-            if interceptor in self._request_interceptors:
-                self._request_interceptors.remove(interceptor)
+            with self._interceptor_lock:
+                if interceptor in self._request_interceptors:
+                    self._request_interceptors.remove(interceptor)
 
         return remove
 
     def add_response_interceptor(self, interceptor: ResponseInterceptor) -> Callable[[], None]:
         """Add a response interceptor."""
-        self._response_interceptors.append(interceptor)
+        with self._interceptor_lock:
+            self._response_interceptors.append(interceptor)
 
         def remove() -> None:
-            if interceptor in self._response_interceptors:
-                self._response_interceptors.remove(interceptor)
+            with self._interceptor_lock:
+                if interceptor in self._response_interceptors:
+                    self._response_interceptors.remove(interceptor)
 
         return remove
 
     def add_error_interceptor(self, interceptor: ErrorInterceptor) -> Callable[[], None]:
         """Add an error interceptor."""
-        self._error_interceptors.append(interceptor)
+        with self._interceptor_lock:
+            self._error_interceptors.append(interceptor)
 
         def remove() -> None:
-            if interceptor in self._error_interceptors:
-                self._error_interceptors.remove(interceptor)
+            with self._interceptor_lock:
+                if interceptor in self._error_interceptors:
+                    self._error_interceptors.remove(interceptor)
 
         return remove
 
     def _run_request_interceptors(self, context: RequestContext) -> RequestContext:
         """Run all request interceptors."""
+        with self._interceptor_lock:
+            interceptors = list(self._request_interceptors)
         ctx = context
-        for interceptor in self._request_interceptors:
+        for interceptor in interceptors:
             result = interceptor(ctx)
             if result is not None:
                 ctx = result
@@ -253,8 +263,10 @@ class AsyncTrix:
 
     def _run_response_interceptors(self, context: ResponseContext) -> ResponseContext:
         """Run all response interceptors."""
+        with self._interceptor_lock:
+            interceptors = list(self._response_interceptors)
         ctx = context
-        for interceptor in self._response_interceptors:
+        for interceptor in interceptors:
             result = interceptor(ctx)
             if result is not None:
                 ctx = result
@@ -262,8 +274,10 @@ class AsyncTrix:
 
     def _run_error_interceptors(self, error: Exception, request: RequestContext) -> Exception:
         """Run all error interceptors."""
+        with self._interceptor_lock:
+            interceptors = list(self._error_interceptors)
         err = error
-        for interceptor in self._error_interceptors:
+        for interceptor in interceptors:
             err = interceptor(err, request)
         return err
 
