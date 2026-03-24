@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import functools
 import logging
+import threading
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -119,6 +120,7 @@ class TelemetryConfig:
 
 # Global telemetry configuration
 _global_config = TelemetryConfig()
+_config_lock = threading.Lock()
 
 
 def configure_telemetry(
@@ -151,23 +153,26 @@ def configure_telemetry(
         ... )
     """
     global _global_config
-    _global_config = TelemetryConfig(
-        tracer=tracer,
-        record_request_body=record_request_body,
-        record_response_body=record_response_body,
-        span_name_prefix=span_name_prefix,
-        default_attributes=default_attributes or {},
-    )
+    with _config_lock:
+        _global_config = TelemetryConfig(
+            tracer=tracer,
+            record_request_body=record_request_body,
+            record_response_body=record_response_body,
+            span_name_prefix=span_name_prefix,
+            default_attributes=default_attributes or {},
+        )
 
 
 def get_telemetry_config() -> TelemetryConfig:
     """Get current telemetry configuration."""
-    return _global_config
+    with _config_lock:
+        return _global_config
 
 
 def is_telemetry_enabled() -> bool:
     """Check if telemetry is enabled."""
-    return _global_config.tracer is not None
+    with _config_lock:
+        return _global_config.tracer is not None
 
 
 class RequestSpan(ABC):
