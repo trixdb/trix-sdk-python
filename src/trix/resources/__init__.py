@@ -6,7 +6,8 @@ from .clusters_async import AsyncClustersResource
 from .enrichments import EnrichmentsResource, AsyncEnrichmentsResource
 from .entities import EntitiesResource
 from .entities_async import AsyncEntitiesResource
-from .facts import FactsResource, AsyncFactsResource
+from .facts import FactsResource
+from .facts_async import AsyncFactsResource
 from .feedback import FeedbackResource
 from .goals import GoalsResource
 from .goals_async import AsyncGoalsResource
