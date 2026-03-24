@@ -1,5 +1,6 @@
 """Metrics and observability utilities for Trix SDK."""
 
+import threading
 import time
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
@@ -312,11 +313,13 @@ class CallbackCollector(MetricsCollector):
 
 # Global metrics collector
 _global_collector: MetricsCollector = NoOpCollector()
+_collector_lock = threading.Lock()
 
 
 def get_metrics_collector() -> MetricsCollector:
     """Get the global metrics collector."""
-    return _global_collector
+    with _collector_lock:
+        return _global_collector
 
 
 def set_metrics_collector(collector: MetricsCollector) -> None:
@@ -331,7 +334,8 @@ def set_metrics_collector(collector: MetricsCollector) -> None:
         >>> set_metrics_collector(collector)
     """
     global _global_collector
-    _global_collector = collector
+    with _collector_lock:
+        _global_collector = collector
 
 
 @contextmanager
