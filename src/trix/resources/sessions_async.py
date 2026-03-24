@@ -1,8 +1,8 @@
-"""Synchronous sessions resource for Trix SDK."""
+"""Async sessions resource for Trix SDK."""
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseSyncResource
+from .base import BaseAsyncResource
 from ..types import (
     Session,
     SessionsResponse,
@@ -16,34 +16,27 @@ from ..types import (
 from ..utils.security import validate_id
 
 
-class SessionsResource(BaseSyncResource):
-    """Resource for managing CLI sessions.
+class AsyncSessionsResource(BaseAsyncResource):
+    """Async resource for managing CLI sessions.
 
     Sessions provide lifecycle management for conversations, projects, and tasks
     with features like pause/resume, completion tracking, and retention policies.
 
     Example:
         >>> # Create a session
-        >>> session = client.sessions.create(
+        >>> session = await client.sessions.create(
         ...     name="My Project",
-        ...     type=SessionType.PROJECT,
-        ...     tags=["work"]
+        ...     type=SessionType.PROJECT
         ... )
         >>>
         >>> # List all sessions
-        >>> sessions = client.sessions.list()
-        >>>
-        >>> # Get active sessions
-        >>> active = client.sessions.get_active()
-        >>>
-        >>> # Pause a session
-        >>> client.sessions.pause("sess_123")
+        >>> sessions = await client.sessions.list()
         >>>
         >>> # Complete a session
-        >>> client.sessions.complete("sess_123", summary="Project completed")
+        >>> await client.sessions.complete("sess_123")
     """
 
-    def create(
+    async def create(
         self,
         name: str,
         description: Optional[str] = None,
@@ -56,7 +49,7 @@ class SessionsResource(BaseSyncResource):
         is_private: bool = False,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Session:
-        """Create a new session.
+        """Create a new session (async).
 
         Args:
             name: Session name (required).
@@ -72,15 +65,6 @@ class SessionsResource(BaseSyncResource):
 
         Returns:
             Created session object.
-
-        Example:
-            >>> session = client.sessions.create(
-            ...     name="Sprint Planning",
-            ...     type=SessionType.PROJECT,
-            ...     tags=["agile", "planning"],
-            ...     retention_policy=RetentionPolicy.AUTO_DELETE,
-            ...     retention_days=90
-            ... )
         """
         data = CreateSessionParams(
             name=name,
@@ -94,14 +78,14 @@ class SessionsResource(BaseSyncResource):
             is_private=is_private,
             metadata=metadata,
         )
-        response = self._request(
+        response = await self._request(
             "POST",
             "/cli-sessions",
             json=data.model_dump(exclude_none=True)
         )
         return Session.model_validate(response)
 
-    def list(
+    async def list(
         self,
         status: Optional[SessionStatus] = None,
         type: Optional[SessionType] = None,
@@ -111,7 +95,7 @@ class SessionsResource(BaseSyncResource):
         limit: int = 100,
         offset: int = 0,
     ) -> SessionsResponse:
-        """List sessions with optional filtering.
+        """List sessions with optional filtering (async).
 
         Args:
             status: Filter by session status.
@@ -124,17 +108,6 @@ class SessionsResource(BaseSyncResource):
 
         Returns:
             Paginated list of sessions.
-
-        Example:
-            >>> # Get all active sessions
-            >>> sessions = client.sessions.list(status=SessionStatus.ACTIVE)
-            >>>
-            >>> # Get project sessions with specific tags
-            >>> sessions = client.sessions.list(
-            ...     type=SessionType.PROJECT,
-            ...     tags=["work"],
-            ...     limit=50
-            ... )
         """
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
         if status:
@@ -148,31 +121,23 @@ class SessionsResource(BaseSyncResource):
         if search:
             params["search"] = search
 
-        response = self._request("GET", "/cli-sessions", params=params)
+        response = await self._request("GET", "/cli-sessions", params=params)
         return SessionsResponse.model_validate(response)
 
-    def get(self, id: str) -> Session:
-        """Get a session by ID.
+    async def get(self, id: str) -> Session:
+        """Get a session by ID (async).
 
         Args:
             id: Session ID.
 
         Returns:
             Session object.
-
-        Raises:
-            ValidationError: If ID format is invalid.
-            NotFoundError: If session doesn't exist.
-
-        Example:
-            >>> session = client.sessions.get("sess_123")
-            >>> print(f"{session.name}: {session.message_count} messages")
         """
         validate_id(id, "session")
-        response = self._request("GET", f"/cli-sessions/{id}")
+        response = await self._request("GET", f"/cli-sessions/{id}")
         return Session.model_validate(response)
 
-    def update(
+    async def update(
         self,
         id: str,
         name: Optional[str] = None,
@@ -183,7 +148,7 @@ class SessionsResource(BaseSyncResource):
         is_private: Optional[bool] = None,
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Session:
-        """Update a session.
+        """Update a session (async).
 
         Args:
             id: Session ID.
@@ -197,17 +162,6 @@ class SessionsResource(BaseSyncResource):
 
         Returns:
             Updated session object.
-
-        Raises:
-            ValidationError: If ID format is invalid.
-            NotFoundError: If session doesn't exist.
-
-        Example:
-            >>> session = client.sessions.update(
-            ...     "sess_123",
-            ...     name="Updated Name",
-            ...     tags=["updated", "important"]
-            ... )
         """
         validate_id(id, "session")
         data = UpdateSessionParams(
@@ -219,91 +173,63 @@ class SessionsResource(BaseSyncResource):
             is_private=is_private,
             metadata=metadata,
         )
-        response = self._request(
+        response = await self._request(
             "PATCH",
             f"/cli-sessions/{id}",
             json=data.model_dump(exclude_none=True)
         )
         return Session.model_validate(response)
 
-    def delete(self, id: str) -> None:
-        """Delete a session.
+    async def delete(self, id: str) -> None:
+        """Delete a session (async).
 
         Args:
             id: Session ID.
-
-        Raises:
-            ValidationError: If ID format is invalid.
-            NotFoundError: If session doesn't exist.
-
-        Example:
-            >>> client.sessions.delete("sess_123")
         """
         validate_id(id, "session")
-        self._request("DELETE", f"/cli-sessions/{id}")
+        await self._request("DELETE", f"/cli-sessions/{id}")
 
-    def get_active(self) -> SessionsResponse:
-        """Get all active sessions.
+    async def get_active(self) -> SessionsResponse:
+        """Get all active sessions (async).
 
         Returns:
             List of active sessions.
-
-        Example:
-            >>> active_sessions = client.sessions.get_active()
-            >>> for session in active_sessions.data:
-            ...     print(f"{session.name}: {session.status}")
         """
-        response = self._request("GET", "/cli-sessions/active")
+        response = await self._request("GET", "/cli-sessions/active")
         return SessionsResponse.model_validate(response)
 
-    def pause(self, id: str) -> Session:
-        """Pause an active session.
+    async def pause(self, id: str) -> Session:
+        """Pause an active session (async).
 
         Args:
             id: Session ID.
 
         Returns:
             Updated session object with paused status.
-
-        Raises:
-            ValidationError: If ID format is invalid.
-            NotFoundError: If session doesn't exist.
-
-        Example:
-            >>> session = client.sessions.pause("sess_123")
-            >>> assert session.status == SessionStatus.PAUSED
         """
         validate_id(id, "session")
-        response = self._request("POST", f"/cli-sessions/{id}/pause")
+        response = await self._request("POST", f"/cli-sessions/{id}/pause")
         return Session.model_validate(response)
 
-    def resume(self, id: str) -> Session:
-        """Resume a paused session.
+    async def resume(self, id: str) -> Session:
+        """Resume a paused session (async).
 
         Args:
             id: Session ID.
 
         Returns:
             Updated session object with active status.
-
-        Raises:
-            ValidationError: If ID format is invalid.
-            NotFoundError: If session doesn't exist.
-
-        Example:
-            >>> session = client.sessions.resume("sess_123")
-            >>> assert session.status == SessionStatus.ACTIVE
         """
         validate_id(id, "session")
-        response = self._request("POST", f"/cli-sessions/{id}/resume")
+        response = await self._request("POST", f"/cli-sessions/{id}/resume")
         return Session.model_validate(response)
 
-    def complete(
+    async def complete(
         self,
         id: str,
         summary: Optional[str] = None,
     ) -> Session:
-        """Complete a session.
+        """Complete a session (async).
 
         Args:
             id: Session ID.
@@ -311,34 +237,23 @@ class SessionsResource(BaseSyncResource):
 
         Returns:
             Updated session object with completed status.
-
-        Raises:
-            ValidationError: If ID format is invalid.
-            NotFoundError: If session doesn't exist.
-
-        Example:
-            >>> session = client.sessions.complete(
-            ...     "sess_123",
-            ...     summary="Project completed successfully with all goals met"
-            ... )
-            >>> assert session.status == SessionStatus.COMPLETED
         """
         validate_id(id, "session")
         data = CompleteSessionParams(summary=summary)
-        response = self._request(
+        response = await self._request(
             "POST",
             f"/cli-sessions/{id}/complete",
             json=data.model_dump(exclude_none=True)
         )
         return Session.model_validate(response)
 
-    def get_memories(
+    async def get_memories(
         self,
         id: str,
         limit: int = 100,
         offset: int = 0,
     ) -> Dict[str, Any]:
-        """Get memories associated with a session.
+        """Get memories associated with a session (async).
 
         Args:
             id: Session ID.
@@ -347,19 +262,10 @@ class SessionsResource(BaseSyncResource):
 
         Returns:
             Dictionary containing list of memories with pagination info.
-
-        Raises:
-            ValidationError: If ID format is invalid.
-            NotFoundError: If session doesn't exist.
-
-        Example:
-            >>> memories = client.sessions.get_memories("sess_123")
-            >>> for memory in memories["data"]:
-            ...     print(memory["content"])
         """
         validate_id(id, "session")
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
-        response = self._request(
+        response = await self._request(
             "GET",
             f"/cli-sessions/{id}/memories",
             params=params

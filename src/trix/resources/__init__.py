@@ -14,7 +14,8 @@ from .memories import MemoriesResource, AsyncMemoriesResource
 from .relationships import RelationshipsResource
 from .resources import ResourcesResource, AsyncResourcesResource
 from .search import SearchResource
-from .sessions import SessionsResource, AsyncSessionsResource
+from .sessions import SessionsResource
+from .sessions_async import AsyncSessionsResource
 from .spaces import SpacesResource
 from .tasks import TasksResource
 from .tasks_async import AsyncTasksResource

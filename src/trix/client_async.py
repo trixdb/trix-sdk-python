@@ -38,7 +38,7 @@ from .resources.memories import AsyncMemoriesResource
 from .resources.relationships import AsyncRelationshipsResource
 from .resources.resources import AsyncResourcesResource
 from .resources.search import AsyncSearchResource
-from .resources.sessions import AsyncSessionsResource
+from .resources.sessions_async import AsyncSessionsResource
 from .resources.spaces import AsyncSpacesResource
 from .resources.personas import AsyncPersonasResource
 from .resources.space_config import AsyncSpaceConfigResource
