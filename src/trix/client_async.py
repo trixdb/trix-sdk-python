@@ -22,7 +22,7 @@ from .client_transport_async import AsyncTransportMixin
 from .resources.agent import AsyncAgentResource
 from .resources.bots import AsyncBotsResource
 from .resources.habits_async import AsyncHabitsResource
-from .resources.clusters import AsyncClustersResource
+from .resources.clusters_async import AsyncClustersResource
 from .resources.enrichments import AsyncEnrichmentsResource
 from .resources.entities_async import AsyncEntitiesResource
 from .resources.facts import AsyncFactsResource

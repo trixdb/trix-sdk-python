@@ -2,6 +2,7 @@
 
 from .agent import AgentResource
 from .clusters import ClustersResource
+from .clusters_async import AsyncClustersResource
 from .enrichments import EnrichmentsResource, AsyncEnrichmentsResource
 from .entities import EntitiesResource
 from .entities_async import AsyncEntitiesResource
