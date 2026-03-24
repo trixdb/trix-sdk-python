@@ -22,6 +22,7 @@ Example:
 from __future__ import annotations
 
 import functools
+import logging
 from abc import ABC, abstractmethod
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -39,6 +40,8 @@ from typing import (
 
 if TYPE_CHECKING:
     pass
+
+logger = logging.getLogger(__name__)
 
 
 # Type definitions that mirror OpenTelemetry API to avoid hard dependency
@@ -274,8 +277,8 @@ class ActiveRequestSpan(RequestSpan):
                 if len(body_str) > 1000:
                     body_str = body_str[:1000] + "..."
                 self._span.set_attribute("http.request.body", body_str)
-            except Exception:
-                pass  # Ignore serialization errors
+            except Exception as e:
+                logger.debug("Failed to serialize for telemetry: %s", e)
 
     def set_status_code(self, code: int) -> None:
         self._span.set_attribute("http.status_code", code)
@@ -289,8 +292,8 @@ class ActiveRequestSpan(RequestSpan):
                 if len(body_str) > 1000:
                     body_str = body_str[:1000] + "..."
                 self._span.set_attribute("http.response.body", body_str)
-            except Exception:
-                pass  # Ignore serialization errors
+            except Exception as e:
+                logger.debug("Failed to serialize for telemetry: %s", e)
 
     def set_response_size(self, size: int) -> None:
         self._span.set_attribute("http.response_content_length", size)
