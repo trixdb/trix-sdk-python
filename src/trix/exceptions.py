@@ -42,6 +42,12 @@ class ValidationError(TrixError):
     pass
 
 
+class ConflictError(TrixError):
+    """Raised when a version conflict occurs (HTTP 409)."""
+
+    pass
+
+
 class RateLimitError(TrixError):
     """Raised when rate limit is exceeded (429)."""
 

@@ -14,6 +14,7 @@ from .exceptions import (
     APIError,
     APIVersionMismatchError,
     AuthenticationError,
+    ConflictError,
     NotFoundError,
     PermissionError,
     RateLimitError,
@@ -177,6 +178,8 @@ def handle_response(response: httpx.Response) -> None:
             status_code=response.status_code,
             response=error_data,
         )
+    elif response.status_code == 409:
+        raise ConflictError(message, response.status_code, error_data)
     elif response.status_code >= 500:
         raise ServerError(message, response.status_code, error_data)
     else:
