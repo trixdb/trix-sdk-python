@@ -4,7 +4,7 @@ Provides audio upload, transcription, and streaming operations.
 """
 
 from pathlib import Path
-from typing import Any, BinaryIO, Dict, Iterator, List, Optional, Union
+from typing import Any, AsyncIterator, BinaryIO, Dict, Iterator, List, Optional, Union
 
 from ...types import Memory, Transcript
 from ...utils.file_handling import build_multipart_data, prepare_file_upload
@@ -104,7 +104,7 @@ class AsyncAudioOperationsMixin:
         validate_id(id, "memory")
         return await self._client._request_raw("GET", f"/memories/{id}/audio")
 
-    async def stream_audio_chunks(self, id: str, chunk_size: int = 8192):
+    async def stream_audio_chunks(self, id: str, chunk_size: int = 8192) -> AsyncIterator[bytes]:
         """Stream audio content in chunks for efficient memory usage (async)."""
         validate_id(id, "memory")
         stream = self._client._request_stream("GET", f"/memories/{id}/audio", chunk_size=chunk_size)
