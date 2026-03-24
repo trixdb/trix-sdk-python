@@ -1,6 +1,6 @@
 """Space configuration resource for Trix SDK."""
 
-from typing import Optional
+from typing import Any, Dict, Optional
 
 from .base import BaseAsyncResource, BaseSyncResource
 from ..types.space_config import (
@@ -53,10 +53,10 @@ class SpaceConfigResource(BaseSyncResource):
     def update(
         self,
         space_id: str,
-        memory: Optional[dict] = None,
-        llm: Optional[dict] = None,
-        retrieval: Optional[dict] = None,
-        privacy: Optional[dict] = None,
+        memory: Optional[Dict[str, Any]] = None,
+        llm: Optional[Dict[str, Any]] = None,
+        retrieval: Optional[Dict[str, Any]] = None,
+        privacy: Optional[Dict[str, Any]] = None,
         expected_version: Optional[int] = None,
     ) -> SpaceConfigResponse:
         """Update space configuration using JSON Merge Patch semantics.
@@ -101,10 +101,10 @@ class SpaceConfigResource(BaseSyncResource):
     def validate(
         self,
         space_id: str,
-        memory: Optional[dict] = None,
-        llm: Optional[dict] = None,
-        retrieval: Optional[dict] = None,
-        privacy: Optional[dict] = None,
+        memory: Optional[Dict[str, Any]] = None,
+        llm: Optional[Dict[str, Any]] = None,
+        retrieval: Optional[Dict[str, Any]] = None,
+        privacy: Optional[Dict[str, Any]] = None,
     ) -> SpaceConfigValidation:
         """Validate a configuration patch without applying it (dry run).
 
@@ -192,10 +192,10 @@ class AsyncSpaceConfigResource(BaseAsyncResource):
     async def update(
         self,
         space_id: str,
-        memory: Optional[dict] = None,
-        llm: Optional[dict] = None,
-        retrieval: Optional[dict] = None,
-        privacy: Optional[dict] = None,
+        memory: Optional[Dict[str, Any]] = None,
+        llm: Optional[Dict[str, Any]] = None,
+        retrieval: Optional[Dict[str, Any]] = None,
+        privacy: Optional[Dict[str, Any]] = None,
         expected_version: Optional[int] = None,
     ) -> SpaceConfigResponse:
         """Update space configuration using JSON Merge Patch semantics (async).
@@ -227,10 +227,10 @@ class AsyncSpaceConfigResource(BaseAsyncResource):
     async def validate(
         self,
         space_id: str,
-        memory: Optional[dict] = None,
-        llm: Optional[dict] = None,
-        retrieval: Optional[dict] = None,
-        privacy: Optional[dict] = None,
+        memory: Optional[Dict[str, Any]] = None,
+        llm: Optional[Dict[str, Any]] = None,
+        retrieval: Optional[Dict[str, Any]] = None,
+        privacy: Optional[Dict[str, Any]] = None,
     ) -> SpaceConfigValidation:
         """Validate a configuration patch without applying it (async).
 
