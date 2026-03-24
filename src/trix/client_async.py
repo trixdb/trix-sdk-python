@@ -374,7 +374,10 @@ class AsyncTrix:
             k: v if k.lower() != "authorization" else "[REDACTED]"
             for k, v in response.headers.items()
         }
-        logger.debug(f"Response: {response.status_code} headers={safe_headers}")
+        elapsed = response.elapsed.total_seconds()
+        logger.debug(
+            f"Response: {response.status_code} ({elapsed:.3f}s) headers={safe_headers}"
+        )
 
         content_length = response.headers.get("content-length")
         if content_length and int(content_length) > self.MAX_RESPONSE_SIZE:
