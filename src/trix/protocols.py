@@ -100,7 +100,7 @@ class AsyncClientProtocol(Protocol):
         """Make an async HTTP request and return raw bytes."""
         ...
 
-    async def _request_stream(
+    def _request_stream(
         self,
         method: str,
         path: str,
