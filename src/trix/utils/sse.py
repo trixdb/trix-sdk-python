@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import Any, Dict, Iterator, Optional
+from typing import Any, Dict, Iterator, Optional, cast
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +31,10 @@ def parse_sse_line(line: str) -> Optional[Dict[str, Any]]:
         if payload == "[DONE]":
             return None
         try:
-            return json.loads(payload)
+            result = json.loads(payload)
+            if isinstance(result, dict):
+                return cast(Dict[str, Any], result)
+            return None
         except json.JSONDecodeError:
             logger.warning(f"Failed to parse SSE data: {payload[:100]}")
             return None
