@@ -6,6 +6,8 @@ from typing import Any, Dict, Iterator, Optional
 
 logger = logging.getLogger(__name__)
 
+MAX_SSE_LINE_SIZE = 1_048_576  # 1MB
+
 
 def parse_sse_line(line: str) -> Optional[Dict[str, Any]]:
     """Parse a single SSE event line into a dict.
@@ -51,6 +53,8 @@ def iter_sse_lines(raw_iter: Iterator[bytes]) -> Iterator[str]:
     buffer = ""
     for chunk in raw_iter:
         buffer += chunk.decode("utf-8", errors="replace")
+        if len(buffer) > MAX_SSE_LINE_SIZE:
+            raise ValueError(f"SSE line exceeds maximum size of {MAX_SSE_LINE_SIZE} bytes")
         while "\n" in buffer:
             line, buffer = buffer.split("\n", 1)
             if line.strip():
