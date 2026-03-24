@@ -10,7 +10,7 @@ import httpx
 from concurrent.futures import ThreadPoolExecutor
 
 from .base import BaseAsyncResource, BaseSyncResource
-from ..exceptions import TimeoutError
+from ..exceptions import APIError, ConnectionError, TimeoutError
 from ..types.bot import (
     Bot,
     BotCreate,
@@ -208,7 +208,7 @@ class BotsResource(BaseSyncResource):
             try:
                 run = self.run(req.bot_id, message=req.message, context=req.context)
                 return BotRunBatchResult(bot_id=req.bot_id, run=run)
-            except Exception as e:
+            except (APIError, TimeoutError, ConnectionError) as e:
                 return BotRunBatchResult(bot_id=req.bot_id, error=str(e))
 
         with ThreadPoolExecutor(max_workers=min(len(requests), 10)) as pool:
@@ -395,7 +395,7 @@ class AsyncBotsResource(BaseAsyncResource):
             try:
                 run = await self.run(req.bot_id, message=req.message, context=req.context)
                 return BotRunBatchResult(bot_id=req.bot_id, run=run)
-            except Exception as e:
+            except (APIError, TimeoutError, ConnectionError) as e:
                 return BotRunBatchResult(bot_id=req.bot_id, error=str(e))
 
         return list(await asyncio.gather(*[_run_one(r) for r in requests]))
