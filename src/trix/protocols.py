@@ -23,6 +23,8 @@ class SyncClientProtocol(Protocol):
     Resources use this protocol for type-safe client access.
     """
 
+    _client: Any  # httpx.Client
+
     def _request(
         self,
         method: str,
@@ -77,6 +79,8 @@ class AsyncClientProtocol(Protocol):
     This protocol defines the interface that the async client must implement.
     Resources use this protocol for type-safe client access.
     """
+
+    _client: Any  # httpx.AsyncClient
 
     async def _request(
         self,
