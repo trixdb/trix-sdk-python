@@ -175,7 +175,11 @@ class Trix:
         )
 
         # Initialize resources
-        self._init_resources()
+        try:
+            self._init_resources()
+        except Exception:
+            self._client.close()
+            raise
 
     def _init_resources(self) -> None:
         """Initialize all resource handlers."""

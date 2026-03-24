@@ -170,7 +170,22 @@ class AsyncTrix:
         )
 
         # Initialize async resources
-        self._init_resources()
+        try:
+            self._init_resources()
+        except Exception:
+            # Close the async client to prevent resource leak on init failure.
+            # Use _transport.close() as sync fallback since __init__ is not async.
+            try:
+                import asyncio as _aio
+
+                loop = _aio.get_event_loop()
+                if loop.is_running():
+                    loop.create_task(self._client.aclose())
+                else:
+                    loop.run_until_complete(self._client.aclose())
+            except RuntimeError:
+                pass  # No event loop available; transport will be GC'd
+            raise
 
     def _init_resources(self) -> None:
         """Initialize all async resource handlers."""
