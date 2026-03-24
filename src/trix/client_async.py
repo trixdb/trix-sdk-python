@@ -422,7 +422,7 @@ class AsyncTrix:
         """Make async HTTP request and return raw bytes."""
         request_timeout = timeout if timeout is not None else self._timeout
         try:
-            logger.debug(f"Request (raw): {method} {path} params={params}")
+            logger.debug(f"Request (raw): {method} {path} params={_safe_log_params(params)}")
             response = await self._client.request(
                 method=method, url=path, params=params, timeout=request_timeout
             )
@@ -448,7 +448,7 @@ class AsyncTrix:
         """Make async HTTP request and stream the response."""
         request_timeout = timeout if timeout is not None else self._timeout
         try:
-            logger.debug(f"Request (stream): {method} {path} params={params}")
+            logger.debug(f"Request (stream): {method} {path} params={_safe_log_params(params)}")
             async with self._client.stream(
                 method=method, url=path, params=params, timeout=request_timeout
             ) as response:

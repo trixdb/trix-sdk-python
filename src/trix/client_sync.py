@@ -3,6 +3,7 @@
 import logging
 import threading
 import time
+import uuid
 from types import TracebackType
 from typing import Any, BinaryIO, Callable, Dict, Iterator, List, Optional, Tuple, Type, Union
 
@@ -364,6 +365,8 @@ class Trix:
             timeout=timeout,
         )
 
+    MAX_RESPONSE_SIZE = 50 * 1024 * 1024  # 50MB
+
     def _process_response(self, response: httpx.Response, ctx: RequestContext) -> Any:
         """Process and validate the HTTP response."""
         safe_headers = {
@@ -371,6 +374,12 @@ class Trix:
             for k, v in response.headers.items()
         }
         logger.debug(f"Response: {response.status_code} headers={safe_headers}")
+
+        content_length = response.headers.get("content-length")
+        if content_length and int(content_length) > self.MAX_RESPONSE_SIZE:
+            raise ValueError(
+                f"Response too large: {content_length} bytes (max {self.MAX_RESPONSE_SIZE})"
+            )
 
         check_api_version(response)
         handle_response(response)
@@ -423,7 +432,7 @@ class Trix:
         """Make HTTP request and return raw bytes."""
         request_timeout = timeout if timeout is not None else self._timeout
         try:
-            logger.debug(f"Request (raw): {method} {path} params={params}")
+            logger.debug(f"Request (raw): {method} {path} params={_safe_log_params(params)}")
             response = self._client.request(
                 method=method, url=path, params=params, timeout=request_timeout
             )
@@ -449,7 +458,7 @@ class Trix:
         """Make HTTP request and stream the response."""
         request_timeout = timeout if timeout is not None else self._timeout
         try:
-            logger.debug(f"Request (stream): {method} {path} params={params}")
+            logger.debug(f"Request (stream): {method} {path} params={_safe_log_params(params)}")
             with self._client.stream(
                 method=method, url=path, params=params, timeout=request_timeout
             ) as response:
