@@ -7,7 +7,7 @@ and file input normalization across different resource modules.
 import io
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any, BinaryIO, Dict, Iterator, Optional, Tuple, Union
+from typing import Any, BinaryIO, Dict, Iterator, List, Optional, Tuple, Union
 
 
 # Content type mappings for common file extensions
@@ -177,7 +177,7 @@ def prepare_file_upload(
 
 def build_multipart_data(
     base_data: Optional[Dict[str, Any]] = None,
-    tags: Optional[list] = None,
+    tags: Optional[List[str]] = None,
     metadata: Optional[Dict[str, Any]] = None,
     space_id: Optional[str] = None,
     **extra_fields: Any,
