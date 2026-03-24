@@ -3,7 +3,8 @@
 from .agent import AgentResource
 from .clusters import ClustersResource
 from .enrichments import EnrichmentsResource, AsyncEnrichmentsResource
-from .entities import EntitiesResource, AsyncEntitiesResource
+from .entities import EntitiesResource
+from .entities_async import AsyncEntitiesResource
 from .facts import FactsResource, AsyncFactsResource
 from .feedback import FeedbackResource
 from .goals import GoalsResource

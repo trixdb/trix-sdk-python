@@ -28,7 +28,7 @@ from .resources.bots import AsyncBotsResource
 from .resources.habits_async import AsyncHabitsResource
 from .resources.clusters import AsyncClustersResource
 from .resources.enrichments import AsyncEnrichmentsResource
-from .resources.entities import AsyncEntitiesResource
+from .resources.entities_async import AsyncEntitiesResource
 from .resources.facts import AsyncFactsResource
 from .resources.feedback import AsyncFeedbackResource
 from .resources.goals_async import AsyncGoalsResource
