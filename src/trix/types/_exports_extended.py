@@ -185,6 +185,21 @@ from .file import (
     FileUploadBase64,
 )
 
+# =============================================================================
+# Calendar Models (ADR-075)
+# =============================================================================
+from .calendar import (
+    Calendar,
+    CalendarConnection,
+    CalendarConnectionsResponse,
+    CalendarEvent,
+    CalendarEventTime,
+    CalendarEventsResponse,
+    CalendarListResponse,
+    CalendarSyncResult,
+    SyncCalendarParams,
+)
+
 __all__ = [
     # Task
     "AssigneeType", "BulkDeleteResult", "BulkTaskCreate", "BulkTaskFailure",
@@ -230,4 +245,8 @@ __all__ = [
     # File
     "ChatFile", "FileDownloadInfo", "FileListResult", "FileQuota",
     "FileUploadBase64",
+    # Calendar
+    "Calendar", "CalendarConnection", "CalendarConnectionsResponse",
+    "CalendarEvent", "CalendarEventTime", "CalendarEventsResponse",
+    "CalendarListResponse", "CalendarSyncResult", "SyncCalendarParams",
 ]

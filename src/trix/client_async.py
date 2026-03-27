@@ -48,6 +48,7 @@ from .resources.files import AsyncFilesResource
 from .resources.invites import AsyncInvitesResource
 from .resources.notes_async import AsyncNotesResource
 from .resources.presets_async import AsyncPresetsResource
+from .resources.calendar import AsyncCalendarResource
 from .resources.skills import AsyncSkillsResource
 from .resources.templates import AsyncTemplatesResource
 from .utils.retry import RetryConfig
@@ -196,6 +197,7 @@ class AsyncTrix(AsyncTransportMixin):
         self.hub_roles = AsyncHubRolesResource(self)
         self.files = AsyncFilesResource(self)
         self.presets = AsyncPresetsResource(self)
+        self.calendar = AsyncCalendarResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""
