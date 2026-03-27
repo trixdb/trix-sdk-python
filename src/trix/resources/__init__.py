@@ -40,6 +40,7 @@ from .hubs_roles import HubRolesResource, AsyncHubRolesResource
 from .files import FilesResource, AsyncFilesResource
 from .presets import PresetsResource
 from .presets_async import AsyncPresetsResource
+from .calendar import CalendarResource, AsyncCalendarResource
 
 __all__ = [
     "AgentResource",
@@ -92,4 +93,6 @@ __all__ = [
     "AsyncFilesResource",
     "PresetsResource",
     "AsyncPresetsResource",
+    "CalendarResource",
+    "AsyncCalendarResource",
 ]
