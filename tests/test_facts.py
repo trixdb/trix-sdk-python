@@ -3,7 +3,8 @@
 import pytest
 from unittest.mock import Mock, AsyncMock
 
-from trix.resources.facts import FactsResource, AsyncFactsResource
+from trix.resources.facts import FactsResource
+from trix.resources.facts_async import AsyncFactsResource
 
 
 class TestFactsResource:
