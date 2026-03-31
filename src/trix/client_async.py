@@ -25,7 +25,7 @@ from .resources.habits_async import AsyncHabitsResource
 from .resources.clusters_async import AsyncClustersResource
 from .resources.enrichments import AsyncEnrichmentsResource
 from .resources.entities_async import AsyncEntitiesResource
-from .resources.facts import AsyncFactsResource
+from .resources.facts_async import AsyncFactsResource
 from .resources.feedback import AsyncFeedbackResource
 from .resources.goals_async import AsyncGoalsResource
 from .resources.graph import AsyncGraphResource
