@@ -44,13 +44,16 @@ class AsyncNotesResource(BaseAsyncResource):
     ) -> Note:
         """Create a new note (async)."""
         data = NoteCreate(
-            title=title, note_type=note_type, visibility=visibility,
-            space_id=space_id, parent_note_id=parent_note_id,
-            icon=icon, tags=tags, blocks=blocks,
+            title=title,
+            note_type=note_type,
+            visibility=visibility,
+            space_id=space_id,
+            parent_note_id=parent_note_id,
+            icon=icon,
+            tags=tags,
+            blocks=blocks,
         )
-        response = await self._request(
-            "POST", "/notes", json=data.model_dump(exclude_none=True)
-        )
+        response = await self._request("POST", "/notes", json=data.model_dump(exclude_none=True))
         return Note.model_validate(response)
 
     async def list(
@@ -107,8 +110,13 @@ class AsyncNotesResource(BaseAsyncResource):
         """Update a note (async). Requires current version for optimistic locking."""
         validate_id(note_id, "note")
         data = NoteUpdate(
-            version=version, title=title, icon=icon, visibility=visibility,
-            is_pinned=is_pinned, is_archived=is_archived, tags=tags,
+            version=version,
+            title=title,
+            icon=icon,
+            visibility=visibility,
+            is_pinned=is_pinned,
+            is_archived=is_archived,
+            tags=tags,
         )
         response = await self._request(
             "PATCH", f"/notes/{note_id}", json=data.model_dump(exclude_none=True)
@@ -132,8 +140,11 @@ class AsyncNotesResource(BaseAsyncResource):
         """Add a content block to a note (async)."""
         validate_id(note_id, "note")
         data = NoteBlockCreate(
-            block_type=block_type, content=content, sort_order=sort_order,
-            after_block_id=after_block_id, parent_block_id=parent_block_id,
+            block_type=block_type,
+            content=content,
+            sort_order=sort_order,
+            after_block_id=after_block_id,
+            parent_block_id=parent_block_id,
         )
         response = await self._request(
             "POST", f"/notes/{note_id}/blocks", json=data.model_dump(exclude_none=True)
@@ -152,10 +163,13 @@ class AsyncNotesResource(BaseAsyncResource):
         validate_id(note_id, "note")
         validate_id(block_id, "block")
         data = NoteBlockUpdate(
-            content=content, block_type=block_type, sort_order=sort_order,
+            content=content,
+            block_type=block_type,
+            sort_order=sort_order,
         )
         response = await self._request(
-            "PATCH", f"/notes/{note_id}/blocks/{block_id}",
+            "PATCH",
+            f"/notes/{note_id}/blocks/{block_id}",
             json=data.model_dump(exclude_none=True),
         )
         return NoteBlock.model_validate(response)
@@ -176,10 +190,13 @@ class AsyncNotesResource(BaseAsyncResource):
         """Add a collaborator to a note (async)."""
         validate_id(note_id, "note")
         data = NoteCollaboratorCreate(
-            actor_type=actor_type, actor_id=actor_id, permission=permission,
+            actor_type=actor_type,
+            actor_id=actor_id,
+            permission=permission,
         )
         response = await self._request(
-            "POST", f"/notes/{note_id}/collaborators",
+            "POST",
+            f"/notes/{note_id}/collaborators",
             json=data.model_dump(exclude_none=True),
         )
         return NoteCollaborator.model_validate(response)
@@ -194,9 +211,7 @@ class AsyncNotesResource(BaseAsyncResource):
         """Remove a collaborator from a note (async)."""
         validate_id(note_id, "note")
         validate_id(collaborator_id, "collaborator")
-        await self._request(
-            "DELETE", f"/notes/{note_id}/collaborators/{collaborator_id}"
-        )
+        await self._request("DELETE", f"/notes/{note_id}/collaborators/{collaborator_id}")
 
     async def create_link(
         self,
@@ -210,8 +225,10 @@ class AsyncNotesResource(BaseAsyncResource):
         validate_id(note_id, "note")
         validate_id(target_note_id, "target_note")
         data = NoteLinkCreate(
-            target_note_id=target_note_id, source_block_id=source_block_id,
-            target_block_id=target_block_id, link_type=link_type,
+            target_note_id=target_note_id,
+            source_block_id=source_block_id,
+            target_block_id=target_block_id,
+            link_type=link_type,
         )
         response = await self._request(
             "POST", f"/notes/{note_id}/links", json=data.model_dump(exclude_none=True)
@@ -248,24 +265,23 @@ class AsyncNotesResource(BaseAsyncResource):
         validate_id(note_id, "note")
         validate_id(memory_id, "memory")
         data = NoteMemoryLinkCreate(
-            memory_id=memory_id, block_id=block_id,
-            link_type=link_type, relevance_score=relevance_score,
+            memory_id=memory_id,
+            block_id=block_id,
+            link_type=link_type,
+            relevance_score=relevance_score,
         )
         response = await self._request(
-            "POST", f"/notes/{note_id}/memories",
+            "POST",
+            f"/notes/{note_id}/memories",
             json=data.model_dump(exclude_none=True),
         )
         return NoteMemoryLink.model_validate(response)
 
-    async def list_memories(
-        self, note_id: str, limit: int = 50, offset: int = 0
-    ) -> NoteMemoryList:
+    async def list_memories(self, note_id: str, limit: int = 50, offset: int = 0) -> NoteMemoryList:
         """List memories linked to a note (async)."""
         validate_id(note_id, "note")
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
-        response = await self._request(
-            "GET", f"/notes/{note_id}/memories", params=params
-        )
+        response = await self._request("GET", f"/notes/{note_id}/memories", params=params)
         return NoteMemoryList.model_validate(response)
 
     async def unlink_memory(self, note_id: str, memory_id: str) -> None:
@@ -309,9 +325,7 @@ class AsyncNotesResource(BaseAsyncResource):
             data["space_id"] = space_id
         if visibility is not None:
             data["visibility"] = visibility
-        response = await self._request(
-            "POST", f"/notes/from-template/{template_id}", json=data
-        )
+        response = await self._request("POST", f"/notes/from-template/{template_id}", json=data)
         return Note.model_validate(response)
 
     async def summarize(self, note_id: str) -> Dict[str, Any]:

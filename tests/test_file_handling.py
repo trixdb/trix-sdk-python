@@ -173,9 +173,11 @@ class TestPrepareFileUpload:
     def test_type_hint_used(self):
         """Test type_hint is passed through to inference."""
         data = b"data"
-        with prepare_file_upload(
-            data, default_filename="file.xyz", type_hint="audio"
-        ) as (_, _, ct):
+        with prepare_file_upload(data, default_filename="file.xyz", type_hint="audio") as (
+            _,
+            _,
+            ct,
+        ):
             assert ct == "audio/mpeg"
 
 

@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.notes import NotesResource
 
-
 NOTE_RESPONSE = {
     "id": "note_123",
     "account_id": "acc_1",
@@ -141,9 +140,7 @@ class TestNotesResource:
         }
 
         resource = NotesResource(mock_client)
-        resource.update_block(
-            "note_123", "block_456", content={"text": "Updated content"}
-        )
+        resource.update_block("note_123", "block_456", content={"text": "Updated content"})
 
         call_args = mock_client._request.call_args
         assert call_args[0] == ("PATCH", "/notes/note_123/blocks/block_456")

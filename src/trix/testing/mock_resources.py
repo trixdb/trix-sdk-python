@@ -27,7 +27,6 @@ from ..types import (
     Pagination,
 )
 
-
 T = TypeVar("T")
 TItem = TypeVar("TItem")
 MockResponse = Union[TItem, Exception, Callable[[], TItem]]

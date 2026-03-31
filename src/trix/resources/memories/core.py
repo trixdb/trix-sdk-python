@@ -87,8 +87,16 @@ class MemoriesResource(
             Created memory object
         """
         data = build_create_data(
-            content, type, tags, metadata, priority, space_id, options,
-            is_pinned, protection_level, session_id,
+            content,
+            type,
+            tags,
+            metadata,
+            priority,
+            space_id,
+            options,
+            is_pinned,
+            protection_level,
+            session_id,
         )
         response = self._client._request(
             "POST", "/memories", json=data.model_dump(exclude_none=True)
@@ -128,8 +136,17 @@ class MemoriesResource(
             List of memories with pagination info
         """
         params = build_list_params(
-            q, mode, limit, offset, tags, space_id, pinned, protected,
-            min_quality, include_deleted, session_id,
+            q,
+            mode,
+            limit,
+            offset,
+            tags,
+            space_id,
+            pinned,
+            protected,
+            min_quality,
+            include_deleted,
+            session_id,
         )
         response = self._client._request("GET", "/memories", params=params)
         return MemoryList.model_validate(response)
@@ -336,8 +353,16 @@ class AsyncMemoriesResource(
     ) -> Memory:
         """Create a new memory (async)."""
         data = build_create_data(
-            content, type, tags, metadata, priority, space_id, options,
-            is_pinned, protection_level, session_id,
+            content,
+            type,
+            tags,
+            metadata,
+            priority,
+            space_id,
+            options,
+            is_pinned,
+            protection_level,
+            session_id,
         )
         response = await self._client._request(
             "POST", "/memories", json=data.model_dump(exclude_none=True)
@@ -360,8 +385,17 @@ class AsyncMemoriesResource(
     ) -> MemoryList:
         """List memories with optional filtering (async)."""
         params = build_list_params(
-            q, mode, limit, offset, tags, space_id, pinned, protected,
-            min_quality, include_deleted, session_id,
+            q,
+            mode,
+            limit,
+            offset,
+            tags,
+            space_id,
+            pinned,
+            protected,
+            min_quality,
+            include_deleted,
+            session_id,
         )
         response = await self._client._request("GET", "/memories", params=params)
         return MemoryList.model_validate(response)
@@ -424,9 +458,7 @@ class AsyncMemoriesResource(
     async def bulk_update(self, updates: List[Dict[str, Any]]) -> BulkResult:
         """Update multiple memories at once (async)."""
         validate_bulk_updates(updates)
-        response = await self._client._request(
-            "PATCH", "/memories/bulk", json={"updates": updates}
-        )
+        response = await self._client._request("PATCH", "/memories/bulk", json={"updates": updates})
         return BulkResult.model_validate(response)
 
     async def bulk_delete(self, ids: List[str]) -> BulkResult:

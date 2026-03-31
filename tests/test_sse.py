@@ -45,7 +45,7 @@ class TestParseSSELine:
 
     def test_data_with_non_dict_json_returns_none(self):
         """Test data with non-dict JSON (e.g. array) returns None."""
-        assert parse_sse_line('data: [1, 2, 3]') is None
+        assert parse_sse_line("data: [1, 2, 3]") is None
         assert parse_sse_line('data: "just a string"') is None
 
     def test_whitespace_around_line(self):

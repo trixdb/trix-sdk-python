@@ -14,7 +14,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from .metrics import MetricsCollector, RequestMetrics
 
-
 logger = logging.getLogger(__name__)
 
 

@@ -88,9 +88,7 @@ class AsyncTasksResource(BaseAsyncResource):
             labels=labels,
             stale_after_days=stale_after_days,
         )
-        response = await self._request(
-            "POST", "/tasks", json=data.model_dump(exclude_none=True)
-        )
+        response = await self._request("POST", "/tasks", json=data.model_dump(exclude_none=True))
         return Task.model_validate(response)
 
     async def list(

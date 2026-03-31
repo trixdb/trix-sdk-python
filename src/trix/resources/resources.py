@@ -51,9 +51,7 @@ class ResourcesResource(BaseSyncResource):
             description=description,
             metadata=metadata,
         )
-        response = self._request(
-            "POST", "/resources", json=data.model_dump(exclude_none=True)
-        )
+        response = self._request("POST", "/resources", json=data.model_dump(exclude_none=True))
         return Resource.model_validate(response)
 
     def list(

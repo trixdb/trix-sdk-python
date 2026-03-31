@@ -46,9 +46,7 @@ class PresetsResource(BaseSyncResource):
     def create(self, name: str, **kwargs: Any) -> AgentPreset:
         """Create a new agent preset."""
         data = AgentPresetCreate(name=name, **kwargs)
-        response = self._request(
-            "POST", "/agent-presets", json=data.model_dump(exclude_none=True)
-        )
+        response = self._request("POST", "/agent-presets", json=data.model_dump(exclude_none=True))
         return AgentPreset.model_validate(response.get("preset", response))
 
     def update(self, id: str, **kwargs: Any) -> AgentPreset:

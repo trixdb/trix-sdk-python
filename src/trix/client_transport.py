@@ -98,9 +98,7 @@ class SyncTransportMixin:
             for k, v in response.headers.items()
         }
         elapsed = response.elapsed.total_seconds()
-        logger.debug(
-            f"Response: {response.status_code} ({elapsed:.3f}s) headers={safe_headers}"
-        )
+        logger.debug(f"Response: {response.status_code} ({elapsed:.3f}s) headers={safe_headers}")
 
         content_length = response.headers.get("content-length")
         if content_length and int(content_length) > self.MAX_RESPONSE_SIZE:
@@ -186,9 +184,7 @@ class SyncTransportMixin:
         """Make HTTP request and stream the response."""
         request_timeout = timeout if timeout is not None else self._timeout
         try:
-            logger.debug(
-                f"Request (stream): {method} {path} params={_safe_log_params(params)}"
-            )
+            logger.debug(f"Request (stream): {method} {path} params={_safe_log_params(params)}")
             with self._client.stream(
                 method=method, url=path, params=params, timeout=request_timeout
             ) as response:
@@ -217,9 +213,7 @@ class SyncTransportMixin:
         request_timeout = timeout if timeout is not None else self._timeout
         try:
             logger.debug(f"Request (multipart): {method} {path}")
-            headers = {
-                k: v for k, v in self._get_headers().items() if k.lower() != "content-type"
-            }
+            headers = {k: v for k, v in self._get_headers().items() if k.lower() != "content-type"}
             response = self._client.request(
                 method=method,
                 url=path,

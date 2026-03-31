@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.tasks import TasksResource
 
-
 TASK_RESPONSE = {
     "id": "task_123",
     "title": "Review quarterly report",
@@ -25,9 +24,7 @@ class TestTasksResource:
         mock_client._request.return_value = TASK_RESPONSE
 
         resource = TasksResource(mock_client)
-        result = resource.create(
-            title="Review quarterly report", space_id="space_abc", priority=3
-        )
+        result = resource.create(title="Review quarterly report", space_id="space_abc", priority=3)
 
         call_args = mock_client._request.call_args
         assert call_args[0] == ("POST", "/tasks")

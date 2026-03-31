@@ -59,9 +59,7 @@ class CalendarResource(BaseSyncResource):
             pii_level=pii_level,
             tags=tags,
         )
-        response = self._request(
-            "POST", "/calendar/sync", json=data.model_dump(exclude_none=True)
-        )
+        response = self._request("POST", "/calendar/sync", json=data.model_dump(exclude_none=True))
         return CalendarSyncResult.model_validate(response)
 
     def list_connections(self) -> CalendarConnectionsResponse:
@@ -72,9 +70,7 @@ class CalendarResource(BaseSyncResource):
     def list_calendars(self, connection_id: str) -> CalendarListResponse:
         """List calendars for a connection."""
         validate_id(connection_id, "connection")
-        response = self._request(
-            "GET", f"/calendar/connections/{connection_id}/calendars"
-        )
+        response = self._request("GET", f"/calendar/connections/{connection_id}/calendars")
         return CalendarListResponse.model_validate(response)
 
 
@@ -132,7 +128,5 @@ class AsyncCalendarResource(BaseAsyncResource):
     async def list_calendars(self, connection_id: str) -> CalendarListResponse:
         """List calendars for a connection (async)."""
         validate_id(connection_id, "connection")
-        response = await self._request(
-            "GET", f"/calendar/connections/{connection_id}/calendars"
-        )
+        response = await self._request("GET", f"/calendar/connections/{connection_id}/calendars")
         return CalendarListResponse.model_validate(response)

@@ -41,9 +41,15 @@ class PersonasResource(BaseSyncResource):
     ) -> Persona:
         """Create a new persona."""
         data = PersonaCreate(
-            name=name, slug=slug, avatar_url=avatar_url, purpose=purpose,
-            system_prompt=system_prompt, goals=goals, settings=settings,
-            is_default=is_default, can_create_spaces=can_create_spaces,
+            name=name,
+            slug=slug,
+            avatar_url=avatar_url,
+            purpose=purpose,
+            system_prompt=system_prompt,
+            goals=goals,
+            settings=settings,
+            is_default=is_default,
+            can_create_spaces=can_create_spaces,
         )
         response = self._request("POST", "/personas", json=data.model_dump(exclude_none=True))
         return Persona.model_validate(response)
@@ -82,9 +88,15 @@ class PersonasResource(BaseSyncResource):
         """Update a persona."""
         validate_id(id, "persona")
         data = PersonaUpdate(
-            name=name, slug=slug, avatar_url=avatar_url, purpose=purpose,
-            system_prompt=system_prompt, goals=goals, settings=settings,
-            is_default=is_default, can_create_spaces=can_create_spaces,
+            name=name,
+            slug=slug,
+            avatar_url=avatar_url,
+            purpose=purpose,
+            system_prompt=system_prompt,
+            goals=goals,
+            settings=settings,
+            is_default=is_default,
+            can_create_spaces=can_create_spaces,
         )
         response = self._request(
             "PATCH", f"/personas/{id}", json=data.model_dump(exclude_none=True)
@@ -107,13 +119,12 @@ class PersonasResource(BaseSyncResource):
         """Add a space to a persona."""
         validate_id(persona_id, "persona")
         data = PersonaAddSpace(
-            space_id=space_id, role=role,
+            space_id=space_id,
+            role=role,
             can_create_memories=can_create_memories,
             can_delete_memories=can_delete_memories,
         )
-        response = self._request(
-            "POST", f"/personas/{persona_id}/spaces", json=data.model_dump()
-        )
+        response = self._request("POST", f"/personas/{persona_id}/spaces", json=data.model_dump())
         return PersonaSpace.model_validate(response)
 
     def remove_space(self, persona_id: str, space_id: str) -> None:
@@ -140,13 +151,17 @@ class AsyncPersonasResource(BaseAsyncResource):
     ) -> Persona:
         """Create a new persona (async)."""
         data = PersonaCreate(
-            name=name, slug=slug, avatar_url=avatar_url, purpose=purpose,
-            system_prompt=system_prompt, goals=goals, settings=settings,
-            is_default=is_default, can_create_spaces=can_create_spaces,
+            name=name,
+            slug=slug,
+            avatar_url=avatar_url,
+            purpose=purpose,
+            system_prompt=system_prompt,
+            goals=goals,
+            settings=settings,
+            is_default=is_default,
+            can_create_spaces=can_create_spaces,
         )
-        response = await self._request(
-            "POST", "/personas", json=data.model_dump(exclude_none=True)
-        )
+        response = await self._request("POST", "/personas", json=data.model_dump(exclude_none=True))
         return Persona.model_validate(response)
 
     async def list(self) -> PersonaList:
@@ -183,9 +198,15 @@ class AsyncPersonasResource(BaseAsyncResource):
         """Update a persona (async)."""
         validate_id(id, "persona")
         data = PersonaUpdate(
-            name=name, slug=slug, avatar_url=avatar_url, purpose=purpose,
-            system_prompt=system_prompt, goals=goals, settings=settings,
-            is_default=is_default, can_create_spaces=can_create_spaces,
+            name=name,
+            slug=slug,
+            avatar_url=avatar_url,
+            purpose=purpose,
+            system_prompt=system_prompt,
+            goals=goals,
+            settings=settings,
+            is_default=is_default,
+            can_create_spaces=can_create_spaces,
         )
         response = await self._request(
             "PATCH", f"/personas/{id}", json=data.model_dump(exclude_none=True)
@@ -208,7 +229,8 @@ class AsyncPersonasResource(BaseAsyncResource):
         """Add a space to a persona (async)."""
         validate_id(persona_id, "persona")
         data = PersonaAddSpace(
-            space_id=space_id, role=role,
+            space_id=space_id,
+            role=role,
             can_create_memories=can_create_memories,
             can_delete_memories=can_delete_memories,
         )

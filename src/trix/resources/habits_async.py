@@ -62,9 +62,7 @@ class AsyncHabitsResource(BaseAsyncResource):
             space_id=space_id,
             grace_days=grace_days,
         )
-        response = await self._request(
-            "POST", "/habits", json=data.model_dump(exclude_none=True)
-        )
+        response = await self._request("POST", "/habits", json=data.model_dump(exclude_none=True))
         return Habit.model_validate(response)
 
     async def list(
@@ -164,9 +162,7 @@ class AsyncHabitsResource(BaseAsyncResource):
         params: Dict[str, Any] = {}
         if date is not None:
             params["date"] = date
-        response = await self._request(
-            "GET", "/habits/due", params=params if params else None
-        )
+        response = await self._request("GET", "/habits/due", params=params if params else None)
         return DueHabitsResult.model_validate(response)
 
     async def analytics(self, habit_id: str) -> HabitAnalytics:

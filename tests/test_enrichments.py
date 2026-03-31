@@ -84,9 +84,7 @@ class TestEnrichmentsGet:
             assert isinstance(enrichment, Enrichment)
             assert enrichment.type == "entities"
             assert enrichment.data is not None
-            mock_request.assert_called_with(
-                "GET", "/memories/mem_123/enrichments/entities"
-            )
+            mock_request.assert_called_with("GET", "/memories/mem_123/enrichments/entities")
             client.close()
 
     def test_get_invalid_type_raises(self):

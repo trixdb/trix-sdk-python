@@ -114,9 +114,7 @@ class FeedbackResource(BaseSyncResource):
             boost_amount=boost_amount,
             create_relationships=create_relationships,
         )
-        response = self._request(
-            "POST", "/feedback", json=data.model_dump(exclude_none=True)
-        )
+        response = self._request("POST", "/feedback", json=data.model_dump(exclude_none=True))
         return FeedbackResponse.model_validate(response)
 
     def quick(
@@ -204,9 +202,7 @@ class AsyncFeedbackResource(BaseAsyncResource):
             boost_amount=boost_amount,
             create_relationships=create_relationships,
         )
-        response = await self._request(
-            "POST", "/feedback", json=data.model_dump(exclude_none=True)
-        )
+        response = await self._request("POST", "/feedback", json=data.model_dump(exclude_none=True))
         return FeedbackResponse.model_validate(response)
 
     async def quick(

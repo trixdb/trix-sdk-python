@@ -136,9 +136,7 @@ class SpaceConfigResource(BaseSyncResource):
         )
         return SpaceConfigValidation.model_validate(response)
 
-    def audit(
-        self, space_id: str, limit: int = 50, offset: int = 0
-    ) -> SpaceConfigAuditResponse:
+    def audit(self, space_id: str, limit: int = 50, offset: int = 0) -> SpaceConfigAuditResponse:
         """Get the configuration audit trail for a space.
 
         Args:

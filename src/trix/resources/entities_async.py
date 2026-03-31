@@ -74,7 +74,9 @@ class AsyncEntitiesResource(BaseAsyncResource):
             page=page,
             offset=offset,
         )
-        response = await self._request("GET", "/knowledge/entities", params=params if params else None)
+        response = await self._request(
+            "GET", "/knowledge/entities", params=params if params else None
+        )
         return EntityList.model_validate(response)
 
     async def update(

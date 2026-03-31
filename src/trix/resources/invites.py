@@ -34,7 +34,9 @@ class InvitesResource(BaseSyncResource):
     ) -> InviteCreateResult:
         """Create a new invitation."""
         data = InviteCreate(
-            email=email, role=role, expires_in_days=expires_in_days,
+            email=email,
+            role=role,
+            expires_in_days=expires_in_days,
         )
         response = self._request(
             "POST", "/accounts/invites", json=data.model_dump(exclude_none=True)
@@ -57,9 +59,7 @@ class InvitesResource(BaseSyncResource):
     def revoke(self, invite_id: str) -> InviteRevokeResult:
         """Revoke a pending invitation."""
         validate_id(invite_id, "invite")
-        response = self._request(
-            "DELETE", f"/accounts/invites/{invite_id}"
-        )
+        response = self._request("DELETE", f"/accounts/invites/{invite_id}")
         return InviteRevokeResult.model_validate(response)
 
     def accept(
@@ -90,7 +90,9 @@ class AsyncInvitesResource(BaseAsyncResource):
     ) -> InviteCreateResult:
         """Create a new invitation (async)."""
         data = InviteCreate(
-            email=email, role=role, expires_in_days=expires_in_days,
+            email=email,
+            role=role,
+            expires_in_days=expires_in_days,
         )
         response = await self._request(
             "POST", "/accounts/invites", json=data.model_dump(exclude_none=True)
@@ -113,9 +115,7 @@ class AsyncInvitesResource(BaseAsyncResource):
     async def revoke(self, invite_id: str) -> InviteRevokeResult:
         """Revoke a pending invitation (async)."""
         validate_id(invite_id, "invite")
-        response = await self._request(
-            "DELETE", f"/accounts/invites/{invite_id}"
-        )
+        response = await self._request("DELETE", f"/accounts/invites/{invite_id}")
         return InviteRevokeResult.model_validate(response)
 
     async def accept(

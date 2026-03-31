@@ -5,7 +5,6 @@ from unittest.mock import Mock
 from trix.resources.webhooks import WebhooksResource
 from trix.types import WebhookEvent
 
-
 WEBHOOK_RESPONSE = {
     "id": "webhook_123",
     "name": "Memory Updates",

@@ -79,9 +79,7 @@ class AsyncSessionsResource(BaseAsyncResource):
             metadata=metadata,
         )
         response = await self._request(
-            "POST",
-            "/cli-sessions",
-            json=data.model_dump(exclude_none=True)
+            "POST", "/cli-sessions", json=data.model_dump(exclude_none=True)
         )
         return Session.model_validate(response)
 
@@ -174,9 +172,7 @@ class AsyncSessionsResource(BaseAsyncResource):
             metadata=metadata,
         )
         response = await self._request(
-            "PATCH",
-            f"/cli-sessions/{id}",
-            json=data.model_dump(exclude_none=True)
+            "PATCH", f"/cli-sessions/{id}", json=data.model_dump(exclude_none=True)
         )
         return Session.model_validate(response)
 
@@ -241,9 +237,7 @@ class AsyncSessionsResource(BaseAsyncResource):
         validate_id(id, "session")
         data = CompleteSessionParams(summary=summary)
         response = await self._request(
-            "POST",
-            f"/cli-sessions/{id}/complete",
-            json=data.model_dump(exclude_none=True)
+            "POST", f"/cli-sessions/{id}/complete", json=data.model_dump(exclude_none=True)
         )
         return Session.model_validate(response)
 
@@ -265,9 +259,5 @@ class AsyncSessionsResource(BaseAsyncResource):
         """
         validate_id(id, "session")
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
-        response = await self._request(
-            "GET",
-            f"/cli-sessions/{id}/memories",
-            params=params
-        )
+        response = await self._request("GET", f"/cli-sessions/{id}/memories", params=params)
         return response

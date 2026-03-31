@@ -479,10 +479,7 @@ class TestSessionsComplete:
             mock_request.return_value = completed_data
             client = Trix(api_key="test_key")
 
-            session = client.sessions.complete(
-                "sess_123",
-                summary="Session completed successfully"
-            )
+            session = client.sessions.complete("sess_123", summary="Session completed successfully")
 
             assert isinstance(session, Session)
             assert session.summary == "Session completed successfully"
@@ -554,11 +551,7 @@ class TestSessionsGetMemories:
             mock_request.return_value = mock_memories_data
             client = Trix(api_key="test_key")
 
-            client.sessions.get_memories(
-                "sess_123",
-                limit=50,
-                offset=20
-            )
+            client.sessions.get_memories("sess_123", limit=50, offset=20)
 
             call_args = mock_request.call_args
             params = call_args[1]["params"]

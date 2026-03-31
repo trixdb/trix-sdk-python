@@ -35,8 +35,11 @@ class SkillsResource(BaseSyncResource):
     ) -> Skill:
         """Create a new skill."""
         data = SkillCreate(
-            name=name, description=description, content=content,
-            tags=tags, metadata=metadata,
+            name=name,
+            description=description,
+            content=content,
+            tags=tags,
+            metadata=metadata,
         )
         response = self._request("POST", "/skills", json=data.model_dump(exclude_none=True))
         return Skill.model_validate(response)
@@ -69,8 +72,11 @@ class SkillsResource(BaseSyncResource):
         """Update a skill."""
         validate_id(skill_id, "skill")
         data = SkillUpdate(
-            name=name, description=description, content=content,
-            tags=tags, metadata=metadata,
+            name=name,
+            description=description,
+            content=content,
+            tags=tags,
+            metadata=metadata,
         )
         response = self._request(
             "PATCH", f"/skills/{skill_id}", json=data.model_dump(exclude_none=True)
@@ -152,12 +158,13 @@ class AsyncSkillsResource(BaseAsyncResource):
     ) -> Skill:
         """Create a new skill (async)."""
         data = SkillCreate(
-            name=name, description=description, content=content,
-            tags=tags, metadata=metadata,
+            name=name,
+            description=description,
+            content=content,
+            tags=tags,
+            metadata=metadata,
         )
-        response = await self._request(
-            "POST", "/skills", json=data.model_dump(exclude_none=True)
-        )
+        response = await self._request("POST", "/skills", json=data.model_dump(exclude_none=True))
         return Skill.model_validate(response)
 
     async def list(
@@ -188,8 +195,11 @@ class AsyncSkillsResource(BaseAsyncResource):
         """Update a skill (async)."""
         validate_id(skill_id, "skill")
         data = SkillUpdate(
-            name=name, description=description, content=content,
-            tags=tags, metadata=metadata,
+            name=name,
+            description=description,
+            content=content,
+            tags=tags,
+            metadata=metadata,
         )
         response = await self._request(
             "PATCH", f"/skills/{skill_id}", json=data.model_dump(exclude_none=True)

@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.goals import GoalsResource
 
-
 GOAL_RESPONSE = {
     "id": "goal_123",
     "account_id": "acc_1",

@@ -279,9 +279,7 @@ class NotesResource(BaseSyncResource):
         )
         return NoteMemoryLink.model_validate(response)
 
-    def list_memories(
-        self, note_id: str, limit: int = 50, offset: int = 0
-    ) -> NoteMemoryList:
+    def list_memories(self, note_id: str, limit: int = 50, offset: int = 0) -> NoteMemoryList:
         """List memories linked to a note."""
         validate_id(note_id, "note")
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
@@ -333,9 +331,7 @@ class NotesResource(BaseSyncResource):
             data["space_id"] = space_id
         if visibility is not None:
             data["visibility"] = visibility
-        response = self._request(
-            "POST", f"/notes/from-template/{template_id}", json=data
-        )
+        response = self._request("POST", f"/notes/from-template/{template_id}", json=data)
         return Note.model_validate(response)
 
     # AI Features (Phase 4)

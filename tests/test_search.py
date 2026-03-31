@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.search import SearchResource
 
-
 SEARCH_RESULT_DATA = {
     "data": [
         {

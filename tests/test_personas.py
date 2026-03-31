@@ -117,9 +117,7 @@ class TestPersonaCreate:
             mock_request.return_value = mock_persona_data
             client = AsyncTrix(api_key="test_key")
 
-            persona = await client.personas.create(
-                name="Research", purpose="Academic research"
-            )
+            persona = await client.personas.create(name="Research", purpose="Academic research")
 
             assert isinstance(persona, Persona)
             assert persona.name == "Research"
@@ -341,9 +339,7 @@ class TestPersonaUpdate:
             mock_request.return_value = updated
             client = AsyncTrix(api_key="test_key")
 
-            persona = await client.personas.update(
-                "persona_123", name="Async Updated"
-            )
+            persona = await client.personas.update("persona_123", name="Async Updated")
 
             assert isinstance(persona, Persona)
             assert persona.name == "Async Updated"

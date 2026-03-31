@@ -70,14 +70,10 @@ class HubsResource(BaseSyncResource):
         validate_id(user_id, "user")
         self._request("DELETE", f"/hubs/{hub_id}/members/{user_id}")
 
-    def list_conversation_members(
-        self, conversation_id: str
-    ) -> List[ConversationMember]:
+    def list_conversation_members(self, conversation_id: str) -> List[ConversationMember]:
         """List all members of a conversation."""
         validate_id(conversation_id, "conversation")
-        response = self._request(
-            "GET", f"/conversations/{conversation_id}/members"
-        )
+        response = self._request("GET", f"/conversations/{conversation_id}/members")
         result = ConversationMemberList.model_validate(response)
         return result.data
 
@@ -133,15 +129,11 @@ class HubsResource(BaseSyncResource):
         )
         return ConversationMember.model_validate(response)
 
-    def remove_conversation_member(
-        self, conversation_id: str, user_id: str
-    ) -> None:
+    def remove_conversation_member(self, conversation_id: str, user_id: str) -> None:
         """Remove a member from a conversation."""
         validate_id(conversation_id, "conversation")
         validate_id(user_id, "user")
-        self._request(
-            "DELETE", f"/conversations/{conversation_id}/members/{user_id}"
-        )
+        self._request("DELETE", f"/conversations/{conversation_id}/members/{user_id}")
 
 
 class AsyncHubsResource(BaseAsyncResource):
@@ -193,14 +185,10 @@ class AsyncHubsResource(BaseAsyncResource):
         validate_id(user_id, "user")
         await self._request("DELETE", f"/hubs/{hub_id}/members/{user_id}")
 
-    async def list_conversation_members(
-        self, conversation_id: str
-    ) -> List[ConversationMember]:
+    async def list_conversation_members(self, conversation_id: str) -> List[ConversationMember]:
         """List all members of a conversation (async)."""
         validate_id(conversation_id, "conversation")
-        response = await self._request(
-            "GET", f"/conversations/{conversation_id}/members"
-        )
+        response = await self._request("GET", f"/conversations/{conversation_id}/members")
         result = ConversationMemberList.model_validate(response)
         return result.data
 
@@ -256,12 +244,8 @@ class AsyncHubsResource(BaseAsyncResource):
         )
         return ConversationMember.model_validate(response)
 
-    async def remove_conversation_member(
-        self, conversation_id: str, user_id: str
-    ) -> None:
+    async def remove_conversation_member(self, conversation_id: str, user_id: str) -> None:
         """Remove a member from a conversation (async)."""
         validate_id(conversation_id, "conversation")
         validate_id(user_id, "user")
-        await self._request(
-            "DELETE", f"/conversations/{conversation_id}/members/{user_id}"
-        )
+        await self._request("DELETE", f"/conversations/{conversation_id}/members/{user_id}")

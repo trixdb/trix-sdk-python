@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.clusters import ClustersResource
 
-
 CLUSTER_RESPONSE = {
     "id": "cluster_123",
     "name": "Work Projects",

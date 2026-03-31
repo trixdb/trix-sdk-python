@@ -209,17 +209,14 @@ class EnrichmentsResource:
         if operations:
             # Convert EnrichmentOperation enums to strings
             data["types"] = [
-                op.value if isinstance(op, EnrichmentOperation) else op
-                for op in operations
+                op.value if isinstance(op, EnrichmentOperation) else op for op in operations
             ]
         if priority:
             data["priority"] = priority
         if force:
             data["force"] = force
 
-        response = self._client._request(
-            "POST", f"/memories/{memory_id}/enrichments", json=data
-        )
+        response = self._client._request("POST", f"/memories/{memory_id}/enrichments", json=data)
         return EnrichmentResult.model_validate(response)
 
 
@@ -337,8 +334,7 @@ class AsyncEnrichmentsResource:
         if operations:
             # Convert EnrichmentOperation enums to strings
             data["types"] = [
-                op.value if isinstance(op, EnrichmentOperation) else op
-                for op in operations
+                op.value if isinstance(op, EnrichmentOperation) else op for op in operations
             ]
         if priority:
             data["priority"] = priority

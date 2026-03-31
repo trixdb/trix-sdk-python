@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.templates import TemplatesResource
 
-
 TEMPLATE_RESPONSE = {
     "id": "tmpl_123",
     "account_id": "acct_456",

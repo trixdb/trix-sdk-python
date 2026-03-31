@@ -5,7 +5,6 @@ This module is imported by trix/__init__.py to keep the main entry point lean.
 All types are originally defined in trix.types submodules.
 """
 
-
 TYPE_NAMES = [
     # Template
     "Template",

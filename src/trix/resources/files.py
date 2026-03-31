@@ -110,9 +110,7 @@ class FilesResource(BaseSyncResource):
             params["limit"] = limit
         if cursor:
             params["cursor"] = cursor
-        response = self._request(
-            "GET", f"/files/conversation/{conversation_id}", params=params
-        )
+        response = self._request("GET", f"/files/conversation/{conversation_id}", params=params)
         return FileListResult.model_validate(response)
 
     def get_quota(self) -> FileQuota:

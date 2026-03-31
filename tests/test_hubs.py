@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.hubs import HubsResource
 
-
 MEMBER_RESPONSE = {
     "id": "hm_001",
     "hub_id": "hub_123",

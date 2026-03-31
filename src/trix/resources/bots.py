@@ -43,7 +43,10 @@ class BotsResource(BaseSyncResource):
         return Bot.model_validate(response)
 
     def list(
-        self, status: Optional[str] = None, limit: int = 100, offset: int = 0,
+        self,
+        status: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
     ) -> BotList:
         """List all bots."""
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
@@ -61,9 +64,7 @@ class BotsResource(BaseSyncResource):
         """Update a bot."""
         validate_id(id, "bot")
         data = BotUpdate(**kwargs)
-        response = self._request(
-            "PATCH", f"/bots/{id}", json=data.model_dump(exclude_none=True)
-        )
+        response = self._request("PATCH", f"/bots/{id}", json=data.model_dump(exclude_none=True))
         return Bot.model_validate(response)
 
     def delete(self, id: str) -> None:
@@ -166,9 +167,7 @@ class BotsResource(BaseSyncResource):
         bot_run = self.run(bot_id, message=message, context=context)
         return self._poll_run(bot_id, bot_run.id, poll_interval, timeout)
 
-    def _poll_run(
-        self, bot_id: str, run_id: str, poll_interval: float, timeout: float
-    ) -> BotRun:
+    def _poll_run(self, bot_id: str, run_id: str, poll_interval: float, timeout: float) -> BotRun:
         """Poll a bot run until it reaches a terminal status."""
         start = time.monotonic()
         terminal_statuses = {"completed", "failed", "cancelled"}
@@ -178,9 +177,7 @@ class BotsResource(BaseSyncResource):
                 return run
             elapsed = time.monotonic() - start
             if elapsed + poll_interval > timeout:
-                raise TimeoutError(
-                    f"Bot run {run_id} did not complete within {timeout}s"
-                )
+                raise TimeoutError(f"Bot run {run_id} did not complete within {timeout}s")
             time.sleep(poll_interval)
 
     def list_runs(self, bot_id: str, limit: int = 20, offset: int = 0) -> BotRunList:
@@ -204,6 +201,7 @@ class BotsResource(BaseSyncResource):
         Returns:
             List of results (one per request, in order).
         """
+
         def _run_one(req: BotRunBatchRequest) -> BotRunBatchResult:
             try:
                 run = self.run(req.bot_id, message=req.message, context=req.context)
@@ -256,7 +254,10 @@ class AsyncBotsResource(BaseAsyncResource):
         return Bot.model_validate(response)
 
     async def list(
-        self, status: Optional[str] = None, limit: int = 100, offset: int = 0,
+        self,
+        status: Optional[str] = None,
+        limit: int = 100,
+        offset: int = 0,
     ) -> BotList:
         """List all bots (async)."""
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
@@ -372,9 +373,7 @@ class AsyncBotsResource(BaseAsyncResource):
                 return run
             elapsed = time.monotonic() - start
             if elapsed + poll_interval > timeout:
-                raise TimeoutError(
-                    f"Bot run {run_id} did not complete within {timeout}s"
-                )
+                raise TimeoutError(f"Bot run {run_id} did not complete within {timeout}s")
             await asyncio.sleep(poll_interval)
 
     async def list_runs(self, bot_id: str, limit: int = 20, offset: int = 0) -> BotRunList:
@@ -391,6 +390,7 @@ class AsyncBotsResource(BaseAsyncResource):
 
     async def run_batch(self, requests: List[BotRunBatchRequest]) -> List[BotRunBatchResult]:
         """Run multiple bots in parallel using asyncio.gather (async)."""
+
         async def _run_one(req: BotRunBatchRequest) -> BotRunBatchResult:
             try:
                 run = await self.run(req.bot_id, message=req.message, context=req.context)

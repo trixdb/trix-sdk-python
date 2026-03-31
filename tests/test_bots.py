@@ -6,7 +6,6 @@ import pytest
 
 from trix.resources.bots import BotsResource, AsyncBotsResource
 
-
 BOT_RESPONSE = {
     "id": "bot_123",
     "account_id": "acc_1",

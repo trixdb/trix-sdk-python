@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.workflows import WorkflowsResource
 
-
 WORKFLOW_RESPONSE = {
     "id": "wf_123",
     "account_id": "acc_1",
@@ -159,9 +158,7 @@ class TestWorkflowsResource:
         }
 
         resource = WorkflowsResource(mock_client)
-        resource.create_trigger(
-            "wf_123", type="cron", cron_expression="0 9 * * *"
-        )
+        resource.create_trigger("wf_123", type="cron", cron_expression="0 9 * * *")
 
         call_args = mock_client._request.call_args
         assert call_args[0] == ("POST", "/workflows/wf_123/triggers")

@@ -193,7 +193,9 @@ class HighlightsResource:
         if extraction_types:
             data["extraction_types"] = [et.value for et in extraction_types]
 
-        response = self._client._request("POST", f"/memories/{memory_id}/extract-highlights", json=data)
+        response = self._client._request(
+            "POST", f"/memories/{memory_id}/extract-highlights", json=data
+        )
         return [ExtractedHighlights.model_validate(e) for e in response.get("extractions", [])]
 
     def list_global(self, limit: int = 100, offset: int = 0) -> HighlightList:
@@ -322,7 +324,9 @@ class AsyncHighlightsResource:
         """List highlights for a memory (async)."""
         validate_id(memory_id, "memory")
         params = {"limit": limit}
-        response = await self._client._request("GET", f"/memories/{memory_id}/highlights", params=params)
+        response = await self._client._request(
+            "GET", f"/memories/{memory_id}/highlights", params=params
+        )
         return HighlightList.model_validate(response)
 
     async def get(self, highlight_id: str) -> Highlight:

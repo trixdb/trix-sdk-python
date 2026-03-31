@@ -124,9 +124,7 @@ class AgentResource:
         validate_id(session_id, "session")
         data: Dict[str, Any] = {"content": content, "role": role}
 
-        response = self._client._request(
-            "POST", f"/agent/sessions/{session_id}/message", json=data
-        )
+        response = self._client._request("POST", f"/agent/sessions/{session_id}/message", json=data)
         return SessionMessage.model_validate(response)
 
     def get_session(self, session_id: str, limit: int = 100, offset: int = 0) -> SessionMemoryList:

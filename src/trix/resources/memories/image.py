@@ -174,9 +174,7 @@ class ImageOperationsMixin:
         """Generate automatic tags for a single image."""
         validate_id(image_id, "image")
         body: Dict[str, Any] = {"apply": apply, "min_confidence": min_confidence}
-        response = self._client._request(
-            "POST", f"/memories/images/{image_id}/auto-tag", json=body
-        )
+        response = self._client._request("POST", f"/memories/images/{image_id}/auto-tag", json=body)
         return AutoTagResult.model_validate(response)
 
     def batch_auto_tag(

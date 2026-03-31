@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.space_config import SpaceConfigResource
 
-
 CONFIG_RESPONSE = {
     "config": {
         "memory": {

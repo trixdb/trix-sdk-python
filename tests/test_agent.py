@@ -6,7 +6,6 @@ from unittest.mock import patch
 from trix import Trix, AsyncTrix
 from trix.types import SessionMessage
 
-
 MOCK_SESSION_MESSAGE = {
     "id": "mem_abc123",
     "session_id": "chat_123",

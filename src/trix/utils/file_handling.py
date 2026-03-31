@@ -9,7 +9,6 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, BinaryIO, Dict, Iterator, List, Optional, Tuple, Union
 
-
 # Content type mappings for common file extensions
 IMAGE_CONTENT_TYPES = {
     ".jpg": "image/jpeg",

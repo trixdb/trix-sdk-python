@@ -72,9 +72,7 @@ class TestCreateWithCustomSlug:
             client = Trix(api_key="test_key")
 
             space = client.spaces.create(
-                name="Test Space",
-                slug="custom-slug",
-                description="A test space"
+                name="Test Space", slug="custom-slug", description="A test space"
             )
 
             assert isinstance(space, Space)
@@ -111,10 +109,7 @@ class TestCreateWithCustomSlug:
             mock_request.return_value = custom_slug_data
             client = AsyncTrix(api_key="test_key")
 
-            space = await client.spaces.create(
-                name="Test Space",
-                slug="custom-slug"
-            )
+            space = await client.spaces.create(name="Test Space", slug="custom-slug")
 
             assert isinstance(space, Space)
             assert space.slug == "custom-slug"
@@ -208,11 +203,7 @@ class TestUpdateSlug:
             mock_request.return_value = updated_data
             client = Trix(api_key="test_key")
 
-            space = client.spaces.update(
-                "space_123",
-                name="Updated Name",
-                slug="updated-slug"
-            )
+            space = client.spaces.update("space_123", name="Updated Name", slug="updated-slug")
 
             assert isinstance(space, Space)
             assert space.name == "Updated Name"
@@ -249,10 +240,7 @@ class TestSpacesCRUD:
             mock_request.return_value = mock_space_data
             client = Trix(api_key="test_key")
 
-            space = client.spaces.create(
-                name="Test Space",
-                description="A test space"
-            )
+            space = client.spaces.create(name="Test Space", description="A test space")
 
             assert isinstance(space, Space)
             assert space.id == "space_123"

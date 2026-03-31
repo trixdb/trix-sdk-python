@@ -85,7 +85,9 @@ class TemplatesResource(BaseSyncResource):
         response = self._request("POST", f"/templates/{template_id}/install")
         return TemplateInstallResult.model_validate(response)
 
-    def review(self, template_id: str, rating: int, comment: Optional[str] = None) -> TemplateReview:
+    def review(
+        self, template_id: str, rating: int, comment: Optional[str] = None
+    ) -> TemplateReview:
         """Submit a review for a template."""
         validate_id(template_id, "template")
         data = TemplateReviewCreate(rating=rating, comment=comment)

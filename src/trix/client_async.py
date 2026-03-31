@@ -54,7 +54,6 @@ from .resources.templates import AsyncTemplatesResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url, validate_id
 
-
 logger = logging.getLogger(__name__)
 
 

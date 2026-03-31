@@ -5,7 +5,6 @@ from unittest.mock import Mock
 from trix.resources.feedback import FeedbackResource
 from trix.types import FeedbackResult
 
-
 FEEDBACK_RESPONSE = {
     "relationships_created": 2,
     "memories_boosted": 3,

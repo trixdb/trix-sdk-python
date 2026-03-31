@@ -46,8 +46,11 @@ class HubRolesResource(BaseSyncResource):
         """Create a custom role for a hub."""
         validate_id(hub_id, "hub")
         data = CreateRoleParams(
-            name=name, color=color, icon=icon,
-            position=position, permissions=permissions,
+            name=name,
+            color=color,
+            icon=icon,
+            position=position,
+            permissions=permissions,
         )
         response = self._request(
             "POST", f"/hubs/{hub_id}/roles", json=data.model_dump(exclude_none=True)
@@ -86,9 +89,7 @@ class HubRolesResource(BaseSyncResource):
         """Assign a role to a hub member."""
         validate_id(hub_id, "hub")
         validate_id(role_id, "role")
-        self._request(
-            "POST", f"/hubs/{hub_id}/roles/{role_id}/assign", json={"user_id": user_id}
-        )
+        self._request("POST", f"/hubs/{hub_id}/roles/{role_id}/assign", json={"user_id": user_id})
 
     def remove_role(self, hub_id: str, role_id: str, user_id: str) -> None:
         """Remove a role from a hub member."""
@@ -99,9 +100,7 @@ class HubRolesResource(BaseSyncResource):
     def list_role_overrides(self, conversation_id: str) -> List[ConvRoleOverride]:
         """List per-role permission overrides for a conversation."""
         validate_id(conversation_id, "conversation")
-        response = self._request(
-            "GET", f"/conversations/{conversation_id}/role-overrides"
-        )
+        response = self._request("GET", f"/conversations/{conversation_id}/role-overrides")
         result = ConvRoleOverrideList.model_validate(response)
         return result.data
 
@@ -122,9 +121,7 @@ class HubRolesResource(BaseSyncResource):
         """Delete a per-role permission override for a conversation."""
         validate_id(conversation_id, "conversation")
         validate_id(role_id, "role")
-        self._request(
-            "DELETE", f"/conversations/{conversation_id}/role-overrides/{role_id}"
-        )
+        self._request("DELETE", f"/conversations/{conversation_id}/role-overrides/{role_id}")
 
 
 class AsyncHubRolesResource(BaseAsyncResource):
@@ -150,8 +147,11 @@ class AsyncHubRolesResource(BaseAsyncResource):
         """Create a custom role for a hub (async)."""
         validate_id(hub_id, "hub")
         data = CreateRoleParams(
-            name=name, color=color, icon=icon,
-            position=position, permissions=permissions,
+            name=name,
+            color=color,
+            icon=icon,
+            position=position,
+            permissions=permissions,
         )
         response = await self._request(
             "POST", f"/hubs/{hub_id}/roles", json=data.model_dump(exclude_none=True)
@@ -184,9 +184,7 @@ class AsyncHubRolesResource(BaseAsyncResource):
     async def reorder_roles(self, hub_id: str, role_ids: List[str]) -> None:
         """Reorder roles for a hub (async)."""
         validate_id(hub_id, "hub")
-        await self._request(
-            "PUT", f"/hubs/{hub_id}/roles/reorder", json={"role_ids": role_ids}
-        )
+        await self._request("PUT", f"/hubs/{hub_id}/roles/reorder", json={"role_ids": role_ids})
 
     async def assign_role(self, hub_id: str, role_id: str, user_id: str) -> None:
         """Assign a role to a hub member (async)."""
@@ -200,18 +198,12 @@ class AsyncHubRolesResource(BaseAsyncResource):
         """Remove a role from a hub member (async)."""
         validate_id(hub_id, "hub")
         validate_id(role_id, "role")
-        await self._request(
-            "DELETE", f"/hubs/{hub_id}/roles/{role_id}/members/{user_id}"
-        )
+        await self._request("DELETE", f"/hubs/{hub_id}/roles/{role_id}/members/{user_id}")
 
-    async def list_role_overrides(
-        self, conversation_id: str
-    ) -> List[ConvRoleOverride]:
+    async def list_role_overrides(self, conversation_id: str) -> List[ConvRoleOverride]:
         """List per-role permission overrides for a conversation (async)."""
         validate_id(conversation_id, "conversation")
-        response = await self._request(
-            "GET", f"/conversations/{conversation_id}/role-overrides"
-        )
+        response = await self._request("GET", f"/conversations/{conversation_id}/role-overrides")
         result = ConvRoleOverrideList.model_validate(response)
         return result.data
 
@@ -228,12 +220,8 @@ class AsyncHubRolesResource(BaseAsyncResource):
         )
         return ConvRoleOverride.model_validate(response)
 
-    async def delete_role_override(
-        self, conversation_id: str, role_id: str
-    ) -> None:
+    async def delete_role_override(self, conversation_id: str, role_id: str) -> None:
         """Delete a per-role permission override for a conversation (async)."""
         validate_id(conversation_id, "conversation")
         validate_id(role_id, "role")
-        await self._request(
-            "DELETE", f"/conversations/{conversation_id}/role-overrides/{role_id}"
-        )
+        await self._request("DELETE", f"/conversations/{conversation_id}/role-overrides/{role_id}")

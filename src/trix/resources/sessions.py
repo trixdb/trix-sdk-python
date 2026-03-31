@@ -94,11 +94,7 @@ class SessionsResource(BaseSyncResource):
             is_private=is_private,
             metadata=metadata,
         )
-        response = self._request(
-            "POST",
-            "/cli-sessions",
-            json=data.model_dump(exclude_none=True)
-        )
+        response = self._request("POST", "/cli-sessions", json=data.model_dump(exclude_none=True))
         return Session.model_validate(response)
 
     def list(
@@ -220,9 +216,7 @@ class SessionsResource(BaseSyncResource):
             metadata=metadata,
         )
         response = self._request(
-            "PATCH",
-            f"/cli-sessions/{id}",
-            json=data.model_dump(exclude_none=True)
+            "PATCH", f"/cli-sessions/{id}", json=data.model_dump(exclude_none=True)
         )
         return Session.model_validate(response)
 
@@ -326,9 +320,7 @@ class SessionsResource(BaseSyncResource):
         validate_id(id, "session")
         data = CompleteSessionParams(summary=summary)
         response = self._request(
-            "POST",
-            f"/cli-sessions/{id}/complete",
-            json=data.model_dump(exclude_none=True)
+            "POST", f"/cli-sessions/{id}/complete", json=data.model_dump(exclude_none=True)
         )
         return Session.model_validate(response)
 
@@ -359,9 +351,5 @@ class SessionsResource(BaseSyncResource):
         """
         validate_id(id, "session")
         params: Dict[str, Any] = {"limit": limit, "offset": offset}
-        response = self._request(
-            "GET",
-            f"/cli-sessions/{id}/memories",
-            params=params
-        )
+        response = self._request("GET", f"/cli-sessions/{id}/memories", params=params)
         return response

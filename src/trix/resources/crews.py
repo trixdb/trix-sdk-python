@@ -61,9 +61,7 @@ class AsyncCrewsResource(BaseAsyncResource):
     async def create(self, name: str, **kwargs: Any) -> Crew:
         """Create a new crew (async)."""
         data = CrewCreate(name=name, **kwargs)
-        response = await self._request(
-            "POST", "/crews", json=data.model_dump(exclude_none=True)
-        )
+        response = await self._request("POST", "/crews", json=data.model_dump(exclude_none=True))
         return Crew.model_validate(response)
 
     async def list(

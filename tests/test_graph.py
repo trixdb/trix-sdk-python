@@ -140,9 +140,7 @@ def test_graph_expand_with_hybrid_scoring(sync_client, respx_mock):
     )
 
     # Act
-    result = sync_client.graph.expand(
-        seed_memory_ids=["mem_1"], apply_hybrid_scoring=True
-    )
+    result = sync_client.graph.expand(seed_memory_ids=["mem_1"], apply_hybrid_scoring=True)
 
     # Assert
     assert isinstance(result, GraphExpansionResult)

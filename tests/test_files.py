@@ -4,7 +4,6 @@ from unittest.mock import Mock
 
 from trix.resources.files import FilesResource
 
-
 FILE_RESPONSE = {
     "id": "file_123",
     "filename": "photo.jpg",

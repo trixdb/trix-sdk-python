@@ -8,7 +8,6 @@ from urllib.parse import urlparse
 # Re-export validate_webhook_url for backwards compatibility
 from .security_webhook import validate_webhook_url  # noqa: F401
 
-
 # Pattern for valid resource IDs - alphanumeric, underscores, hyphens
 ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{1,255}$")
 

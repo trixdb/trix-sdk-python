@@ -162,9 +162,7 @@ class TestHighlightsUpdate:
             mock_request.return_value = mock_highlight_data
             client = Trix(api_key="test_key")
 
-            hl = client.highlights.update(
-                "hl_123", text="Updated text", note="Updated note"
-            )
+            hl = client.highlights.update("hl_123", text="Updated text", note="Updated note")
 
             assert hl.text == "Updated text"
             assert hl.note == "Updated note"
@@ -195,9 +193,7 @@ class TestAsyncHighlights:
         with patch.object(AsyncTrix, "_request") as mock_request:
             mock_request.return_value = mock_highlight_data
             async with AsyncTrix(api_key="test_key") as client:
-                hl = await client.highlights.create(
-                    memory_id="mem_001", text="Important"
-                )
+                hl = await client.highlights.create(memory_id="mem_001", text="Important")
                 assert hl.id == "hl_123"
 
     @pytest.mark.asyncio

@@ -217,9 +217,7 @@ class TestRelationshipsBulk:
             mock_request.return_value = {"reinforced": 2, "failed": 0}
             client = Trix(api_key="test_key")
 
-            result = client.relationships.reinforce_group(
-                ["rel_123", "rel_456"], amount=0.1
-            )
+            result = client.relationships.reinforce_group(["rel_123", "rel_456"], amount=0.1)
 
             assert result.reinforced == 2
             assert result.failed == 0
