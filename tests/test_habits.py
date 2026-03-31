@@ -5,13 +5,11 @@ from unittest.mock import Mock
 
 import pytest
 
-from trix import Trix
 from trix.resources.habits import HabitsResource
 from trix.types.habit import (
     CheckInResult,
     DueHabitsResult,
     Habit,
-    HabitCompletion,
     HabitHistoryResult,
     HabitList,
     StreakInfo,

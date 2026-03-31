@@ -8,16 +8,10 @@ from ..types.hub import (
     AddHubMemberParams,
     ConversationMember,
     ConversationMemberList,
-    ConvRoleOverride,
-    ConvRoleOverrideList,
-    CreateRoleParams,
-    HubCustomRole,
-    HubCustomRoleList,
     HubMember,
     HubMemberList,
     UpdateConversationMemberParams,
     UpdateHubMemberParams,
-    UpdateRoleParams,
 )
 from ..utils.security import validate_id
 

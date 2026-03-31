@@ -9,7 +9,7 @@ from typing import Any, Awaitable, Callable, Dict, Optional
 
 import httpx
 
-from . import MAX_API_VERSION, MIN_API_VERSION, __api_version__, __version__
+from . import MAX_API_VERSION, MIN_API_VERSION, __version__
 from .exceptions import (
     APIError,
     APIVersionMismatchError,

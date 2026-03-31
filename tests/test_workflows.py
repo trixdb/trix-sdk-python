@@ -159,7 +159,7 @@ class TestWorkflowsResource:
         }
 
         resource = WorkflowsResource(mock_client)
-        result = resource.create_trigger(
+        resource.create_trigger(
             "wf_123", type="cron", cron_expression="0 9 * * *"
         )
 

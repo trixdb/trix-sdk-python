@@ -204,7 +204,7 @@ class TestPersonaGet:
 
     def test_get_validates_id(self):
         """Test that get raises ValueError for invalid IDs."""
-        with patch.object(Trix, "_request") as mock_request:
+        with patch.object(Trix, "_request"):
             client = Trix(api_key="test_key")
 
             with pytest.raises(ValueError, match="persona ID cannot be empty"):

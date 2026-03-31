@@ -3,7 +3,7 @@
 Provides pinning, protection level, and soft delete operations.
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, List, Optional
 
 from ...types import Memory, Topic
 from ...utils.security import validate_id

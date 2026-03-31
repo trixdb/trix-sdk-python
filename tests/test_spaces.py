@@ -2,7 +2,6 @@
 
 import pytest
 from unittest.mock import patch
-from datetime import datetime
 
 from trix import Trix, AsyncTrix
 from trix.types import Space, SpaceList
@@ -143,7 +142,7 @@ class TestGetBySlug:
 
     def test_get_by_slug_empty_raises_error(self):
         """Test that empty slug raises ValueError."""
-        with patch.object(Trix, "_request") as mock_request:
+        with patch.object(Trix, "_request"):
             client = Trix(api_key="test_key")
 
             with pytest.raises(ValueError, match="Slug must be a non-empty string"):
@@ -167,7 +166,7 @@ class TestGetBySlug:
     @pytest.mark.asyncio
     async def test_get_by_slug_empty_raises_error_async(self):
         """Test that async empty slug raises ValueError."""
-        with patch.object(AsyncTrix, "_request") as mock_request:
+        with patch.object(AsyncTrix, "_request"):
             client = AsyncTrix(api_key="test_key")
 
             with pytest.raises(ValueError, match="Slug must be a non-empty string"):

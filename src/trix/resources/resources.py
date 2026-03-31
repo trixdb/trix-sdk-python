@@ -1,10 +1,9 @@
 """Resources API - Manage resources (projects, topics, etc.) and their relationships with memories."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
-    Pagination,
     Resource,
     ResourceCreate,
     ResourceList,

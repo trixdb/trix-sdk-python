@@ -1,7 +1,6 @@
 """Tests for graph expansion functionality."""
 
 import pytest
-import respx
 from httpx import Response
 from trix.types import GraphExpansionResult
 

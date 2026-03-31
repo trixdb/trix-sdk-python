@@ -1,6 +1,5 @@
 """Calendar types for Trix SDK (ADR-075)."""
 
-from datetime import datetime
 from typing import List, Literal, Optional
 
 from pydantic import BaseModel

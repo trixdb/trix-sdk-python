@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseSyncResource
 from .tasks_bulk import TasksBulkMixin
 from ..types.task import (
     SubtaskCreate,

@@ -3,7 +3,7 @@
 Provides operations to link and unlink resources to memories.
 """
 
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional
 
 from ...protocols import AsyncClientProtocol, SyncClientProtocol
 from ...utils.security import validate_id

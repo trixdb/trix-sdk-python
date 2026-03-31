@@ -5,7 +5,6 @@ from urllib.parse import quote
 
 from .base import BaseAsyncResource, BaseSyncResource
 from ..types.invite import (
-    Invite,
     InviteAccept,
     InviteAcceptResult,
     InviteCreate,

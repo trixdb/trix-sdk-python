@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import patch
 from trix import Trix
-from trix.types import Resource, ResourceList, Pagination
+from trix.types import Resource, ResourceList
 
 
 @pytest.fixture

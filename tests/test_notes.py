@@ -141,7 +141,7 @@ class TestNotesResource:
         }
 
         resource = NotesResource(mock_client)
-        result = resource.update_block(
+        resource.update_block(
             "note_123", "block_456", content={"text": "Updated content"}
         )
 
@@ -171,7 +171,7 @@ class TestNotesResource:
         }
 
         resource = NotesResource(mock_client)
-        result = resource.create_link("note_123", target_note_id="note_456")
+        resource.create_link("note_123", target_note_id="note_456")
 
         call_args = mock_client._request.call_args
         assert call_args[0] == ("POST", "/notes/note_123/links")

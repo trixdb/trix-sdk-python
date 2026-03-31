@@ -4,7 +4,7 @@ import logging
 import threading
 import uuid
 from types import TracebackType
-from typing import Any, Callable, Dict, List, Optional, Type
+from typing import Callable, Dict, List, Optional, Type
 
 import httpx
 

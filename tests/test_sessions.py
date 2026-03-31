@@ -2,7 +2,6 @@
 
 import pytest
 from unittest.mock import patch
-from datetime import datetime
 
 from trix import Trix, AsyncTrix
 from trix.types import (
@@ -12,9 +11,6 @@ from trix.types import (
     SessionType,
     SessionStatus,
     RetentionPolicy,
-    CreateSessionParams,
-    UpdateSessionParams,
-    CompleteSessionParams,
 )
 
 
@@ -558,7 +554,7 @@ class TestSessionsGetMemories:
             mock_request.return_value = mock_memories_data
             client = Trix(api_key="test_key")
 
-            result = client.sessions.get_memories(
+            client.sessions.get_memories(
                 "sess_123",
                 limit=50,
                 offset=20
@@ -595,7 +591,7 @@ class TestSessionsErrorHandling:
 
     def test_invalid_session_id(self):
         """Test validation of invalid session ID."""
-        with patch.object(Trix, "_request") as mock_request:
+        with patch.object(Trix, "_request"):
             client = Trix(api_key="test_key")
 
             # This should raise a validation error for invalid ID format

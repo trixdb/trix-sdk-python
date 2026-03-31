@@ -1,6 +1,5 @@
 """Tests for telemetry module."""
 
-from typing import Any, Optional, Union
 from unittest.mock import MagicMock
 
 import pytest

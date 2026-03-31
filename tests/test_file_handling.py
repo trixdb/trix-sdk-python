@@ -5,7 +5,6 @@ import json
 import tempfile
 from pathlib import Path
 
-import pytest
 
 from trix.utils.file_handling import (
     FileHandle,

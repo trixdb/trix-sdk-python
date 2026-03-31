@@ -13,7 +13,7 @@ Example:
 """
 
 from pathlib import Path
-from typing import Any, BinaryIO, Dict, List, Optional, Union
+from typing import Any, BinaryIO, Dict, Optional, Union
 
 from ..types.file import (
     ChatFile,

@@ -15,7 +15,7 @@ TDD Workflow:
 
 import pytest
 from datetime import datetime
-from unittest.mock import MagicMock, patch, AsyncMock
+from unittest.mock import patch
 
 from trix import Trix
 from trix.types import (
@@ -27,11 +27,7 @@ from trix.types import (
     MemoryUpdate,
     Resource,
     ResourceCreate,
-    ResourceList,
     MemoryResource,
-    MemoryResourceList,
-    MemoryResourceLinkResult,
-    MemoryResourceUnlinkResult,
 )
 
 
@@ -286,7 +282,7 @@ class TestTrixOriginContext:
         }
 
         # This tests the expected API contract
-        result = client.memories.create(
+        client.memories.create(
             content="Meeting notes",
             origin_type=OriginType.WORK,
             source_type=SourceType.MEETING,
@@ -310,7 +306,7 @@ class TestTrixOriginContext:
         }
 
         # Filter by origin_type
-        result = client.memories.list(origin_type=OriginType.WORK)
+        client.memories.list(origin_type=OriginType.WORK)
 
         mock_request.assert_called()
         call_args = mock_request.call_args
@@ -326,7 +322,7 @@ class TestTrixOriginContext:
         }
 
         # Filter by source_type
-        result = client.memories.list(source_type=SourceType.MEETING)
+        client.memories.list(source_type=SourceType.MEETING)
 
         mock_request.assert_called()
 
@@ -339,7 +335,7 @@ class TestTrixOriginContext:
         }
 
         # Filter by session_id
-        result = client.memories.list(session_id="session-123")
+        client.memories.list(session_id="session-123")
 
         mock_request.assert_called()
 
@@ -368,7 +364,7 @@ class TestResourceMethods:
         # This assumes a resources.create() method will be implemented
         # For now, this test documents the expected API
         if hasattr(client, "resources"):
-            result = client.resources.create(name="Project Alpha")
+            client.resources.create(name="Project Alpha")
             mock_request.assert_called()
 
     def test_list_resources(self, mock_client):
@@ -388,7 +384,7 @@ class TestResourceMethods:
         }
 
         if hasattr(client, "resources"):
-            result = client.resources.list()
+            client.resources.list()
             mock_request.assert_called()
 
     def test_link_memory_to_resource(self, mock_client):

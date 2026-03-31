@@ -7,17 +7,11 @@ sync and async implementations.
 from typing import Any, Dict, List, Optional
 
 from ...types import (
-    BulkResult,
-    Memory,
-    MemoryConfig,
     MemoryCreate,
-    MemoryList,
     MemoryOptions,
-    MemoryStats,
     MemoryType,
     MemoryUpdate,
     SearchMode,
-    Topic,
 )
 from ...utils.security import validate_id
 

@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from trix import AsyncTrix, Trix
+from trix import AsyncTrix
 from trix.resources.invites import InvitesResource
 from trix.types.invite import InviteCreateResult, InviteList, InviteAcceptResult, InviteRevokeResult
 
