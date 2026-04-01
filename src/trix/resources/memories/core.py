@@ -497,4 +497,3 @@ class AsyncMemoriesResource(
         )
         response = await self._client._request("GET", "/memories/stats", params=params)
         return MemoryStats.model_validate(response)
-

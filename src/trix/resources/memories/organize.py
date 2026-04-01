@@ -86,6 +86,4 @@ class AsyncOrganizeOperationsMixin:
             body["space_id"] = space_id
         if detect_contradictions:
             body["detect_contradictions"] = True
-        return await self._client._request(
-            "POST", "/memories/store-organize", json=body
-        )
+        return await self._client._request("POST", "/memories/store-organize", json=body)
