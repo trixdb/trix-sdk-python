@@ -51,6 +51,7 @@ from .resources.presets_async import AsyncPresetsResource
 from .resources.calendar import AsyncCalendarResource
 from .resources.skills import AsyncSkillsResource
 from .resources.templates import AsyncTemplatesResource
+from .resources.knowledge import AsyncKnowledgeResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url, validate_id
 
@@ -197,6 +198,7 @@ class AsyncTrix(AsyncTransportMixin):
         self.files = AsyncFilesResource(self)
         self.presets = AsyncPresetsResource(self)
         self.calendar = AsyncCalendarResource(self)
+        self.knowledge = AsyncKnowledgeResource(self)
 
     def set_persona(self, persona_id: str) -> None:
         """Set the active persona for all subsequent requests."""

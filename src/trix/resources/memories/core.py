@@ -31,6 +31,7 @@ from .base import (
     validate_bulk_updates,
 )
 from .image import AsyncImageOperationsMixin, ImageOperationsMixin
+from .organize import AsyncOrganizeOperationsMixin, OrganizeOperationsMixin
 from .protection import AsyncProtectionOperationsMixin, ProtectionOperationsMixin
 from .resource_links import AsyncResourceLinksMixin, ResourceLinksMixin
 
@@ -38,6 +39,7 @@ from .resource_links import AsyncResourceLinksMixin, ResourceLinksMixin
 class MemoriesResource(
     AudioOperationsMixin,
     ImageOperationsMixin,
+    OrganizeOperationsMixin,
     ProtectionOperationsMixin,
     ResourceLinksMixin,
 ):
@@ -320,6 +322,7 @@ class MemoriesResource(
 class AsyncMemoriesResource(
     AsyncAudioOperationsMixin,
     AsyncImageOperationsMixin,
+    AsyncOrganizeOperationsMixin,
     AsyncProtectionOperationsMixin,
     AsyncResourceLinksMixin,
 ):
@@ -494,3 +497,4 @@ class AsyncMemoriesResource(
         )
         response = await self._client._request("GET", "/memories/stats", params=params)
         return MemoryStats.model_validate(response)
+

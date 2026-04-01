@@ -41,6 +41,7 @@ from .files import FilesResource, AsyncFilesResource
 from .presets import PresetsResource
 from .presets_async import AsyncPresetsResource
 from .calendar import CalendarResource, AsyncCalendarResource
+from .knowledge import KnowledgeResource, AsyncKnowledgeResource
 
 __all__ = [
     "AgentResource",
@@ -95,4 +96,6 @@ __all__ = [
     "AsyncPresetsResource",
     "CalendarResource",
     "AsyncCalendarResource",
+    "KnowledgeResource",
+    "AsyncKnowledgeResource",
 ]

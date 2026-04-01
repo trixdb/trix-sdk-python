@@ -182,6 +182,44 @@ class SearchResource(BaseSyncResource):
         response = self._request("GET", "/search/topic", params=params)
         return SearchResults.model_validate(response)
 
+    def batch_search(
+        self,
+        searches: List[Dict[str, Any]],
+        *,
+        deduplicate: bool = True,
+    ) -> Dict[str, Any]:
+        """Run multiple search strategies in parallel.
+
+        Args:
+            searches: List of search configs, each with 'strategy'
+                (semantic/fulltext/aggregate), 'query', and optional
+                'limit', 'threshold', 'space_id', 'tags', 'group_by'
+            deduplicate: Remove duplicate memories across results
+
+        Returns:
+            Combined results with per-strategy status and merged memories
+        """
+        return self._request(
+            "POST",
+            "/search/batch",
+            json={"searches": searches, "deduplicate": deduplicate},
+        )
+
+    def suggest_strategy(self, query: str) -> Dict[str, Any]:
+        """Suggest the best search strategy for a query.
+
+        Args:
+            query: The search query to classify
+
+        Returns:
+            Recommended strategy with confidence and alternatives
+        """
+        return self._request(
+            "POST",
+            "/search/suggest-strategy",
+            json={"query": query},
+        )
+
 
 class AsyncSearchResource(BaseAsyncResource):
     """Async resource for search and embeddings.
@@ -301,3 +339,41 @@ class AsyncSearchResource(BaseAsyncResource):
 
         response = await self._request("GET", "/search/topic", params=params)
         return SearchResults.model_validate(response)
+
+    async def batch_search(
+        self,
+        searches: List[Dict[str, Any]],
+        *,
+        deduplicate: bool = True,
+    ) -> Dict[str, Any]:
+        """Run multiple search strategies in parallel (async).
+
+        Args:
+            searches: List of search configs, each with 'strategy'
+                (semantic/fulltext/aggregate), 'query', and optional
+                'limit', 'threshold', 'space_id', 'tags', 'group_by'
+            deduplicate: Remove duplicate memories across results
+
+        Returns:
+            Combined results with per-strategy status and merged memories
+        """
+        return await self._request(
+            "POST",
+            "/search/batch",
+            json={"searches": searches, "deduplicate": deduplicate},
+        )
+
+    async def suggest_strategy(self, query: str) -> Dict[str, Any]:
+        """Suggest the best search strategy for a query (async).
+
+        Args:
+            query: The search query to classify
+
+        Returns:
+            Recommended strategy with confidence and alternatives
+        """
+        return await self._request(
+            "POST",
+            "/search/suggest-strategy",
+            json={"query": query},
+        )
