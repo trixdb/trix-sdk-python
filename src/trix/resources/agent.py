@@ -277,6 +277,26 @@ class AgentResource:
             data["pipeline"] = pipeline
         return self._client._request("POST", "/agent/scoped-facts/harvest", json=data)
 
+    # ADR-109a — Account-level default pipeline preset
+    # (Placed here pragmatically; pipeline-presets has no dedicated SDK
+    # resource yet. Thin wrappers over /v1/pipeline-presets/_default.)
+
+    def get_default_pipeline(self) -> Optional[str]:
+        """Return the account's current default pipeline preset name (or None)."""
+        resp = self._client._request("GET", "/pipeline-presets/_default")
+        return resp.get("name") if isinstance(resp, dict) else None
+
+    def set_default_pipeline(self, name: str) -> str:
+        """Set the account default pipeline preset. Raises on unknown name."""
+        resp = self._client._request(
+            "POST", f"/pipeline-presets/{name}/set-default", json={}
+        )
+        return resp["name"] if isinstance(resp, dict) else name
+
+    def clear_default_pipeline(self) -> None:
+        """Clear the account default pipeline preset."""
+        self._client._request("DELETE", "/pipeline-presets/_default")
+
 
 class AsyncAgentResource:
     """Async resource for agent sessions."""
@@ -434,3 +454,21 @@ class AsyncAgentResource:
         if pipeline:
             data["pipeline"] = pipeline
         return await self._client._request("POST", "/agent/scoped-facts/harvest", json=data)
+
+    # ADR-109a — Account-level default pipeline preset (async)
+
+    async def get_default_pipeline(self) -> Optional[str]:
+        """Return the account's current default pipeline preset name (or None)."""
+        resp = await self._client._request("GET", "/pipeline-presets/_default")
+        return resp.get("name") if isinstance(resp, dict) else None
+
+    async def set_default_pipeline(self, name: str) -> str:
+        """Set the account default pipeline preset. Raises on unknown name."""
+        resp = await self._client._request(
+            "POST", f"/pipeline-presets/{name}/set-default", json={}
+        )
+        return resp["name"] if isinstance(resp, dict) else name
+
+    async def clear_default_pipeline(self) -> None:
+        """Clear the account default pipeline preset."""
+        await self._client._request("DELETE", "/pipeline-presets/_default")
