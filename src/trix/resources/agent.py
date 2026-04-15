@@ -236,6 +236,47 @@ class AgentResource:
         response = self._client._request("POST", f"/agent/sessions/{session_id}/end", json=data)
         return AgentSession.model_validate(response)
 
+    # ==================== ADR-112 P10 — Ingestion-pipeline triggers ====================
+
+    def summarize_session(
+        self, session_id: str, pipeline: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Enqueue a session_summary job for the given session.
+
+        Returns the trigger response (`{session_id, enqueued, job_id, pipeline}`).
+        """
+        validate_id(session_id, "session")
+        data: Dict[str, Any] = {}
+        if pipeline:
+            data["pipeline"] = pipeline
+        return self._client._request(
+            "POST", f"/agent/sessions/{session_id}/summarize", json=data
+        )
+
+    def trigger_mega_summary(
+        self,
+        scope_id: str,
+        scope_type: str = "account",
+        pipeline: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Enqueue a cross-session mega_summary generation job."""
+        data: Dict[str, Any] = {"scope_id": scope_id, "scope_type": scope_type}
+        if pipeline:
+            data["pipeline"] = pipeline
+        return self._client._request("POST", "/agent/mega-summary/trigger", json=data)
+
+    def trigger_scoped_facts(
+        self,
+        scope_id: str,
+        scope_type: str = "session",
+        pipeline: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Enqueue a scoped_fact harvest job."""
+        data: Dict[str, Any] = {"scope_id": scope_id, "scope_type": scope_type}
+        if pipeline:
+            data["pipeline"] = pipeline
+        return self._client._request("POST", "/agent/scoped-facts/harvest", json=data)
+
 
 class AsyncAgentResource:
     """Async resource for agent sessions."""
@@ -355,3 +396,41 @@ class AsyncAgentResource:
             "POST", f"/agent/sessions/{session_id}/end", json=data
         )
         return AgentSession.model_validate(response)
+
+    # ==================== ADR-112 P10 — Ingestion-pipeline triggers ====================
+
+    async def summarize_session(
+        self, session_id: str, pipeline: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Enqueue a session_summary job for the given session (async)."""
+        validate_id(session_id, "session")
+        data: Dict[str, Any] = {}
+        if pipeline:
+            data["pipeline"] = pipeline
+        return await self._client._request(
+            "POST", f"/agent/sessions/{session_id}/summarize", json=data
+        )
+
+    async def trigger_mega_summary(
+        self,
+        scope_id: str,
+        scope_type: str = "account",
+        pipeline: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Enqueue a cross-session mega_summary generation job (async)."""
+        data: Dict[str, Any] = {"scope_id": scope_id, "scope_type": scope_type}
+        if pipeline:
+            data["pipeline"] = pipeline
+        return await self._client._request("POST", "/agent/mega-summary/trigger", json=data)
+
+    async def trigger_scoped_facts(
+        self,
+        scope_id: str,
+        scope_type: str = "session",
+        pipeline: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Enqueue a scoped_fact harvest job (async)."""
+        data: Dict[str, Any] = {"scope_id": scope_id, "scope_type": scope_type}
+        if pipeline:
+            data["pipeline"] = pipeline
+        return await self._client._request("POST", "/agent/scoped-facts/harvest", json=data)
