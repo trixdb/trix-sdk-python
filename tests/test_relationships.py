@@ -76,8 +76,9 @@ class TestRelationshipsCreate:
             assert isinstance(rel, Relationship)
             call_args = mock_request.call_args
             assert call_args[0][0] == "POST"
-            assert call_args[0][1] == "/relationships/mem_001/create/mem_002"
+            assert call_args[0][1] == "/relationships/mem_001"
             body = call_args[1]["json"]
+            assert body["target_id"] == "mem_002"
             assert body["description"] == "Strong connection"
             assert body["weight"] == 2.0
             assert body["bidirectional"] is True
