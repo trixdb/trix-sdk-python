@@ -297,6 +297,24 @@ class AgentResource:
         """Clear the account default pipeline preset."""
         self._client._request("DELETE", "/pipeline-presets/_default")
 
+    # ADR-109a — Space-level default pipeline preset
+
+    def get_space_default_pipeline(self, space_id: str) -> Optional[str]:
+        """Return the space's current default pipeline preset name (or None)."""
+        resp = self._client._request("GET", f"/spaces/{space_id}/default-pipeline")
+        return resp.get("name") if isinstance(resp, dict) else None
+
+    def set_space_default_pipeline(self, space_id: str, name: str) -> str:
+        """Set the space default pipeline preset. Raises on unknown name."""
+        resp = self._client._request(
+            "POST", f"/spaces/{space_id}/default-pipeline/{name}", json={}
+        )
+        return resp["name"] if isinstance(resp, dict) else name
+
+    def clear_space_default_pipeline(self, space_id: str) -> None:
+        """Clear the space default pipeline preset."""
+        self._client._request("DELETE", f"/spaces/{space_id}/default-pipeline")
+
 
 class AsyncAgentResource:
     """Async resource for agent sessions."""
@@ -472,3 +490,21 @@ class AsyncAgentResource:
     async def clear_default_pipeline(self) -> None:
         """Clear the account default pipeline preset."""
         await self._client._request("DELETE", "/pipeline-presets/_default")
+
+    # ADR-109a — Space-level default pipeline preset (async)
+
+    async def get_space_default_pipeline(self, space_id: str) -> Optional[str]:
+        """Return the space's current default pipeline preset name (or None)."""
+        resp = await self._client._request("GET", f"/spaces/{space_id}/default-pipeline")
+        return resp.get("name") if isinstance(resp, dict) else None
+
+    async def set_space_default_pipeline(self, space_id: str, name: str) -> str:
+        """Set the space default pipeline preset (async)."""
+        resp = await self._client._request(
+            "POST", f"/spaces/{space_id}/default-pipeline/{name}", json={}
+        )
+        return resp["name"] if isinstance(resp, dict) else name
+
+    async def clear_space_default_pipeline(self, space_id: str) -> None:
+        """Clear the space default pipeline preset (async)."""
+        await self._client._request("DELETE", f"/spaces/{space_id}/default-pipeline")
