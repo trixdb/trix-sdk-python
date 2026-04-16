@@ -2,6 +2,7 @@
 
 import logging
 import threading
+import time
 import uuid
 from types import TracebackType
 from typing import Callable, Dict, List, Optional, Type
@@ -10,6 +11,7 @@ import httpx
 
 from . import __api_version__, __version__
 from .auth import Auth
+from .types import PingResult
 from .client_base import (
     ErrorInterceptor,
     PoolConfig,
@@ -290,6 +292,15 @@ class AsyncTrix(AsyncTransportMixin):
         if self._persona_id:
             headers["X-Persona-Id"] = self._persona_id
         return headers
+
+    async def ping(self) -> PingResult:
+        """Async health-check ping against ``GET /v1/health`` (ADR-143)."""
+        start = time.monotonic()
+        body = await self._request("GET", "/health")
+        latency_ms = int((time.monotonic() - start) * 1000)
+        status_ok = isinstance(body, dict) and body.get("status") == "ok"
+        version = body.get("version") if isinstance(body, dict) else None
+        return PingResult(ok=status_ok, version=version, latency_ms=latency_ms)
 
     async def close(self) -> None:
         """Close the async HTTP client and clear credentials."""

@@ -48,3 +48,17 @@ class BulkResult(BaseResponse):
         if self.total == 0:
             return 0.0
         return self.success / self.total
+
+
+class PingResult(BaseResponse):
+    """Result of a health-check ping (ADR-143).
+
+    Returned by ``Trix.ping()`` / ``AsyncTrix.ping()``. Server returns
+    ``{status, timestamp, uptime, version}``; this adds client-measured
+    latency so the caller can surface a round-trip time without another
+    call.
+    """
+
+    ok: bool
+    version: Optional[str] = None
+    latency_ms: int

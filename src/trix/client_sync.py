@@ -2,11 +2,14 @@
 
 import logging
 import threading
+import time
 import uuid
 from types import TracebackType
 from typing import Callable, Dict, List, Optional, Type
 
 import httpx
+
+from .types import PingResult
 
 from . import __api_version__, __version__
 from .auth import Auth
@@ -283,6 +286,23 @@ class Trix(SyncTransportMixin):
         if self._persona_id:
             headers["X-Persona-Id"] = self._persona_id
         return headers
+
+    def ping(self) -> PingResult:
+        """Perform a health-check round-trip against ``GET /v1/health`` (ADR-143).
+
+        Unauthenticated — safe to call before credentials are configured
+        or when diagnosing connectivity. Measures client-side latency in
+        milliseconds and surfaces the server's reported version.
+
+        Returns:
+            PingResult: ``ok`` is True when the server returns ``status == "ok"``.
+        """
+        start = time.monotonic()
+        body = self._request("GET", "/health")
+        latency_ms = int((time.monotonic() - start) * 1000)
+        status_ok = isinstance(body, dict) and body.get("status") == "ok"
+        version = body.get("version") if isinstance(body, dict) else None
+        return PingResult(ok=status_ok, version=version, latency_ms=latency_ms)
 
     def close(self) -> None:
         """Close the HTTP client and clear credentials."""

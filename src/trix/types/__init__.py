@@ -46,7 +46,7 @@ from .enums import (  # noqa: E402
 # =============================================================================
 # Base Models
 # =============================================================================
-from .base import BaseResponse, BulkResult, PaginatedResponse, Pagination  # noqa: E402, F401
+from .base import BaseResponse, BulkResult, PaginatedResponse, Pagination, PingResult  # noqa: E402, F401
 
 # =============================================================================
 # Memory Models
@@ -239,6 +239,7 @@ _core_all = [
     "BulkResult",
     "PaginatedResponse",
     "Pagination",
+    "PingResult",
     # Memory
     "Memory",
     "MemoryConfig",
