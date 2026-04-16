@@ -315,6 +315,38 @@ class AgentResource:
         """Clear the space default pipeline preset."""
         self._client._request("DELETE", f"/spaces/{space_id}/default-pipeline")
 
+    # ADR-109a observability (tick 79) — dry-run 3-tier preset resolution.
+
+    def resolve_pipeline(
+        self,
+        space_id: Optional[str] = None,
+        pipeline: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Ask the server what pipeline preset would apply right now for the
+        given (space, pipeline) pair, without running a search or chat.
+
+        Returns a dict with:
+          - ``name``: resolved preset name (or None)
+          - ``source``: ``"caller"`` | ``"space"`` | ``"account"`` | None
+          - ``preset``: full preset spec (or None)
+
+        Args:
+            space_id: Optional space UUID or slug to include the space tier.
+            pipeline: Optional caller preset name to simulate an explicit request.
+        """
+        params: Dict[str, Any] = {}
+        if space_id:
+            params["space_id"] = space_id
+        if pipeline:
+            params["pipeline"] = pipeline
+        resp = self._client._request(
+            "GET", "/pipeline-presets/_resolve", params=params or None
+        )
+        if isinstance(resp, dict):
+            return resp
+        return {"name": None, "source": None, "preset": None}
+
 
 class AsyncAgentResource:
     """Async resource for agent sessions."""
@@ -508,3 +540,21 @@ class AsyncAgentResource:
     async def clear_space_default_pipeline(self, space_id: str) -> None:
         """Clear the space default pipeline preset (async)."""
         await self._client._request("DELETE", f"/spaces/{space_id}/default-pipeline")
+
+    async def resolve_pipeline(
+        self,
+        space_id: Optional[str] = None,
+        pipeline: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Async dry-run of the 3-tier resolver. See sync variant for docs."""
+        params: Dict[str, Any] = {}
+        if space_id:
+            params["space_id"] = space_id
+        if pipeline:
+            params["pipeline"] = pipeline
+        resp = await self._client._request(
+            "GET", "/pipeline-presets/_resolve", params=params or None
+        )
+        if isinstance(resp, dict):
+            return resp
+        return {"name": None, "source": None, "preset": None}
