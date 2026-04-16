@@ -61,10 +61,12 @@ class RelationshipsResource:
             weight=weight,
             bidirectional=bidirectional,
         )
+        payload = data.model_dump(exclude_none=True)
+        payload["target_id"] = target_id
         response = self._client._request(
             "POST",
-            f"/relationships/{source_id}/create/{target_id}",
-            json=data.model_dump(exclude_none=True),
+            f"/relationships/{source_id}",
+            json=payload,
         )
         return Relationship.model_validate(response)
 
@@ -294,10 +296,12 @@ class AsyncRelationshipsResource:
             weight=weight,
             bidirectional=bidirectional,
         )
+        payload = data.model_dump(exclude_none=True)
+        payload["target_id"] = target_id
         response = await self._client._request(
             "POST",
-            f"/relationships/{source_id}/create/{target_id}",
-            json=data.model_dump(exclude_none=True),
+            f"/relationships/{source_id}",
+            json=payload,
         )
         return Relationship.model_validate(response)
 
