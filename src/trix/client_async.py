@@ -51,6 +51,7 @@ from .resources.invites import AsyncInvitesResource
 from .resources.notes_async import AsyncNotesResource
 from .resources.presets_async import AsyncPresetsResource
 from .resources.calendar import AsyncCalendarResource
+from .resources.github import AsyncGitHubResource
 from .resources.skills import AsyncSkillsResource
 from .resources.templates import AsyncTemplatesResource
 from .resources.knowledge import AsyncKnowledgeResource
@@ -200,6 +201,7 @@ class AsyncTrix(AsyncTransportMixin):
         self.files = AsyncFilesResource(self)
         self.presets = AsyncPresetsResource(self)
         self.calendar = AsyncCalendarResource(self)
+        self.github = AsyncGitHubResource(self)
         self.knowledge = AsyncKnowledgeResource(self)
 
     def set_persona(self, persona_id: str) -> None:

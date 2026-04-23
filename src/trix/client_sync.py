@@ -56,6 +56,7 @@ from .resources.hubs_roles import HubRolesResource
 from .resources.files import FilesResource
 from .resources.presets import PresetsResource
 from .resources.calendar import CalendarResource
+from .resources.github import GitHubResource
 from .resources.knowledge import KnowledgeResource
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url, validate_id
@@ -194,6 +195,7 @@ class Trix(SyncTransportMixin):
         self.files = FilesResource(self)
         self.presets = PresetsResource(self)
         self.calendar = CalendarResource(self)
+        self.github = GitHubResource(self)
         self.knowledge = KnowledgeResource(self)
 
     def set_persona(self, persona_id: str) -> None:
