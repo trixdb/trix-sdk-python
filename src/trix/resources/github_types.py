@@ -194,6 +194,10 @@ class AgentAttributionResponse(BaseModel):
     agent_total: int
     human_total: int
     agent_ratio: float
+    agent_quality_scores: Dict[str, Optional[float]] = {}
+    """Average PR quality score (0-100) per AI tool, keyed by agent name."""
+    human_avg_quality: Optional[float] = None
+    """Average PR quality score (0-100) for human-authored PRs."""
 
 
 class LinkedGoal(BaseModel):
