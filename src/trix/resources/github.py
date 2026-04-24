@@ -35,6 +35,12 @@ from .github_types import (
     AgentPRResult,
     PRReviewResult,
     ScanCodeResult,
+    CodeSummaryResult,
+    CloneGroupsResult,
+    DeadExportsResult,
+    TestCoverageResult,
+    LoadBearingResult,
+    BugDensityResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -405,3 +411,47 @@ class GitHubResource(BaseSyncResource):
             json={"file_path": file_path, "content": content},
         )
         return ScanCodeResult.model_validate(response)
+
+    def get_code_summary(self, project_id: str) -> CodeSummaryResult:
+        """Combined code health snapshot — quality gate, debt, hotspots, smells, languages."""
+        validate_id(project_id, "project")
+        return CodeSummaryResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/code-summary")
+        )
+
+    def get_clone_groups(self, project_id: str) -> CloneGroupsResult:
+        """Structural code clone groups — sets of functions with identical normalised structure."""
+        validate_id(project_id, "project")
+        return CloneGroupsResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/clone-groups")
+        )
+
+    def get_dead_exports(self, project_id: str) -> DeadExportsResult:
+        """Unused exported symbols in JS/TS files (dead code candidates)."""
+        validate_id(project_id, "project")
+        return DeadExportsResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/dead-exports")
+        )
+
+    def get_test_coverage(self, project_id: str) -> TestCoverageResult:
+        """Test file coverage by naming convention — source files without paired tests."""
+        validate_id(project_id, "project")
+        return TestCoverageResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/test-coverage")
+        )
+
+    def get_load_bearing_functions(
+        self, project_id: str, *, min_callers: int = 3
+    ) -> LoadBearingResult:
+        """Functions called by many files — high blast-radius, risky to change."""
+        validate_id(project_id, "project")
+        return LoadBearingResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/load-bearing?min_callers={min_callers}")
+        )
+
+    def get_bug_density(self, project_id: str) -> BugDensityResult:
+        """Per-file issue density — open suggestions per 1,000 LOC, ranked by density."""
+        validate_id(project_id, "project")
+        return BugDensityResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/bug-density")
+        )

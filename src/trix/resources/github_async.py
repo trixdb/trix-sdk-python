@@ -35,6 +35,12 @@ from .github_types import (
     AgentPRResult,
     PRReviewResult,
     ScanCodeResult,
+    CodeSummaryResult,
+    CloneGroupsResult,
+    DeadExportsResult,
+    TestCoverageResult,
+    LoadBearingResult,
+    BugDensityResult,
 )
 
 
@@ -417,3 +423,49 @@ class AsyncGitHubResource(BaseAsyncResource):
             json={"file_path": file_path, "content": content},
         )
         return ScanCodeResult.model_validate(response)
+
+    async def get_code_summary(self, project_id: str) -> CodeSummaryResult:
+        """Combined code health snapshot — quality gate, debt, hotspots, smells, languages (async)."""
+        validate_id(project_id, "project")
+        return CodeSummaryResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/code-summary")
+        )
+
+    async def get_clone_groups(self, project_id: str) -> CloneGroupsResult:
+        """Structural code clone groups (async)."""
+        validate_id(project_id, "project")
+        return CloneGroupsResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/clone-groups")
+        )
+
+    async def get_dead_exports(self, project_id: str) -> DeadExportsResult:
+        """Unused exported symbols in JS/TS files (async)."""
+        validate_id(project_id, "project")
+        return DeadExportsResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/dead-exports")
+        )
+
+    async def get_test_coverage(self, project_id: str) -> TestCoverageResult:
+        """Test file coverage by naming convention (async)."""
+        validate_id(project_id, "project")
+        return TestCoverageResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/test-coverage")
+        )
+
+    async def get_load_bearing_functions(
+        self, project_id: str, *, min_callers: int = 3
+    ) -> LoadBearingResult:
+        """High callerCount functions — risky to change (async)."""
+        validate_id(project_id, "project")
+        return LoadBearingResult.model_validate(
+            await self._request(
+                "GET", f"/projects/{project_id}/github/load-bearing?min_callers={min_callers}"
+            )
+        )
+
+    async def get_bug_density(self, project_id: str) -> BugDensityResult:
+        """Per-file issue density — open suggestions per 1,000 LOC (async)."""
+        validate_id(project_id, "project")
+        return BugDensityResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/bug-density")
+        )

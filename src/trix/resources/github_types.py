@@ -442,3 +442,109 @@ class ScanCodeResult(BaseModel):
     findings: List[SecurityFinding] = []
     summary: ScanCodeSummary = ScanCodeSummary()
 
+
+# ── Code health analytics (Session 15–16) ────────────────────────────────────
+
+
+class CodeSummaryDebt(BaseModel):
+    total_minutes: int = 0
+    total_hours: float = 0.0
+    top_categories: List[Dict[str, Any]] = []
+
+
+class CodeSummaryResult(BaseModel):
+    quality_gate: Dict[str, Any] = {}
+    debt: CodeSummaryDebt = CodeSummaryDebt()
+    hotspots: List[Dict[str, Any]] = []
+    open_counts: Dict[str, int] = {}
+    top_smells: List[Dict[str, Any]] = []
+    languages: List[Dict[str, Any]] = []
+
+
+class CloneInstance(BaseModel):
+    file_path: str
+    repo_full_name: str
+    fn_name: str
+    start_line: Optional[int] = None
+    loc: Optional[int] = None
+    language: Optional[str] = None
+
+
+class CloneGroup(BaseModel):
+    clone_hash: str
+    instance_count: int
+    max_loc: Optional[int] = None
+    instances: List[CloneInstance] = []
+
+
+class CloneGroupsResult(BaseModel):
+    groups: List[CloneGroup] = []
+    total_groups: int = 0
+
+
+class DeadExportFile(BaseModel):
+    file_path: str
+    repo_full_name: str
+    language: Optional[str] = None
+    dead_count: int = 0
+    symbols: List[str] = []
+
+
+class DeadExportsResult(BaseModel):
+    files: List[DeadExportFile] = []
+    total_files: int = 0
+    total_dead_symbols: int = 0
+
+
+class TestCoverageFile(BaseModel):
+    file_path: str
+    repo_full_name: str
+    language: Optional[str] = None
+    hotspot_score: Optional[float] = None
+    cyclomatic_complexity: Optional[int] = None
+    test_file: Optional[str] = None
+
+
+class TestCoverageResult(BaseModel):
+    uncovered: List[TestCoverageFile] = []
+    covered: List[TestCoverageFile] = []
+    total_files: int = 0
+    uncovered_count: int = 0
+    covered_count: int = 0
+    coverage_ratio: int = 0
+
+
+class LoadBearingFunction(BaseModel):
+    file_path: str
+    repo_full_name: str
+    language: Optional[str] = None
+    fn_name: str
+    caller_count: int = 0
+    cyclomatic: Optional[int] = None
+    loc: Optional[int] = None
+    start_line: Optional[int] = None
+    clone_count: int = 0
+
+
+class LoadBearingResult(BaseModel):
+    functions: List[LoadBearingFunction] = []
+    count: int = 0
+    min_callers: int = 3
+
+
+class BugDensityFile(BaseModel):
+    file_path: str
+    repo_full_name: str
+    language: Optional[str] = None
+    loc: int = 0
+    hotspot_score: Optional[float] = None
+    issue_count: int = 0
+    critical_count: int = 0
+    high_count: int = 0
+    density_per_kloc: float = 0.0
+
+
+class BugDensityResult(BaseModel):
+    files: List[BugDensityFile] = []
+    count: int = 0
+
