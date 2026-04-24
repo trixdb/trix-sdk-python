@@ -377,9 +377,20 @@ class AgentPRResult(BaseModel):
     sha: str
 
 
+class SecurityFinding(BaseModel):
+    category: str
+    priority: str
+    title: str
+    description: str
+    file_path: Optional[str] = None
+    evidence: Dict[str, Any] = {}
+    generated_by: str = "rule"
+
+
 class PRReviewResult(BaseModel):
     review: Dict[str, Any]
     signals: List[Dict[str, Any]] = []
     smells: List[Dict[str, Any]] = []
+    security_findings: List[SecurityFinding] = []
     files_analyzed: int = 0
     posted: bool = False
