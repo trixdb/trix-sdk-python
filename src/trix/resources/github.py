@@ -30,6 +30,10 @@ from .github_types import (
     SymbolsResponse,
     VelocityResponse,
     WeeklyActivityDay,
+    TechnicalDebt,
+    QualityGate,
+    AgentPRResult,
+    PRReviewResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -334,3 +338,59 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         response = self._request("GET", f"/projects/{project_id}/github/activity/weekly")
         return [WeeklyActivityDay.model_validate(d) for d in (response if isinstance(response, list) else [])]
+
+    def get_code_debt(self, project_id: str) -> TechnicalDebt:
+        """Get technical debt aggregated by category (minutes + hours)."""
+        validate_id(project_id, "project")
+        response = self._request("GET", f"/projects/{project_id}/github/improvements/debt")
+        return TechnicalDebt.model_validate(response)
+
+    def get_quality_gate(self, project_id: str) -> QualityGate:
+        """Evaluate quality gate — returns pass/fail with per-check detail."""
+        validate_id(project_id, "project")
+        response = self._request("GET", f"/projects/{project_id}/github/improvements/quality-gate")
+        return QualityGate.model_validate(response)
+
+    def query_code(self, project_id: str, query: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute a CQL query over code metrics (files or functions)."""
+        validate_id(project_id, "project")
+        return self._request("POST", f"/projects/{project_id}/github/query", json=query)
+
+    def review_pr(
+        self,
+        project_id: str,
+        connection_id: str,
+        pr_number: int,
+        *,
+        event: str = "COMMENT",
+        dry_run: bool = False,
+    ) -> PRReviewResult:
+        """Run an agent PR review and post a structured comment to GitHub."""
+        validate_id(project_id, "project")
+        response = self._request(
+            "POST",
+            f"/projects/{project_id}/github/review-pr",
+            json={"connection_id": connection_id, "pr_number": pr_number, "event": event, "dry_run": dry_run},
+        )
+        return PRReviewResult.model_validate(response)
+
+    def create_pr(
+        self,
+        project_id: str,
+        *,
+        connection_id: str,
+        branch_name: str,
+        commit_message: str,
+        pr_title: str,
+        changes: List[Dict[str, str]],
+        base_branch: str = "main",
+        pr_body: str = "",
+    ) -> AgentPRResult:
+        """Create a GitHub PR with agent-authored file changes (max 50 files)."""
+        validate_id(project_id, "project")
+        response = self._request(
+            "POST",
+            f"/projects/{project_id}/github/create-pr",
+            json={"connection_id": connection_id, "branch_name": branch_name, "base_branch": base_branch, "commit_message": commit_message, "pr_title": pr_title, "pr_body": pr_body, "changes": changes},
+        )
+        return AgentPRResult.model_validate(response)

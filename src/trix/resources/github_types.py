@@ -342,3 +342,44 @@ class WeeklyActivityDay(BaseModel):
     prs: int
     issues: int
     total: int
+
+
+class DebtCategory(BaseModel):
+    category: str
+    count: int
+    minutes: int
+
+
+class TechnicalDebt(BaseModel):
+    total_minutes: int = 0
+    total_hours: float = 0.0
+    by_category: List[DebtCategory] = []
+
+
+class QualityCheck(BaseModel):
+    id: str
+    label: str
+    passed: bool
+    value: Optional[float] = None
+    threshold: float
+    unit: Optional[str] = None
+
+
+class QualityGate(BaseModel):
+    passed: bool
+    checks: List[QualityCheck] = []
+
+
+class AgentPRResult(BaseModel):
+    pr_number: int
+    pr_url: str
+    branch_name: str
+    sha: str
+
+
+class PRReviewResult(BaseModel):
+    review: Dict[str, Any]
+    signals: List[Dict[str, Any]] = []
+    smells: List[Dict[str, Any]] = []
+    files_analyzed: int = 0
+    posted: bool = False
