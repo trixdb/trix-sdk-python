@@ -417,6 +417,7 @@ class PRFileMetric(BaseModel):
 
 class PRReviewResult(BaseModel):
     review: Dict[str, Any]
+    quality_score: int = 100
     signals: List[Dict[str, Any]] = []
     smells: List[Dict[str, Any]] = []
     security_findings: List[SecurityFinding] = []
