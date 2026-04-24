@@ -205,6 +205,7 @@ class AsyncGitHubResource(BaseAsyncResource):
         limit: int = 20,
         min_quality_score: Optional[int] = None,
         max_quality_score: Optional[int] = None,
+        agent: Optional[str] = None,
     ) -> PRBriefsResponse:
         """Get PR briefs with quality scores and risk signals (async).
 
@@ -215,6 +216,7 @@ class AsyncGitHubResource(BaseAsyncResource):
             limit: Max results to return (1–50).
             min_quality_score: Exclude PRs below this quality threshold (0–100).
             max_quality_score: Exclude PRs above this threshold — use to surface risky PRs.
+            agent: Filter to PRs by a specific AI agent: 'claude', 'copilot', 'cursor', 'gemini'.
         """
         validate_id(project_id, "project")
         params: Dict[str, Any] = {"state": state, "limit": limit}
@@ -224,6 +226,8 @@ class AsyncGitHubResource(BaseAsyncResource):
             params["min_quality_score"] = min_quality_score
         if max_quality_score is not None:
             params["max_quality_score"] = max_quality_score
+        if agent is not None:
+            params["agent"] = agent
         response = await self._request(
             "GET", f"/projects/{project_id}/github/pr-briefs", params=params
         )
