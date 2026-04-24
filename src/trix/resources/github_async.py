@@ -13,6 +13,8 @@ from .github_types import (
     CycleTimeResponse,
     FileComplexityResponse,
     FlaggedPRsResponse,
+    PRBrief,  # noqa: F401
+    PRBriefsResponse,
     GenerateNarrativeResponse,
     GitHubConnection,
     GitHubConnectionsResponse,
@@ -182,6 +184,31 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         response = await self._request("GET", f"/projects/{project_id}/github/flagged-prs")
         return FlaggedPRsResponse.model_validate(response)
+
+    async def get_pr_briefs(
+        self,
+        project_id: str,
+        *,
+        state: str = "open",
+        pr_number: Optional[int] = None,
+        limit: int = 20,
+    ) -> PRBriefsResponse:
+        """Get PR briefs with quality scores and risk signals (async).
+
+        Args:
+            project_id: Project UUID.
+            state: Filter by PR state — 'open', 'closed', or 'all'.
+            pr_number: Fetch brief for a specific PR number.
+            limit: Max results to return (1–50).
+        """
+        validate_id(project_id, "project")
+        params: Dict[str, Any] = {"state": state, "limit": limit}
+        if pr_number is not None:
+            params["pr_number"] = pr_number
+        response = await self._request(
+            "GET", f"/projects/{project_id}/github/pr-briefs", params=params
+        )
+        return PRBriefsResponse.model_validate(response)
 
     async def get_cycle_time(self, project_id: str) -> CycleTimeResponse:
         """Get issue cycle time trends (async)."""

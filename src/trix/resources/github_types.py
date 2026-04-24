@@ -152,6 +152,30 @@ class FlaggedPRsResponse(BaseModel):
     prs: List[FlaggedPR]
 
 
+class PRBrief(BaseModel):
+    id: str
+    pr_number: Optional[int] = None
+    repo: Optional[str] = None
+    title: str
+    brief_content: str
+    risk_flags: List[str]
+    quality_score: Optional[float] = None
+    is_open: bool
+    has_tests: bool
+    touches_hotspots: bool
+    touches_load_bearing: bool
+    touches_clones: bool
+    scope_creep: bool
+    semantic_drift: bool
+    created_at: str
+
+
+class PRBriefsResponse(BaseModel):
+    briefs: List[PRBrief]
+    total: int
+    state: str
+
+
 class CycleTimeResponse(BaseModel):
     avg_cycle_days_last_30: Optional[float] = None
     avg_cycle_days_30_60: Optional[float] = None
