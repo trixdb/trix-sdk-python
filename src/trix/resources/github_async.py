@@ -203,6 +203,8 @@ class AsyncGitHubResource(BaseAsyncResource):
         state: str = "open",
         pr_number: Optional[int] = None,
         limit: int = 20,
+        min_quality_score: Optional[int] = None,
+        max_quality_score: Optional[int] = None,
     ) -> PRBriefsResponse:
         """Get PR briefs with quality scores and risk signals (async).
 
@@ -211,11 +213,17 @@ class AsyncGitHubResource(BaseAsyncResource):
             state: Filter by PR state — 'open', 'closed', or 'all'.
             pr_number: Fetch brief for a specific PR number.
             limit: Max results to return (1–50).
+            min_quality_score: Exclude PRs below this quality threshold (0–100).
+            max_quality_score: Exclude PRs above this threshold — use to surface risky PRs.
         """
         validate_id(project_id, "project")
         params: Dict[str, Any] = {"state": state, "limit": limit}
         if pr_number is not None:
             params["pr_number"] = pr_number
+        if min_quality_score is not None:
+            params["min_quality_score"] = min_quality_score
+        if max_quality_score is not None:
+            params["max_quality_score"] = max_quality_score
         response = await self._request(
             "GET", f"/projects/{project_id}/github/pr-briefs", params=params
         )
