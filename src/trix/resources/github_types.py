@@ -296,3 +296,26 @@ class RepoStatsData(BaseModel):
 
 class RepoStatsResponse(BaseModel):
     stats: RepoStatsData
+
+
+class ReviewerStat(BaseModel):
+    reviewer: str
+    total: int
+    approvals: int
+    changes_requested: int
+
+
+class ReviewStats(BaseModel):
+    total_reviews: int
+    total_approvals: int
+    total_changes_requested: int
+    approval_rate: Optional[float] = None
+    top_reviewers: List[ReviewerStat] = []
+
+
+class WeeklyActivityDay(BaseModel):
+    day: str  # ISO date YYYY-MM-DD
+    commits: int
+    prs: int
+    issues: int
+    total: int

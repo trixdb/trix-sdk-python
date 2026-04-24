@@ -25,9 +25,11 @@ from .github_types import (
     QualitySummaryResponse,
     ReleaseReadinessResponse,
     RepoStatsResponse,
+    ReviewStats,
     ScanRepoResponse,
     SymbolsResponse,
     VelocityResponse,
+    WeeklyActivityDay,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -320,3 +322,15 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         response = self._request("GET", f"/projects/{project_id}/github/improvements/stats")
         return RepoStatsResponse.model_validate(response)
+
+    def get_review_stats(self, project_id: str) -> ReviewStats:
+        """Get PR review analytics: approval rate + top reviewers (last 30 days)."""
+        validate_id(project_id, "project")
+        response = self._request("GET", f"/projects/{project_id}/github/review-stats")
+        return ReviewStats.model_validate(response)
+
+    def get_weekly_activity(self, project_id: str) -> List[WeeklyActivityDay]:
+        """Get daily commit/PR/issue counts for the last 52 weeks (heatmap data)."""
+        validate_id(project_id, "project")
+        response = self._request("GET", f"/projects/{project_id}/github/activity/weekly")
+        return [WeeklyActivityDay.model_validate(d) for d in (response if isinstance(response, list) else [])]
