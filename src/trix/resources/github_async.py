@@ -15,6 +15,7 @@ from .github_types import (
     FlaggedPRsResponse,
     PRBrief,  # noqa: F401
     PRBriefsResponse,
+    HealthSnapshotResponse,
     GenerateNarrativeResponse,
     GitHubConnection,
     GitHubConnectionsResponse,
@@ -178,6 +179,16 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         response = await self._request("GET", f"/projects/{project_id}/github/velocity")
         return VelocityResponse.model_validate(response)
+
+    async def get_health_snapshot(self, project_id: str) -> HealthSnapshotResponse:
+        """Get a one-call project health snapshot for agents (async).
+
+        Aggregates code quality gate, PR velocity, open PR risk signals,
+        and top issues. Use as the first call to understand project state.
+        """
+        validate_id(project_id, "project")
+        response = await self._request("GET", f"/projects/{project_id}/github/health-snapshot")
+        return HealthSnapshotResponse.model_validate(response)
 
     async def get_flagged_prs(self, project_id: str) -> FlaggedPRsResponse:
         """Get risk-flagged pull requests (async)."""

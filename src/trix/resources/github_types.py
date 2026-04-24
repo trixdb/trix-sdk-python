@@ -575,3 +575,43 @@ class BugDensityResult(BaseModel):
     files: List[BugDensityFile] = []
     count: int = 0
 
+
+
+# ── Health Snapshot ─────────────────────────────────────────────────────────
+
+
+class HealthSnapshotRisk(BaseModel):
+    type: str
+    label: str
+
+
+class HealthSnapshotQualityGate(BaseModel):
+    passed: Optional[bool] = None
+    avg_maintainability_index: Optional[int] = None
+    total_files: int = 0
+    critical_files: int = 0
+
+
+class HealthSnapshotSuggestions(BaseModel):
+    critical: int = 0
+    high: int = 0
+    total: int = 0
+
+
+class HealthSnapshotVelocity(BaseModel):
+    merged_last_7_days: int = 0
+    merged_last_30_days: int = 0
+
+
+class HealthSnapshotOpenPRs(BaseModel):
+    total: int = 0
+    risky: int = 0
+    avg_quality_score: Optional[int] = None
+
+
+class HealthSnapshotResponse(BaseModel):
+    quality_gate: HealthSnapshotQualityGate
+    suggestions: HealthSnapshotSuggestions
+    velocity: HealthSnapshotVelocity
+    open_prs: HealthSnapshotOpenPRs
+    top_risks: List[HealthSnapshotRisk] = []

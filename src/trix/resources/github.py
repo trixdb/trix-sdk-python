@@ -15,6 +15,7 @@ from .github_types import (
     FlaggedPRsResponse,
     PRBrief,  # noqa: F401
     PRBriefsResponse,
+    HealthSnapshotResponse,
     GenerateNarrativeResponse,
     GitHubConnection,
     GitHubConnectionsResponse,
@@ -176,6 +177,16 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         response = self._request("GET", f"/projects/{project_id}/github/velocity")
         return VelocityResponse.model_validate(response)
+
+    def get_health_snapshot(self, project_id: str) -> HealthSnapshotResponse:
+        """Get a one-call project health snapshot for agents.
+
+        Aggregates code quality gate, PR velocity, open PR risk signals,
+        and top issues. Use as the first call to understand project state.
+        """
+        validate_id(project_id, "project")
+        response = self._request("GET", f"/projects/{project_id}/github/health-snapshot")
+        return HealthSnapshotResponse.model_validate(response)
 
     def get_flagged_prs(self, project_id: str) -> FlaggedPRsResponse:
         """Get risk-flagged pull requests."""
