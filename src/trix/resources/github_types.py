@@ -387,10 +387,31 @@ class SecurityFinding(BaseModel):
     generated_by: str = "rule"
 
 
+class DepVulnEvidence(BaseModel):
+    vuln_id: str = ""
+    package: str = ""
+    ecosystem: str = ""
+    cvss: Optional[float] = None
+    fix_version: Optional[str] = None
+    url: Optional[str] = None
+
+
+class DepVuln(BaseModel):
+    category: str = "dependency"
+    priority: str
+    title: str
+    description: str
+    file_path: Optional[str] = None
+    evidence: DepVulnEvidence = DepVulnEvidence()
+
+
 class PRReviewResult(BaseModel):
     review: Dict[str, Any]
     signals: List[Dict[str, Any]] = []
     smells: List[Dict[str, Any]] = []
     security_findings: List[SecurityFinding] = []
+    dep_vulns: List[DepVuln] = []
+    inline_comments: int = 0
     files_analyzed: int = 0
+    unsupported_files: int = 0
     posted: bool = False
