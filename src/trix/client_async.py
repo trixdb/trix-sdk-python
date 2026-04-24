@@ -51,7 +51,7 @@ from .resources.invites import AsyncInvitesResource
 from .resources.notes_async import AsyncNotesResource
 from .resources.presets_async import AsyncPresetsResource
 from .resources.calendar import AsyncCalendarResource
-from .resources.github import AsyncGitHubResource
+from .resources.github_async import AsyncGitHubResource
 from .resources.skills import AsyncSkillsResource
 from .resources.templates import AsyncTemplatesResource
 from .resources.knowledge import AsyncKnowledgeResource
