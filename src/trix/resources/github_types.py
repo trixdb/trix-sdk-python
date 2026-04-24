@@ -161,6 +161,7 @@ class PRBrief(BaseModel):
     brief_content: str
     risk_flags: List[str]
     quality_score: Optional[float] = None
+    agent: Optional[str] = None  # 'claude', 'copilot', 'cursor', 'gemini' or None
     is_open: bool
     has_tests: bool
     touches_hotspots: bool
