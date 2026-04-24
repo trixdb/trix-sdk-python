@@ -155,6 +155,7 @@ class FlaggedPRsResponse(BaseModel):
 class PRBrief(BaseModel):
     id: str
     pr_number: Optional[int] = None
+    pr_url: Optional[str] = None
     repo: Optional[str] = None
     title: str
     brief_content: str
