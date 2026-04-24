@@ -368,6 +368,7 @@ class QualityCheck(BaseModel):
 class QualityGate(BaseModel):
     passed: bool
     checks: List[QualityCheck] = []
+    score: int = 0
 
 
 class AgentPRResult(BaseModel):
@@ -459,6 +460,7 @@ class CodeSummaryResult(BaseModel):
     open_counts: Dict[str, int] = {}
     top_smells: List[Dict[str, Any]] = []
     languages: List[Dict[str, Any]] = []
+    last_scanned_at: Optional[str] = None
 
 
 class CloneInstance(BaseModel):
