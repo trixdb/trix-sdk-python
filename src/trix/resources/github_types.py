@@ -62,6 +62,26 @@ class ChurnFilesResponse(BaseModel):
     count: int
 
 
+class FunctionComplexityMetric(BaseModel):
+    """Per-function complexity breakdown from tree-sitter AST analysis."""
+
+    name: str
+    start_line: int
+    end_line: int
+    loc: int
+    cyclomatic: int
+    cognitive: int
+    caller_count: Optional[int] = None  # files that call this fn (load-bearing indicator)
+    clone_count: Optional[int] = None   # structurally identical functions found
+    clone_hash: Optional[str] = None
+    clone_partners: Optional[List[str]] = None
+
+
+class TestCoverageInfo(BaseModel):
+    status: str  # "covered" | "uncovered" | "unknown"
+    test_file: Optional[str] = None
+
+
 class FileComplexityMetric(BaseModel):
     file_path: str
     repo_full_name: str
@@ -72,6 +92,9 @@ class FileComplexityMetric(BaseModel):
     hotspot_score: Optional[float] = None
     complexity_level: Optional[str] = None  # "ok" | "warning" | "critical"
     computed_at: Optional[str] = None
+    functions: Optional[List[FunctionComplexityMetric]] = None
+    unused_exports: Optional[List[str]] = None
+    test_coverage: Optional[TestCoverageInfo] = None
 
 
 class FileComplexityResponse(BaseModel):
