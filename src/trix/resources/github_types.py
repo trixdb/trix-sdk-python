@@ -405,12 +405,23 @@ class DepVuln(BaseModel):
     evidence: DepVulnEvidence = DepVulnEvidence()
 
 
+class PRFileMetric(BaseModel):
+    path: str
+    cc: Optional[int] = None
+    cogc: Optional[int] = None
+    mi: Optional[int] = None
+    loc: Optional[int] = None
+    test_coverage: Optional[Dict[str, Any]] = None
+    unused_exports: List[str] = []
+
+
 class PRReviewResult(BaseModel):
     review: Dict[str, Any]
     signals: List[Dict[str, Any]] = []
     smells: List[Dict[str, Any]] = []
     security_findings: List[SecurityFinding] = []
     dep_vulns: List[DepVuln] = []
+    file_metrics: List[PRFileMetric] = []
     inline_comments: int = 0
     files_analyzed: int = 0
     unsupported_files: int = 0
