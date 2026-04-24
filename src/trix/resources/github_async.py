@@ -264,18 +264,37 @@ class AsyncGitHubResource(BaseAsyncResource):
         category: Optional[str] = None,
         priority: Optional[str] = None,
         status: str = "open",
+        file_path: Optional[str] = None,
     ) -> CodeImprovementsResponse:
-        """List code improvement suggestions with optional filters (async)."""
+        """List code improvement suggestions with optional filters (async).
+
+        Args:
+            file_path: Filter by file path substring, e.g. "src/auth" returns
+                       all findings in that directory.
+        """
         validate_id(project_id, "project")
         params: Dict[str, Any] = {"status": status}
         if category is not None:
             params["category"] = category
         if priority is not None:
             params["priority"] = priority
+        if file_path is not None:
+            params["file_path"] = file_path
         response = await self._request(
             "GET", f"/projects/{project_id}/github/improvements", params=params
         )
         return CodeImprovementsResponse.model_validate(response)
+
+    async def create_issue_from_suggestion(
+        self, project_id: str, suggestion_id: str
+    ) -> Dict[str, Any]:
+        """Push a code quality finding to GitHub Issues and mark it in_progress (async)."""
+        validate_id(project_id, "project")
+        validate_id(suggestion_id, "suggestion")
+        return await self._request(
+            "POST",
+            f"/projects/{project_id}/github/improvements/{suggestion_id}/create-issue",
+        )
 
     async def update_code_improvement_status(
         self, project_id: str, suggestion_id: str, status: str
