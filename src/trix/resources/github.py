@@ -34,6 +34,7 @@ from .github_types import (
     QualityGate,
     AgentPRResult,
     PRReviewResult,
+    ScanCodeResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -394,3 +395,13 @@ class GitHubResource(BaseSyncResource):
             json={"connection_id": connection_id, "branch_name": branch_name, "base_branch": base_branch, "commit_message": commit_message, "pr_title": pr_title, "pr_body": pr_body, "changes": changes},
         )
         return AgentPRResult.model_validate(response)
+
+    def scan_code(self, project_id: str, *, file_path: str, content: str) -> ScanCodeResult:
+        """Scan arbitrary file content with all SAST + secret scanners (no GitHub auth needed)."""
+        validate_id(project_id, "project")
+        response = self._request(
+            "POST",
+            f"/projects/{project_id}/github/scan-code",
+            json={"file_path": file_path, "content": content},
+        )
+        return ScanCodeResult.model_validate(response)

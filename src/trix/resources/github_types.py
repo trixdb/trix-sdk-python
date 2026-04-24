@@ -427,3 +427,18 @@ class PRReviewResult(BaseModel):
     files_analyzed: int = 0
     unsupported_files: int = 0
     posted: bool = False
+
+
+class ScanCodeSummary(BaseModel):
+    secrets: int = 0
+    security: int = 0
+    critical: int = 0
+    high: int = 0
+    safe: bool = True
+
+
+class ScanCodeResult(BaseModel):
+    file_path: str
+    findings: List[SecurityFinding] = []
+    summary: ScanCodeSummary = ScanCodeSummary()
+
