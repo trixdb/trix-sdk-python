@@ -47,6 +47,7 @@ from .github_types import (
     BugDensityResult,
     ActiveBranchesResult,
     ContributorQualityResult,
+    PrAgingResult,
     PRQualityWeek,
 )
 
@@ -552,4 +553,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return ContributorQualityResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/contributor-quality")
+        )
+
+    async def get_pr_aging(self, project_id: str) -> PrAgingResult:
+        """Open PRs sorted oldest-first with ageDays + isStale flag (async)."""
+        validate_id(project_id, "project")
+        return PrAgingResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/pr-aging")
         )

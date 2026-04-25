@@ -677,3 +677,22 @@ class ContributorQualityStat(BaseModel):
 class ContributorQualityResult(BaseModel):
     contributors: List[ContributorQualityStat] = []
     count: int = 0
+
+
+class OpenPRAging(BaseModel):
+    pr_number: Optional[int] = None
+    title: Optional[str] = None
+    author: Optional[str] = None
+    url: Optional[str] = None
+    repo: Optional[str] = None
+    head_branch: Optional[str] = None
+    opened_at: Optional[str] = None
+    last_updated_at: Optional[str] = None
+    age_days: int = 0
+    is_stale: bool = False
+
+
+class PrAgingResult(BaseModel):
+    prs: List[OpenPRAging] = []
+    count: int = 0
+    stale_days: int = 7

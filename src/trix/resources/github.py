@@ -47,6 +47,7 @@ from .github_types import (
     BugDensityResult,
     ActiveBranchesResult,
     ContributorQualityResult,
+    PrAgingResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -537,4 +538,11 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return ContributorQualityResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/contributor-quality")
+        )
+
+    def get_pr_aging(self, project_id: str) -> PrAgingResult:
+        """Open PRs sorted oldest-first with ageDays + isStale flag (>7 days without update)."""
+        validate_id(project_id, "project")
+        return PrAgingResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/pr-aging")
         )
