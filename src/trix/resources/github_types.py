@@ -1767,6 +1767,7 @@ CqlFromMode = Literal[
     "symbols",
     "summary",
     "history",
+    "file_report",
 ]
 
 
