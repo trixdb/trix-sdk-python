@@ -1029,3 +1029,21 @@ class IssueResolversResult(BaseModel):
     resolvers: List["IssueResolver"]
     total_closed: int
     lookback_days: int
+
+
+# ── Cycle Time Trend (Phase 4: Estimation Accuracy Tracker) ──────────────────
+
+
+class CycleTimeTrendWeek(BaseModel):
+    """One week of cycle time data."""
+    week_start: str
+    avg_days: Optional[float] = None
+    issue_count: int
+
+
+class CycleTimeTrendResult(BaseModel):
+    """Weekly average issue cycle time trend."""
+    weeks: List["CycleTimeTrendWeek"]
+    trend: str  # 'improving' | 'stable' | 'declining'
+    overall_avg_days: Optional[float] = None
+    lookback_weeks: int

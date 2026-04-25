@@ -66,6 +66,7 @@ from .github_types import (
     IssueCycleTimeResult,
     IssueThroughputResult,
     IssueResolversResult,
+    CycleTimeTrendResult,
 )
 
 
@@ -713,4 +714,14 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/issue-resolvers",
             params={"days": days},
             response_model=IssueResolversResult,
+        )
+
+    async def get_cycle_time_trend(
+        self, project_id: str, weeks: int = 8
+    ) -> CycleTimeTrendResult:
+        """Get weekly average issue cycle time trend — are we getting faster or slower?"""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/cycle-time-trend",
+            params={"weeks": weeks},
+            response_model=CycleTimeTrendResult,
         )
