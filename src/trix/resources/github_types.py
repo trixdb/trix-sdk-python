@@ -673,6 +673,16 @@ class HealthSnapshotIssueFlow(BaseModel):
     net_flow_7d: int = 0
 
 
+class HealthSnapshotIssueThroughput(BaseModel):
+    avg_per_week: float = 0
+    trend: str = "stable"  # 'improving' | 'stable' | 'declining'
+
+
+class HealthSnapshotSlowestCycleLabel(BaseModel):
+    label: str
+    avg_days: float
+
+
 class HealthSnapshotResponse(BaseModel):
     quality_gate: HealthSnapshotQualityGate
     suggestions: HealthSnapshotSuggestions
@@ -685,6 +695,8 @@ class HealthSnapshotResponse(BaseModel):
     issue_backlog: Optional[HealthSnapshotIssueBacklog] = None
     review_coverage: Optional[HealthSnapshotReviewCoverage] = None
     issue_flow: Optional[HealthSnapshotIssueFlow] = None
+    issue_throughput: Optional[HealthSnapshotIssueThroughput] = None
+    slowest_cycle_label: Optional[HealthSnapshotSlowestCycleLabel] = None
 
 
 class BranchInfo(BaseModel):
