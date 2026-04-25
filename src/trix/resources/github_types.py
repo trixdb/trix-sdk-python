@@ -1764,6 +1764,7 @@ CqlFromMode = Literal[
     "metrics",
     "coverage",
     "tech_debt",
+    "symbols",
     "summary",
     "history",
 ]
