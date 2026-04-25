@@ -229,18 +229,58 @@ class GoalProgressHistoryResponse(BaseModel):
     history: List[GoalProgressEvent]
 
 
-class ReleaseReadinessSignals(BaseModel):
-    open_prs: int
-    blocking_tasks: int
-    goal_completion_pct: int
-    scope_creep_prs: int
+class ReleaseReadinessBlocker(BaseModel):
+    issue_number: str
+    title: str
+    url: str
+    author: str
+    labels: List[str]
+    age_days: int
+
+
+class ReleaseReadinessUnreviewedPR(BaseModel):
+    pr_number: str
+    title: str
+    url: str
+    author: str
+    age_days: int
+    requested_reviewers: List[str]
+
+
+class ReleaseReadinessStalePR(BaseModel):
+    pr_number: str
+    title: str
+    url: str
+    author: str
+    age_days: int
+
+
+class ReleaseReadinessHotspot(BaseModel):
+    file_path: str
+    repo: str
+    hotspot_score: float
+
+
+class ReleaseReadinessOpenIssues(BaseModel):
+    count: int
+    blocker_count: int
+    blockers: List[ReleaseReadinessBlocker]
+
+
+class ReleaseReadinessOpenPRs(BaseModel):
+    count: int
+    unreviewed_count: int
+    stale_count: int
+    unreviewed: List[ReleaseReadinessUnreviewedPR]
+    stale_prs: List[ReleaseReadinessStalePR]
 
 
 class ReleaseReadinessResponse(BaseModel):
-    score: int
-    ready: bool
-    signals: ReleaseReadinessSignals
-    details: Dict[str, Any]
+    readiness_score: int
+    open_issues: ReleaseReadinessOpenIssues
+    open_prs: ReleaseReadinessOpenPRs
+    recent_merges: Dict[str, Any]
+    top_hotspots: List[ReleaseReadinessHotspot]
 
 
 class GenerateNarrativeResponse(BaseModel):
