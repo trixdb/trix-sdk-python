@@ -1128,3 +1128,50 @@ class AgentAuditResult(BaseModel):
     lookback_days: int
     by_agent: List["AgentBreakdown"]
     weekly_trend: List["AgentWeeklyTrend"]
+
+
+class ScopeCreepSummary(BaseModel):
+    """Summary counts for scope creep detection."""
+    total_prs: int
+    scope_creep_count: int
+    large_count: int
+    flagged_count: int
+    flagged_pct: int
+
+
+class ScopeCreepPR(BaseModel):
+    """A PR that exceeded the scope creep threshold."""
+    title: str
+    author: str
+    url: str
+    repo: str
+    changed_files: int
+    additions: int
+    deletions: int
+    severity: str
+    created_at: str
+
+
+class ScopeCreepAuthor(BaseModel):
+    """Per-author scope creep statistics."""
+    author: str
+    total_prs: int
+    scope_creep_count: int
+    large_count: int
+    avg_files: int
+
+
+class ScopeCreepWeek(BaseModel):
+    """Weekly scope creep trend data point."""
+    week: str
+    scope_creep_count: int
+    large_count: int
+
+
+class ScopeCreepResult(BaseModel):
+    """Scope creep detection report for a project."""
+    summary: ScopeCreepSummary
+    lookback_days: int
+    top_prs: List["ScopeCreepPR"]
+    by_author: List["ScopeCreepAuthor"]
+    weekly_trend: List["ScopeCreepWeek"]

@@ -69,6 +69,7 @@ from .github_types import (
     PrMergeTimeResult,
     ContributorMomentumResult,
     AgentAuditResult,
+    ScopeCreepResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -742,4 +743,14 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/agent-audit",
             params={"days": days},
             response_model=AgentAuditResult,
+        )
+
+    def get_scope_creep(
+        self, project_id: str, days: int = 90
+    ) -> ScopeCreepResult:
+        """Get scope creep detection report — PRs that changed >20 or >50 files."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/scope-creep",
+            params={"days": days},
+            response_model=ScopeCreepResult,
         )

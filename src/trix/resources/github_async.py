@@ -70,6 +70,7 @@ from .github_types import (
     PrMergeTimeResult,
     ContributorMomentumResult,
     AgentAuditResult,
+    ScopeCreepResult,
 )
 
 
@@ -757,4 +758,14 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/agent-audit",
             params={"days": days},
             response_model=AgentAuditResult,
+        )
+
+    async def get_scope_creep(
+        self, project_id: str, days: int = 90
+    ) -> ScopeCreepResult:
+        """Get scope creep detection report — PRs that changed >20 or >50 files."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/scope-creep",
+            params={"days": days},
+            response_model=ScopeCreepResult,
         )
