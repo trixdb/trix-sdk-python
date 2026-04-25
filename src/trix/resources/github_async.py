@@ -85,6 +85,7 @@ from .github_types import (
     BatchScanFileInput,
     BatchScanCodeResult,
     AnalyzeCodeComplexityResult,
+    CqlQuery,
 )
 
 
@@ -472,10 +473,16 @@ class AsyncGitHubResource(BaseAsyncResource):
         )
         return QualityGate.model_validate(response)
 
-    async def query_code(self, project_id: str, query: Dict[str, Any]) -> Dict[str, Any]:
-        """Execute a CQL query over code metrics (files or functions) (async)."""
+    async def query_code(self, project_id: str, query: "Dict[str, Any] | CqlQuery") -> Dict[str, Any]:
+        """Execute a CQL query over code metrics (async).
+
+        Accepts either a raw dict or a typed CqlQuery instance.
+        Supports 12 from: modes: files, functions, suggestions, ast_pattern,
+        hotspots, patterns, dead_code, clones, metrics, coverage, summary, history.
+        """
         validate_id(project_id, "project")
-        return await self._request("POST", f"/projects/{project_id}/github/query", json=query)
+        body = query.to_dict() if isinstance(query, CqlQuery) else query
+        return await self._request("POST", f"/projects/{project_id}/github/query", json=body)
 
     async def review_pr(
         self,

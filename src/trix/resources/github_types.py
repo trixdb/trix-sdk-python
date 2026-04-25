@@ -1736,3 +1736,52 @@ class AnalyzeCodeComplexityResult(BaseModel):
     functions: List[Dict[str, Any]] = []
     smells: List[CodeSmellItem] = []
     summary: CodeComplexitySummary = CodeComplexitySummary()
+
+
+# ── CQL (Code Query Language) types ───────────────────────────────────────────
+
+CqlFromMode = Literal[
+    "files",
+    "functions",
+    "suggestions",
+    "ast_pattern",
+    "hotspots",
+    "patterns",
+    "dead_code",
+    "clones",
+    "metrics",
+    "coverage",
+    "summary",
+    "history",
+]
+
+
+class CqlWhereCondition(BaseModel):
+    contains: Optional[str] = None
+    startsWith: Optional[str] = None
+    eq: Optional[Any] = None
+    gte: Optional[Any] = None
+    lte: Optional[Any] = None
+    gt: Optional[Any] = None
+    lt: Optional[Any] = None
+
+
+class CqlQuery(BaseModel):
+    """Typed CQL query object for query_code()."""
+
+    from_: Optional[CqlFromMode] = None
+    where: Optional[Dict[str, Dict[str, Any]]] = None
+    order_by: Optional[str] = None
+    order_dir: Optional[Literal["asc", "desc"]] = None
+    limit: Optional[int] = None
+    language: Optional[str] = None
+    pattern: Optional[str] = None
+    patterns: Optional[List[str]] = None
+    risk: Optional[Literal["high", "medium", "all"]] = None
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to API-ready dict (maps from_ → from)."""
+        d = self.model_dump(exclude_none=True)
+        if "from_" in d:
+            d["from"] = d.pop("from_")
+        return d
