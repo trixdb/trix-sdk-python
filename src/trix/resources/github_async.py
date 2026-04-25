@@ -62,6 +62,7 @@ from .github_types import (
     PRQualityWeek,
     WeekOverWeekResult,
     IssueTriageResult,
+    IssueFlowResult,
 )
 
 
@@ -668,4 +669,15 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return IssueTriageResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/issue-triage?days={days}")
+        )
+
+    async def get_issue_flow(self, project_id: str, days: int = 30) -> IssueFlowResult:
+        """Daily issue open/close flow — backlog burn-down visibility (async).
+
+        Args:
+            days: Lookback window in days (default 30; range: 7-90)
+        """
+        validate_id(project_id, "project")
+        return IssueFlowResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/issue-flow?days={days}")
         )

@@ -956,3 +956,21 @@ class IssueTriageResult(BaseModel):
     issues: List[TriageIssue] = []
     count: int = 0
     lookback_days: int = 7
+
+
+# ── Issue Flow ─────────────────────────────────────────────────────────────────
+
+
+class IssueFlowDay(BaseModel):
+    day: str
+    opened: int = 0
+    closed: int = 0
+    net: int = 0
+
+
+class IssueFlowResult(BaseModel):
+    data: List[IssueFlowDay] = []
+    total_opened: int = 0
+    total_closed: int = 0
+    net_flow: int = 0
+    lookback_days: int = 30

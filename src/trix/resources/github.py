@@ -61,6 +61,7 @@ from .github_types import (
     MilestonesResult,
     WeekOverWeekResult,
     IssueTriageResult,
+    IssueFlowResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -653,4 +654,15 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return IssueTriageResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/issue-triage?days={days}")
+        )
+
+    def get_issue_flow(self, project_id: str, days: int = 30) -> IssueFlowResult:
+        """Daily issue open/close flow — backlog burn-down visibility.
+
+        Args:
+            days: Lookback window in days (default 30; range: 7-90)
+        """
+        validate_id(project_id, "project")
+        return IssueFlowResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/issue-flow?days={days}")
         )
