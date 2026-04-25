@@ -59,6 +59,7 @@ from .github_types import (
     CommitLeadersResult,
     LabelVelocityResult,
     MilestonesResult,
+    WeekOverWeekResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -633,4 +634,11 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return MilestonesResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/milestones")
+        )
+    def get_week_over_week(self, project_id: str) -> WeekOverWeekResult:
+        """Week-over-week velocity comparison — PRs merged, issues closed, and commits
+        in the current 7-day window vs the previous 7-day window."""
+        validate_id(project_id, "project")
+        return WeekOverWeekResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/week-over-week")
         )

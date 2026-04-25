@@ -918,3 +918,22 @@ class MilestoneStat(BaseModel):
 class MilestonesResult(BaseModel):
     milestones: List[MilestoneStat] = []
     total_milestones: int = 0
+
+
+# ── Week-over-Week Velocity ────────────────────────────────────────────────────
+
+from typing import Literal
+
+
+class WeekStat(BaseModel):
+    label: str
+    this_week: int = 0
+    last_week: int = 0
+    delta: int = 0
+    trend: Literal["up", "down", "flat"] = "flat"
+
+
+class WeekOverWeekResult(BaseModel):
+    prs: WeekStat
+    issues: WeekStat
+    commits: WeekStat

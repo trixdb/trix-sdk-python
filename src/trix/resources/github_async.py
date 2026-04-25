@@ -60,6 +60,7 @@ from .github_types import (
     LabelVelocityResult,
     MilestonesResult,
     PRQualityWeek,
+    WeekOverWeekResult,
 )
 
 
@@ -648,4 +649,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return MilestonesResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/milestones")
+        )
+    async def get_week_over_week(self, project_id: str) -> WeekOverWeekResult:
+        """Week-over-week velocity comparison — PRs merged, issues closed, and commits
+        in the current 7-day window vs the previous 7-day window (async)."""
+        validate_id(project_id, "project")
+        return WeekOverWeekResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/week-over-week")
         )
