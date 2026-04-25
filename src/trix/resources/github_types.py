@@ -920,6 +920,7 @@ class MilestoneStat(BaseModel):
     closed_count: int = 0
     total_count: int = 0
     progress_pct: int = 0
+    predicted_date: Optional[str] = None
 
 
 class MilestonesResult(BaseModel):
@@ -1011,3 +1012,20 @@ class IssueThroughputResult(BaseModel):
     avg_closed_per_week: float
     trend: str  # 'improving' | 'stable' | 'declining'
     lookback_weeks: int
+
+
+# ── Issue Resolver Leaderboard (Phase 4) ──────────────────────────────────────
+
+
+class IssueResolver(BaseModel):
+    """One entry in the issue resolver leaderboard."""
+    login: str
+    closed_count: int
+    pct: float
+
+
+class IssueResolversResult(BaseModel):
+    """Issue resolver leaderboard — top contributors by closed issue count."""
+    resolvers: List["IssueResolver"]
+    total_closed: int
+    lookback_days: int

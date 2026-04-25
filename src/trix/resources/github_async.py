@@ -65,6 +65,7 @@ from .github_types import (
     IssueFlowResult,
     IssueCycleTimeResult,
     IssueThroughputResult,
+    IssueResolversResult,
 )
 
 
@@ -702,4 +703,14 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/issue-throughput",
             params={"weeks": weeks},
             response_model=IssueThroughputResult,
+        )
+
+    async def get_issue_resolvers(
+        self, project_id: str, days: int = 30
+    ) -> IssueResolversResult:
+        """Get issue resolver leaderboard — top contributors by closed issue count."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/issue-resolvers",
+            params={"days": days},
+            response_model=IssueResolversResult,
         )

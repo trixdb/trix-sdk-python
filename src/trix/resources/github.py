@@ -64,6 +64,7 @@ from .github_types import (
     IssueFlowResult,
     IssueCycleTimeResult,
     IssueThroughputResult,
+    IssueResolversResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -687,4 +688,14 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/issue-throughput",
             params={"weeks": weeks},
             response_model=IssueThroughputResult,
+        )
+
+    def get_issue_resolvers(
+        self, project_id: str, days: int = 30
+    ) -> IssueResolversResult:
+        """Get issue resolver leaderboard — top contributors by closed issue count."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/issue-resolvers",
+            params={"days": days},
+            response_model=IssueResolversResult,
         )
