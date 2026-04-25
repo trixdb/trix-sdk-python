@@ -96,6 +96,8 @@ from .github_types import (
     CreateFixPRResult,
     ReviewDepsResult,
     ChangeImpactResult,
+    ExplainCodeResult,
+    SuggestRefactoringResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -1095,4 +1097,54 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/change-impact",
             json={"pr_number": pr_number, "repo_full_name": repo_full_name, "max_files": max_files},
             response_model=ChangeImpactResult,
+        )
+
+    def explain_code(
+        self,
+        project_id: str,
+        repo_full_name: str,
+        file_path: str,
+        function_name: str,
+        ref: Optional[str] = None,
+    ) -> ExplainCodeResult:
+        """Explain a specific function using tree-sitter extraction and LLM analysis."""
+        body: Dict[str, Any] = {
+            "repo_full_name": repo_full_name,
+            "file_path": file_path,
+            "function_name": function_name,
+        }
+        if ref is not None:
+            body["ref"] = ref
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/explain-code",
+            json=body,
+            response_model=ExplainCodeResult,
+        )
+
+    def suggest_refactoring(
+        self,
+        project_id: str,
+        repo_full_name: str,
+        file_path: str,
+        function_name: str,
+        ref: Optional[str] = None,
+        goals: Optional[List[str]] = None,
+        context: Optional[str] = None,
+    ) -> SuggestRefactoringResult:
+        """Suggest LLM-powered refactoring for a function with goal-directed improvements."""
+        body: Dict[str, Any] = {
+            "repo_full_name": repo_full_name,
+            "file_path": file_path,
+            "function_name": function_name,
+        }
+        if ref is not None:
+            body["ref"] = ref
+        if goals is not None:
+            body["goals"] = goals
+        if context is not None:
+            body["context"] = context
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/suggest-refactoring",
+            json=body,
+            response_model=SuggestRefactoringResult,
         )

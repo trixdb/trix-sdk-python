@@ -2064,3 +2064,62 @@ class ChangeImpactResult(BaseModel):
     summary: str = ""
 
     model_config = {"populate_by_name": True}
+
+
+# ── explain_code ──────────────────────────────────────────────────────────────
+
+class ExplainCodeResult(BaseModel):
+    file_path: str = Field(alias="file_path", default="")
+    function_name: str = Field(alias="function_name", default="")
+    language: str = ""
+    ref: str = "HEAD"
+    cyclomatic_complexity: Optional[int] = Field(alias="cyclomatic_complexity", default=None)
+    explanation: Dict[str, Any] = {}
+    code_snippet: str = Field(alias="code_snippet", default="")
+
+    model_config = {"populate_by_name": True}
+
+
+# ── suggest_refactoring ───────────────────────────────────────────────────────
+
+class RefactoringMetrics(BaseModel):
+    cyclomatic: Optional[int] = None
+    cognitive: Optional[int] = None
+    loc: Optional[int] = None
+
+    model_config = {"populate_by_name": True}
+
+
+class RefactoringSuggestion(BaseModel):
+    refactored_code: str = Field(alias="refactored_code", default="")
+    helpers_needed: List[str] = Field(alias="helpers_needed", default=[])
+    changes_summary: str = Field(alias="changes_summary", default="")
+    estimated_cc_reduction: Optional[int] = Field(alias="estimated_cc_reduction", default=None)
+    rationale: str = ""
+    risks: List[str] = []
+
+    model_config = {"populate_by_name": True}
+
+
+class FixPRHint(BaseModel):
+    file_path: str = Field(alias="file_path", default="")
+    start_line: int = Field(alias="start_line", default=0)
+    end_line: int = Field(alias="end_line", default=0)
+    replacement: str = ""
+    description: str = ""
+
+    model_config = {"populate_by_name": True}
+
+
+class SuggestRefactoringResult(BaseModel):
+    file_path: str = Field(alias="file_path", default="")
+    function_name: str = Field(alias="function_name", default="")
+    language: str = ""
+    ref: str = "HEAD"
+    original_metrics: RefactoringMetrics = Field(alias="original_metrics", default_factory=RefactoringMetrics)
+    original_start_line: int = Field(alias="original_start_line", default=0)
+    goals_applied: List[str] = Field(alias="goals_applied", default=[])
+    suggestion: RefactoringSuggestion = Field(default_factory=RefactoringSuggestion)
+    fix_pr_hint: FixPRHint = Field(alias="fix_pr_hint", default_factory=FixPRHint)
+
+    model_config = {"populate_by_name": True}
