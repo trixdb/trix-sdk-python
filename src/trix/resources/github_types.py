@@ -1531,3 +1531,33 @@ class ReviewNetworkResult(BaseModel):
     edges: List[ReviewEdge] = []
     contributors: List[ReviewContributor] = []
     lookbackDays: int
+
+
+class ReviewDepthSummary(BaseModel):
+    """Summary of team-wide reviewer thoroughness."""
+
+    totalReviews: int
+    totalReviewers: int
+    avgScrutinyRate: int
+    rubberstampCount: int
+    rigorousCount: int
+
+
+class ReviewerDepthStat(BaseModel):
+    """Per-reviewer breakdown of review state distribution."""
+
+    reviewer: str
+    totalReviews: int
+    approvals: int
+    changesRequested: int
+    commentsOnly: int
+    scrutinyRate: int
+    uniquePrs: int
+
+
+class ReviewDepthResult(BaseModel):
+    """Reviewer thoroughness analytics — scrutiny rate and rubber-stamp detection."""
+
+    summary: ReviewDepthSummary
+    reviewers: List[ReviewerDepthStat] = []
+    lookbackDays: int

@@ -78,6 +78,7 @@ from .github_types import (
     AIvsHumanResult,
     BusFactorResult,
     ReviewNetworkResult,
+    ReviewDepthResult,
 )
 
 
@@ -838,4 +839,12 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/review-network",
             params={"days": days},
             response_model=ReviewNetworkResult,
+        )
+
+    async def get_review_depth(self, project_id: str, days: int = 90) -> ReviewDepthResult:
+        """Reviewer thoroughness analytics — scrutiny rate, rubber-stamp vs rigorous (async)."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/review-depth",
+            params={"days": days},
+            response_model=ReviewDepthResult,
         )

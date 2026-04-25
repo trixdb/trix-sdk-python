@@ -77,6 +77,7 @@ from .github_types import (
     AIvsHumanResult,
     BusFactorResult,
     ReviewNetworkResult,
+    ReviewDepthResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -826,4 +827,12 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/review-network",
             params={"days": days},
             response_model=ReviewNetworkResult,
+        )
+
+    def get_review_depth(self, project_id: str, days: int = 90) -> ReviewDepthResult:
+        """Reviewer thoroughness analytics — scrutiny rate, rubber-stamp vs rigorous."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/review-depth",
+            params={"days": days},
+            response_model=ReviewDepthResult,
         )
