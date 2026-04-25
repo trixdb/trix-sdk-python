@@ -691,6 +691,8 @@ class ContributorQualityStat(BaseModel):
     test_coverage_pct: int = 0
     avg_merge_days: Optional[float] = None
     last_active_at: Optional[str] = None
+    reviews_given: int = 0
+    approvals: int = 0
 
 
 class ContributorQualityResult(BaseModel):
