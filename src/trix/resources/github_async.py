@@ -54,6 +54,7 @@ from .github_types import (
     ReviewerWorkloadResult,
     ApprovedPRsResult,
     IssueBacklogResult,
+    ReviewCoverageResult,
     PRQualityWeek,
 )
 
@@ -608,4 +609,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return IssueBacklogResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/issue-backlog")
+        )
+
+    async def get_review_coverage(self, project_id: str) -> ReviewCoverageResult:
+        """PR review coverage — % of merged PRs (last 90d) that received at least one review (async)."""
+        validate_id(project_id, "project")
+        return ReviewCoverageResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/review-coverage")
         )

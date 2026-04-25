@@ -54,6 +54,7 @@ from .github_types import (
     ReviewerWorkloadResult,
     ApprovedPRsResult,
     IssueBacklogResult,
+    ReviewCoverageResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -593,4 +594,11 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return IssueBacklogResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/issue-backlog")
+        )
+
+    def get_review_coverage(self, project_id: str) -> ReviewCoverageResult:
+        """PR review coverage — % of merged PRs (last 90d) that received at least one review."""
+        validate_id(project_id, "project")
+        return ReviewCoverageResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/review-coverage")
         )

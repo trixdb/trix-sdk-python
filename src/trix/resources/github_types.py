@@ -825,3 +825,20 @@ class IssueBacklogResult(BaseModel):
     avg_age_days: int = 0
     label_distribution: List[IssueLabelCount] = []
     oldest_issues: List[BacklogIssue] = []
+
+
+class AuthorReviewCoverage(BaseModel):
+    author: str
+    merged_count: int = 0
+    reviewed_count: int = 0
+    unreviewed_count: int = 0
+    coverage_pct: int = 0
+
+
+class ReviewCoverageResult(BaseModel):
+    total_merged: int = 0
+    reviewed_count: int = 0
+    unreviewed_count: int = 0
+    coverage_pct: Optional[int] = None
+    lookback_days: int = 90
+    by_author: List[AuthorReviewCoverage] = []
