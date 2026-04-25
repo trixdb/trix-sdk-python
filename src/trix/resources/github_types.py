@@ -1632,3 +1632,40 @@ class PRCodeReviewResult(BaseModel):
     analyzedFiles: int
     skippedFiles: int
     formatted: Optional[PRCodeReviewFormatted] = None
+
+
+class SubmitPRReviewResult(BaseModel):
+    """Result of posting a PR review to GitHub."""
+
+    reviewId: Optional[int] = None
+    reviewUrl: Optional[str] = None
+    event: str  # 'APPROVE' | 'COMMENT' | 'REQUEST_CHANGES'
+    grade: str
+    qualityScore: int
+    analyzedFiles: int
+    inlineComments: int
+    dryRun: Optional[bool] = None
+
+
+class QualityGateCondition(BaseModel):
+    """A single quality gate condition evaluation."""
+
+    label: str
+    actual: Any
+    limit: Any
+    passed: bool
+    mode: str
+
+
+class QualityGateResult(BaseModel):
+    """Result of evaluating a PR against a quality gate."""
+
+    passed: bool
+    status: str  # 'PASSED' | 'FAILED'
+    grade: str
+    qualityScore: int
+    conditions: List[QualityGateCondition] = []
+    blockers: List[QualityGateCondition] = []
+    prNumber: Optional[int] = None
+    repo: Optional[str] = None
+    analyzedFiles: Optional[int] = None

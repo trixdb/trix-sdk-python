@@ -80,6 +80,8 @@ from .github_types import (
     ReviewNetworkResult,
     ReviewDepthResult,
     PRCodeReviewResult,
+    SubmitPRReviewResult,
+    QualityGateResult,
 )
 
 
@@ -866,4 +868,43 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/pr-review",
             json=body,
             response_model=PRCodeReviewResult,
+        )
+
+    async def submit_pr_review(
+        self,
+        project_id: str,
+        pr_number: int,
+        *,
+        repo_full_name: Optional[str] = None,
+        dry_run: bool = False,
+    ) -> SubmitPRReviewResult:
+        """Run AST analysis and post the review with inline comments to GitHub (async)."""
+        body: Dict[str, Any] = {"prNumber": pr_number, "dryRun": dry_run}
+        if repo_full_name is not None:
+            body["repoFullName"] = repo_full_name
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/pr-submit-review",
+            json=body,
+            response_model=SubmitPRReviewResult,
+        )
+
+    async def check_pr_quality_gate(
+        self,
+        project_id: str,
+        pr_number: int,
+        *,
+        repo_full_name: Optional[str] = None,
+        gate: Optional[Any] = None,
+        post_status: bool = False,
+    ) -> QualityGateResult:
+        """Evaluate a PR against a quality gate — returns PASSED/FAILED with condition detail (async)."""
+        body: Dict[str, Any] = {"prNumber": pr_number, "postStatus": post_status}
+        if repo_full_name is not None:
+            body["repoFullName"] = repo_full_name
+        if gate is not None:
+            body["gate"] = gate
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/pr-quality-gate",
+            json=body,
+            response_model=QualityGateResult,
         )
