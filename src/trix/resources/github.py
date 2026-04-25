@@ -82,6 +82,7 @@ from .github_types import (
     SubmitPRReviewResult,
     QualityGateResult,
     ActionPlanResult,
+    TechDebtResult,
     BatchScanFileInput,
     BatchScanCodeResult,
     AnalyzeCodeComplexityResult,
@@ -964,4 +965,11 @@ class GitHubResource(BaseSyncResource):
         return self._client.get(
             f"/v1/projects/{project_id}/github/action-plan",
             response_model=ActionPlanResult,
+        )
+
+    def get_tech_debt(self, project_id: str) -> TechDebtResult:
+        """SonarQube-style technical debt breakdown by category with remediation estimate and grade."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/tech-debt",
+            response_model=TechDebtResult,
         )

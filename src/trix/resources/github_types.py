@@ -1834,3 +1834,33 @@ class ActionPlanResult(BaseModel):
     results: List[ActionItem] = []
     count: int = 0
     breakdown: ActionPlanBreakdown = ActionPlanBreakdown()
+
+
+class TechDebtFindings(BaseModel):
+    critical: int = 0
+    high: int = 0
+    medium: int = 0
+    low: int = 0
+
+
+class TechDebtCategory(BaseModel):
+    category: str
+    count: int
+    file_count: int = Field(alias="fileCount", default=0)
+    findings: TechDebtFindings = TechDebtFindings()
+    total_minutes: int = Field(alias="totalMinutes", default=0)
+    debt_label: str = Field(alias="debtLabel", default="0m")
+
+    model_config = {"populate_by_name": True}
+
+
+class TechDebtResult(BaseModel):
+    """Result from get_tech_debt / get_tech_debt_async."""
+
+    results: List[TechDebtCategory] = []
+    count: int = 0
+    total_debt_minutes: int = Field(alias="totalDebtMinutes", default=0)
+    total_debt_label: str = Field(alias="totalDebtLabel", default="0m")
+    grade: str = "A"
+
+    model_config = {"populate_by_name": True}
