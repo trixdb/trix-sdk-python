@@ -63,6 +63,7 @@ from .github_types import (
     WeekOverWeekResult,
     IssueTriageResult,
     IssueFlowResult,
+    IssueCycleTimeResult,
 )
 
 
@@ -680,4 +681,14 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return IssueFlowResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/issue-flow?days={days}")
+        )
+
+    async def get_issue_cycle_time(
+        self, project_id: str, days: int = 90
+    ) -> IssueCycleTimeResult:
+        """Get issue cycle time by label (avg/median days open to close)."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/issue-cycle-time",
+            params={"days": days},
+            response_model=IssueCycleTimeResult,
         )

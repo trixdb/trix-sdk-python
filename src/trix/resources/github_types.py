@@ -981,3 +981,18 @@ class IssueFlowResult(BaseModel):
     total_closed: int = 0
     net_flow: int = 0
     lookback_days: int = 30
+
+
+class CycleTimeByLabel(BaseModel):
+    """Cycle time stats for a single GitHub label."""
+    label: str
+    issue_count: int
+    avg_days: float
+    median_days: float
+    min_days: float
+    max_days: float
+
+class IssueCycleTimeResult(BaseModel):
+    """Issue cycle time by label — average/median days from open to close."""
+    by_label: List["CycleTimeByLabel"]
+    lookback_days: int

@@ -62,6 +62,7 @@ from .github_types import (
     WeekOverWeekResult,
     IssueTriageResult,
     IssueFlowResult,
+    IssueCycleTimeResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -665,4 +666,14 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return IssueFlowResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/issue-flow?days={days}")
+        )
+
+    def get_issue_cycle_time(
+        self, project_id: str, days: int = 90
+    ) -> IssueCycleTimeResult:
+        """Get issue cycle time by label (avg/median days open to close)."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/issue-cycle-time",
+            params={"days": days},
+            response_model=IssueCycleTimeResult,
         )
