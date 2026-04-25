@@ -1101,3 +1101,30 @@ class ContributorMomentumResult(BaseModel):
     """Contributor commit momentum comparison."""
     contributors: List["ContributorMomentum"]
     period_days: int
+
+
+class AgentBreakdown(BaseModel):
+    """Per-AI-assistant PR attribution count."""
+    agent: str
+    tag: str
+    label: str
+    count: int
+    pct: int
+
+
+class AgentWeeklyTrend(BaseModel):
+    """Weekly AI-attributed PR trend data point."""
+    week: str
+    total: int
+    agent_count: int
+    agent_pct: int
+
+
+class AgentAuditResult(BaseModel):
+    """AI coding assistant audit trail for a project."""
+    total_prs: int
+    agent_prs: int
+    agent_pct: int
+    lookback_days: int
+    by_agent: List["AgentBreakdown"]
+    weekly_trend: List["AgentWeeklyTrend"]

@@ -68,6 +68,7 @@ from .github_types import (
     CycleTimeTrendResult,
     PrMergeTimeResult,
     ContributorMomentumResult,
+    AgentAuditResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -731,4 +732,14 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/contributor-momentum",
             params={"days": days},
             response_model=ContributorMomentumResult,
+        )
+
+    def get_agent_audit_trail(
+        self, project_id: str, days: int = 90
+    ) -> AgentAuditResult:
+        """Get AI coding assistant attribution audit trail for a project."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/agent-audit",
+            params={"days": days},
+            response_model=AgentAuditResult,
         )

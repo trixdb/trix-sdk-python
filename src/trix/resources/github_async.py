@@ -69,6 +69,7 @@ from .github_types import (
     CycleTimeTrendResult,
     PrMergeTimeResult,
     ContributorMomentumResult,
+    AgentAuditResult,
 )
 
 
@@ -746,4 +747,14 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/contributor-momentum",
             params={"days": days},
             response_model=ContributorMomentumResult,
+        )
+
+    async def get_agent_audit_trail(
+        self, project_id: str, days: int = 90
+    ) -> AgentAuditResult:
+        """Get AI coding assistant attribution audit trail for a project."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/agent-audit",
+            params={"days": days},
+            response_model=AgentAuditResult,
         )
