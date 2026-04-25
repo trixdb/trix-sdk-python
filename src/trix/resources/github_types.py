@@ -1086,3 +1086,18 @@ class PrMergeTimeResult(BaseModel):
     lookback_days: int
     distribution: List["MergeTimeBucket"]
     author_stats: List["MergeTimeAuthor"]
+
+
+class ContributorMomentum(BaseModel):
+    """Per-contributor commit momentum vs prior period."""
+    author: str
+    recent_commits: int
+    previous_commits: int
+    pct_change: Optional[int] = None
+    trend: str  # 'accelerating' | 'stable' | 'fading'
+
+
+class ContributorMomentumResult(BaseModel):
+    """Contributor commit momentum comparison."""
+    contributors: List["ContributorMomentum"]
+    period_days: int

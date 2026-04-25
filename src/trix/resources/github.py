@@ -67,6 +67,7 @@ from .github_types import (
     IssueResolversResult,
     CycleTimeTrendResult,
     PrMergeTimeResult,
+    ContributorMomentumResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -720,4 +721,14 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/pr-merge-time",
             params={"days": days},
             response_model=PrMergeTimeResult,
+        )
+
+    def get_contributor_momentum(
+        self, project_id: str, days: int = 28
+    ) -> ContributorMomentumResult:
+        """Get contributor commit momentum: accelerating/stable/fading vs prior period."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/contributor-momentum",
+            params={"days": days},
+            response_model=ContributorMomentumResult,
         )

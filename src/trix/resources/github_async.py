@@ -68,6 +68,7 @@ from .github_types import (
     IssueResolversResult,
     CycleTimeTrendResult,
     PrMergeTimeResult,
+    ContributorMomentumResult,
 )
 
 
@@ -735,4 +736,14 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/pr-merge-time",
             params={"days": days},
             response_model=PrMergeTimeResult,
+        )
+
+    async def get_contributor_momentum(
+        self, project_id: str, days: int = 28
+    ) -> ContributorMomentumResult:
+        """Get contributor commit momentum: accelerating/stable/fading vs prior period."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/contributor-momentum",
+            params={"days": days},
+            response_model=ContributorMomentumResult,
         )
