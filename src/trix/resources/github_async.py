@@ -77,6 +77,7 @@ from .github_types import (
     DORAResult,
     AIvsHumanResult,
     BusFactorResult,
+    ReviewNetworkResult,
 )
 
 
@@ -829,4 +830,12 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/bus-factor",
             params={"days": days},
             response_model=BusFactorResult,
+        )
+
+    async def get_review_network(self, project_id: str, days: int = 90) -> ReviewNetworkResult:
+        """Map team code review collaboration — who reviews whose code, silo detection (async)."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/review-network",
+            params={"days": days},
+            response_model=ReviewNetworkResult,
         )

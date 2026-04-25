@@ -1502,3 +1502,32 @@ class BusFactorResult(BaseModel):
     atRisk: List[BusFactorAtRiskFile] = []
     byContributor: List[BusFactorContributor] = []
     lookbackDays: int
+
+
+# ── Review Collaboration Network ──────────────────────────────────────────────
+
+
+class ReviewEdge(BaseModel):
+    """A directional reviewer→author relationship with review count."""
+
+    reviewer: str
+    author: str
+    reviewCount: int
+
+
+class ReviewContributor(BaseModel):
+    """Per-contributor summary of review activity."""
+
+    name: str
+    reviewsGiven: int
+    reviewsReceived: int
+    uniqueAuthors: int
+    uniqueReviewers: int
+
+
+class ReviewNetworkResult(BaseModel):
+    """Team code review collaboration graph."""
+
+    edges: List[ReviewEdge] = []
+    contributors: List[ReviewContributor] = []
+    lookbackDays: int
