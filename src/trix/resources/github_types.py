@@ -2123,3 +2123,49 @@ class SuggestRefactoringResult(BaseModel):
     fix_pr_hint: FixPRHint = Field(alias="fix_pr_hint", default_factory=FixPRHint)
 
     model_config = {"populate_by_name": True}
+
+
+# ── build_ast_query ───────────────────────────────────────────────────────────
+
+class BuildAstQueryResult(BaseModel):
+    description: str = ""
+    language: str = "javascript"
+    pattern: str = ""
+    capture_name: str = Field(alias="capture_name", default="")
+    explanation: str = ""
+    caveats: List[str] = []
+    example_matches: List[str] = Field(alias="example_matches", default=[])
+    cql_payload: Dict[str, Any] = Field(alias="cql_payload", default={})
+    usage_hint: str = Field(alias="usage_hint", default="")
+
+    model_config = {"populate_by_name": True}
+
+
+# ── architecture_review ───────────────────────────────────────────────────────
+
+class ArchitectureConcern(BaseModel):
+    type: str = ""
+    severity: str = "low"
+    title: str = ""
+    description: str = ""
+    affected_files: List[str] = Field(alias="affected_files", default=[])
+    recommendation: str = ""
+
+    model_config = {"populate_by_name": True}
+
+
+class ArchitectureReviewResult(BaseModel):
+    pr_number: int = Field(alias="pr_number", default=0)
+    repo_full_name: str = Field(alias="repo_full_name", default="")
+    base: Optional[str] = None
+    head: Optional[str] = None
+    files_changed: int = Field(alias="files_changed", default=0)
+    severity: str = "none"
+    concerns: List[ArchitectureConcern] = []
+    positive_observations: List[str] = Field(alias="positive_observations", default=[])
+    overall_assessment: str = Field(alias="overall_assessment", default="")
+    concern_count: int = Field(alias="concern_count", default=0)
+    critical_count: int = Field(alias="critical_count", default=0)
+    high_count: int = Field(alias="high_count", default=0)
+
+    model_config = {"populate_by_name": True}

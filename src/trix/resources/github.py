@@ -98,6 +98,8 @@ from .github_types import (
     ChangeImpactResult,
     ExplainCodeResult,
     SuggestRefactoringResult,
+    BuildAstQueryResult,
+    ArchitectureReviewResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -1147,4 +1149,36 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/suggest-refactoring",
             json=body,
             response_model=SuggestRefactoringResult,
+        )
+
+    def build_ast_query(
+        self,
+        project_id: str,
+        description: str,
+        language: Optional[str] = None,
+        example_code: Optional[str] = None,
+        file_path_filter: Optional[str] = None,
+    ) -> BuildAstQueryResult:
+        """Convert a natural language pattern description into a tree-sitter S-expression query."""
+        body: Dict[str, Any] = {"description": description}
+        if language is not None:
+            body["language"] = language
+        if example_code is not None:
+            body["example_code"] = example_code
+        if file_path_filter is not None:
+            body["file_path_filter"] = file_path_filter
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/build-ast-query",
+            json=body,
+            response_model=BuildAstQueryResult,
+        )
+
+    def architecture_review(
+        self, project_id: str, pr_number: int, repo_full_name: str
+    ) -> ArchitectureReviewResult:
+        """LLM-powered holistic architecture review — layer violations, coupling, god modules."""
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/architecture-review",
+            json={"pr_number": pr_number, "repo_full_name": repo_full_name},
+            response_model=ArchitectureReviewResult,
         )
