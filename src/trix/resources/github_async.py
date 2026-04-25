@@ -578,6 +578,20 @@ class AsyncGitHubResource(BaseAsyncResource):
         )
         return AnalyzeCodeComplexityResult.model_validate(response)
 
+    async def pre_flight_pr(
+        self,
+        project_id: str,
+        *,
+        changes: List[BatchScanFileInput],
+    ) -> Dict[str, Any]:
+        """Pre-flight quality gate: SAST+secrets+complexity+design before creating a PR (async)."""
+        validate_id(project_id, "project")
+        return await self._request(
+            "POST",
+            f"/projects/{project_id}/github/pre-flight-pr",
+            json={"changes": [f.model_dump() for f in changes]},
+        )
+
     async def get_code_summary(self, project_id: str) -> CodeSummaryResult:
         """Combined code health snapshot — quality gate, debt, hotspots, smells, languages (async)."""
         validate_id(project_id, "project")

@@ -568,6 +568,25 @@ class GitHubResource(BaseSyncResource):
         )
         return AnalyzeCodeComplexityResult.model_validate(response)
 
+    def pre_flight_pr(
+        self,
+        project_id: str,
+        *,
+        changes: List[BatchScanFileInput],
+    ) -> Dict[str, Any]:
+        """Pre-flight quality gate: SAST+secrets+complexity+design check before creating a PR.
+
+        Returns a PASS/WARN/BLOCK verdict with structured blockers and warnings.
+        Call this before create_pr to catch issues early.
+        """
+        validate_id(project_id, "project")
+        response = self._request(
+            "POST",
+            f"/projects/{project_id}/github/pre-flight-pr",
+            json={"changes": [f.model_dump() for f in changes]},
+        )
+        return response
+
     def get_code_summary(self, project_id: str) -> CodeSummaryResult:
         """Combined code health snapshot — quality gate, debt, hotspots, smells, languages."""
         validate_id(project_id, "project")
