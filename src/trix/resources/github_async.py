@@ -55,6 +55,7 @@ from .github_types import (
     ApprovedPRsResult,
     IssueBacklogResult,
     ReviewCoverageResult,
+    MilestonesResult,
     PRQualityWeek,
 )
 
@@ -616,4 +617,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return ReviewCoverageResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/review-coverage")
+        )
+
+    async def get_milestones(self, project_id: str) -> MilestonesResult:
+        """Milestone progress — open/closed issue counts per GitHub milestone, least-complete first (async)."""
+        validate_id(project_id, "project")
+        return MilestonesResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/milestones")
         )

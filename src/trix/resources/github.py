@@ -55,6 +55,7 @@ from .github_types import (
     ApprovedPRsResult,
     IssueBacklogResult,
     ReviewCoverageResult,
+    MilestonesResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -601,4 +602,11 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return ReviewCoverageResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/review-coverage")
+        )
+
+    def get_milestones(self, project_id: str) -> MilestonesResult:
+        """Milestone progress — open/closed issue counts per GitHub milestone, least-complete first."""
+        validate_id(project_id, "project")
+        return MilestonesResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/milestones")
         )

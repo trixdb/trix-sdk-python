@@ -855,3 +855,19 @@ class ReviewCoverageResult(BaseModel):
     coverage_pct: Optional[int] = None
     lookback_days: int = 90
     by_author: List[AuthorReviewCoverage] = []
+
+
+# ── Milestone Progress ──────────────────────────────────────────────────────
+
+
+class MilestoneStat(BaseModel):
+    name: str
+    open_count: int = 0
+    closed_count: int = 0
+    total_count: int = 0
+    progress_pct: int = 0
+
+
+class MilestonesResult(BaseModel):
+    milestones: List[MilestoneStat] = []
+    total_milestones: int = 0
