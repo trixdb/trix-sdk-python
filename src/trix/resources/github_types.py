@@ -656,6 +656,17 @@ class HealthSnapshotUrgentItems(BaseModel):
     urgent_total: int = 0
 
 
+class HealthSnapshotIssueBacklog(BaseModel):
+    total_open: int = 0
+    unassigned_count: int = 0
+
+
+class HealthSnapshotReviewCoverage(BaseModel):
+    total_merged: int = 0
+    coverage_pct: Optional[int] = None
+    lookback_days: int = 30
+
+
 class HealthSnapshotResponse(BaseModel):
     quality_gate: HealthSnapshotQualityGate
     suggestions: HealthSnapshotSuggestions
@@ -665,6 +676,8 @@ class HealthSnapshotResponse(BaseModel):
     pr_quality_trend: Optional[HealthSnapshotPRQualityTrend] = None
     review_turnaround: Optional[HealthSnapshotReviewTurnaround] = None
     urgent_items: Optional[HealthSnapshotUrgentItems] = None
+    issue_backlog: Optional[HealthSnapshotIssueBacklog] = None
+    review_coverage: Optional[HealthSnapshotReviewCoverage] = None
 
 
 class BranchInfo(BaseModel):
