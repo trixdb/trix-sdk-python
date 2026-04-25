@@ -66,6 +66,7 @@ from .github_types import (
     IssueThroughputResult,
     IssueResolversResult,
     CycleTimeTrendResult,
+    PrMergeTimeResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -709,4 +710,14 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/cycle-time-trend",
             params={"weeks": weeks},
             response_model=CycleTimeTrendResult,
+        )
+
+    def get_pr_merge_time(
+        self, project_id: str, days: int = 90
+    ) -> PrMergeTimeResult:
+        """Get PR open→merge time distribution: p25/p50/p75/p95, buckets, per-author avg."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/pr-merge-time",
+            params={"days": days},
+            response_model=PrMergeTimeResult,
         )

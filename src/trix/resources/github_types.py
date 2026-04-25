@@ -1059,3 +1059,30 @@ class CycleTimeTrendResult(BaseModel):
     trend: str  # 'improving' | 'stable' | 'declining'
     overall_avg_days: Optional[float] = None
     lookback_weeks: int
+
+
+class MergeTimeBucket(BaseModel):
+    """Count of PRs in a merge-time bucket."""
+    label: str
+    key: str
+    count: int
+
+
+class MergeTimeAuthor(BaseModel):
+    """Per-author PR merge time stats."""
+    author: str
+    pr_count: int
+    avg_hours: Optional[float] = None
+
+
+class PrMergeTimeResult(BaseModel):
+    """PR open→merge cycle time distribution."""
+    p25: Optional[float] = None
+    p50: Optional[float] = None
+    p75: Optional[float] = None
+    p95: Optional[float] = None
+    avg_hours: Optional[float] = None
+    total_merged: int
+    lookback_days: int
+    distribution: List["MergeTimeBucket"]
+    author_stats: List["MergeTimeAuthor"]

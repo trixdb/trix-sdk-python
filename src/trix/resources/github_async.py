@@ -67,6 +67,7 @@ from .github_types import (
     IssueThroughputResult,
     IssueResolversResult,
     CycleTimeTrendResult,
+    PrMergeTimeResult,
 )
 
 
@@ -724,4 +725,14 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/cycle-time-trend",
             params={"weeks": weeks},
             response_model=CycleTimeTrendResult,
+        )
+
+    async def get_pr_merge_time(
+        self, project_id: str, days: int = 90
+    ) -> PrMergeTimeResult:
+        """Get PR open→merge time distribution: p25/p50/p75/p95, buckets, per-author avg."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/pr-merge-time",
+            params={"days": days},
+            response_model=PrMergeTimeResult,
         )
