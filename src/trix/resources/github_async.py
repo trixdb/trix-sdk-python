@@ -48,6 +48,7 @@ from .github_types import (
     ActiveBranchesResult,
     ContributorQualityResult,
     PrAgingResult,
+    PrSizeDistributionResult,
     PRQualityWeek,
 )
 
@@ -560,4 +561,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return PrAgingResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/pr-aging")
+        )
+
+    async def get_pr_size_distribution(self, project_id: str) -> PrSizeDistributionResult:
+        """PR size distribution (Small/Medium/Large/Extra-large) with quality + test coverage (async)."""
+        validate_id(project_id, "project")
+        return PrSizeDistributionResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/pr-size-distribution")
         )

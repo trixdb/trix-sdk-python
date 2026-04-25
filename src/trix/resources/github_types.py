@@ -696,3 +696,17 @@ class PrAgingResult(BaseModel):
     prs: List[OpenPRAging] = []
     count: int = 0
     stale_days: int = 7
+
+
+class PRSizeBucket(BaseModel):
+    size: str
+    key: str
+    count: int = 0
+    pct: int = 0
+    avg_quality: Optional[float] = None
+    test_coverage_pct: int = 0
+
+
+class PrSizeDistributionResult(BaseModel):
+    distribution: List[PRSizeBucket] = []
+    total: int = 0
