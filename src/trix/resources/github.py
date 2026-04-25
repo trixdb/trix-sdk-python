@@ -81,6 +81,9 @@ from .github_types import (
     PRCodeReviewResult,
     SubmitPRReviewResult,
     QualityGateResult,
+    BatchScanFileInput,
+    BatchScanCodeResult,
+    AnalyzeCodeComplexityResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -525,6 +528,38 @@ class GitHubResource(BaseSyncResource):
             json={"file_path": file_path, "content": content},
         )
         return ScanCodeResult.model_validate(response)
+
+    def batch_scan_code(
+        self, project_id: str, *, files: List[BatchScanFileInput]
+    ) -> BatchScanCodeResult:
+        """Batch SAST + secret scan up to 20 files — ideal pre-flight check before creating a PR."""
+        validate_id(project_id, "project")
+        response = self._request(
+            "POST",
+            f"/projects/{project_id}/github/batch-scan-code",
+            json={"files": [f.model_dump() for f in files]},
+        )
+        return BatchScanCodeResult.model_validate(response)
+
+    def analyze_code_complexity(
+        self,
+        project_id: str,
+        *,
+        file_path: str,
+        content: str,
+        language: Optional[str] = None,
+    ) -> AnalyzeCodeComplexityResult:
+        """Compute per-function cyclomatic + cognitive complexity and code smells."""
+        validate_id(project_id, "project")
+        body: Dict[str, Any] = {"file_path": file_path, "content": content}
+        if language:
+            body["language"] = language
+        response = self._request(
+            "POST",
+            f"/projects/{project_id}/github/analyze-complexity",
+            json=body,
+        )
+        return AnalyzeCodeComplexityResult.model_validate(response)
 
     def get_code_summary(self, project_id: str) -> CodeSummaryResult:
         """Combined code health snapshot — quality gate, debt, hotspots, smells, languages."""

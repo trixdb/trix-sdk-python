@@ -1669,3 +1669,70 @@ class QualityGateResult(BaseModel):
     prNumber: Optional[int] = None
     repo: Optional[str] = None
     analyzedFiles: Optional[int] = None
+
+
+# ── Batch Scan Code ────────────────────────────────────────────────────────────
+
+
+class BatchScanFileInput(BaseModel):
+    file_path: str
+    content: str
+
+
+class BatchScanFileSummary(BaseModel):
+    secrets: int = 0
+    security: int = 0
+    critical: int = 0
+    high: int = 0
+    filesScanned: int = 0
+    safe: bool = True
+    grade: str = "A"
+
+
+class BatchScanFileResult(BaseModel):
+    file_path: str
+    findings: List[SecurityFinding] = []
+    secrets: int = 0
+    security: int = 0
+    critical: int = 0
+    high: int = 0
+
+
+class BatchScanCodeResult(BaseModel):
+    files: List[BatchScanFileResult] = []
+    summary: BatchScanFileSummary = BatchScanFileSummary()
+
+
+# ── Analyze Code Complexity ────────────────────────────────────────────────────
+
+
+class CodeComplexityMetrics(BaseModel):
+    cyclomatic: int = 0
+    cognitive: int = 0
+    loc: int = 0
+    supported: bool = True
+
+
+class CodeSmellItem(BaseModel):
+    type: str
+    severity: str  # 'critical' | 'high' | 'medium' | 'low'
+    message: str
+    line: Optional[int] = None
+    function: Optional[str] = None
+
+
+class CodeComplexitySummary(BaseModel):
+    functionCount: int = 0
+    smellCount: int = 0
+    critical: int = 0
+    high: int = 0
+    avgCyclomatic: Optional[str] = None
+
+
+class AnalyzeCodeComplexityResult(BaseModel):
+    file_path: str
+    language: str
+    metrics: CodeComplexityMetrics = CodeComplexityMetrics()
+    functions: List[Dict[str, Any]] = []
+    smells: List[CodeSmellItem] = []
+    summary: CodeComplexitySummary = CodeComplexitySummary()
