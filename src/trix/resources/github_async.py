@@ -84,6 +84,9 @@ from .github_types import (
     QualityGateResult,
     ActionPlanResult,
     TechDebtResult,
+    CustomRule,
+    CustomRulesResponse,
+    CustomRuleTestResult,
     BatchScanFileInput,
     BatchScanCodeResult,
     AnalyzeCodeComplexityResult,
@@ -979,4 +982,39 @@ class AsyncGitHubResource(BaseAsyncResource):
         return await self._client.get(
             f"/v1/projects/{project_id}/github/tech-debt",
             response_model=TechDebtResult,
+        )
+
+    async def list_custom_rules(self, project_id: str) -> CustomRulesResponse:
+        """List all user-defined tree-sitter SAST rules for a project."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/custom-rules",
+            response_model=CustomRulesResponse,
+        )
+
+    async def create_custom_rule(self, project_id: str, **kwargs: Any) -> CustomRule:
+        """Create a user-defined tree-sitter SAST rule."""
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/custom-rules",
+            json=kwargs,
+            response_model=CustomRule,
+        )
+
+    async def update_custom_rule(self, project_id: str, rule_id: str, **kwargs: Any) -> CustomRule:
+        """Update fields on an existing custom rule."""
+        return await self._client.patch(
+            f"/v1/projects/{project_id}/github/custom-rules/{rule_id}",
+            json=kwargs,
+            response_model=CustomRule,
+        )
+
+    async def delete_custom_rule(self, project_id: str, rule_id: str) -> None:
+        """Delete a custom rule permanently."""
+        await self._client.delete(f"/v1/projects/{project_id}/github/custom-rules/{rule_id}")
+
+    async def test_custom_rule(self, project_id: str, rule_id: str) -> CustomRuleTestResult:
+        """Run a custom rule against the top hotspot files and return matches."""
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/custom-rules/{rule_id}/test",
+            json={},
+            response_model=CustomRuleTestResult,
         )

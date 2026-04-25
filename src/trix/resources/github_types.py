@@ -1864,3 +1864,50 @@ class TechDebtResult(BaseModel):
     grade: str = "A"
 
     model_config = {"populate_by_name": True}
+
+# ── Custom Rules ───────────────────────────────────────────────────────────
+
+
+class CustomRule(BaseModel):
+    id: str
+    project_id: str
+    name: str
+    description: str = ""
+    language: str
+    tree_sitter_query: str
+    severity: str
+    category: str
+    message_template: str = ""
+    enabled: bool = True
+    run_count: int = 0
+    last_match_count: int = 0
+    created_at: str = ""
+    updated_at: str = ""
+
+
+class CustomRulesResponse(BaseModel):
+    results: List[CustomRule] = []
+    count: int = 0
+
+
+class CustomRuleMatch(BaseModel):
+    text: str
+    line: int = 0
+    capture_name: str = Field(alias="captureName", default="")
+
+    model_config = {"populate_by_name": True}
+
+
+class CustomRuleTestHit(BaseModel):
+    file_path: str
+    matches: List[CustomRuleMatch] = []
+
+
+class CustomRuleTestResult(BaseModel):
+    rule: Dict[str, Any] = {}
+    files_scanned: int = Field(alias="filesScanned", default=0)
+    matching_files: int = Field(alias="matchingFiles", default=0)
+    total_matches: int = Field(alias="totalMatches", default=0)
+    hits: List[CustomRuleTestHit] = []
+
+    model_config = {"populate_by_name": True}

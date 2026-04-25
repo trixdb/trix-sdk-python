@@ -83,6 +83,9 @@ from .github_types import (
     QualityGateResult,
     ActionPlanResult,
     TechDebtResult,
+    CustomRule,
+    CustomRulesResponse,
+    CustomRuleTestResult,
     BatchScanFileInput,
     BatchScanCodeResult,
     AnalyzeCodeComplexityResult,
@@ -972,4 +975,39 @@ class GitHubResource(BaseSyncResource):
         return self._client.get(
             f"/v1/projects/{project_id}/github/tech-debt",
             response_model=TechDebtResult,
+        )
+
+    def list_custom_rules(self, project_id: str) -> CustomRulesResponse:
+        """List all user-defined tree-sitter SAST rules for a project."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/custom-rules",
+            response_model=CustomRulesResponse,
+        )
+
+    def create_custom_rule(self, project_id: str, **kwargs: Any) -> CustomRule:
+        """Create a user-defined tree-sitter SAST rule."""
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/custom-rules",
+            json=kwargs,
+            response_model=CustomRule,
+        )
+
+    def update_custom_rule(self, project_id: str, rule_id: str, **kwargs: Any) -> CustomRule:
+        """Update fields on an existing custom rule."""
+        return self._client.patch(
+            f"/v1/projects/{project_id}/github/custom-rules/{rule_id}",
+            json=kwargs,
+            response_model=CustomRule,
+        )
+
+    def delete_custom_rule(self, project_id: str, rule_id: str) -> None:
+        """Delete a custom rule permanently."""
+        self._client.delete(f"/v1/projects/{project_id}/github/custom-rules/{rule_id}")
+
+    def test_custom_rule(self, project_id: str, rule_id: str) -> CustomRuleTestResult:
+        """Run a custom rule against the top hotspot files and return matches."""
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/custom-rules/{rule_id}/test",
+            json={},
+            response_model=CustomRuleTestResult,
         )
