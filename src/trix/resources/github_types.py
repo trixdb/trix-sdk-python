@@ -1561,3 +1561,74 @@ class ReviewDepthResult(BaseModel):
     summary: ReviewDepthSummary
     reviewers: List[ReviewerDepthStat] = []
     lookbackDays: int
+
+
+class PRCodeReviewSmell(BaseModel):
+    """A code smell found during PR review."""
+
+    kind: Optional[str] = None
+    severity: Optional[str] = None
+    filePath: Optional[str] = None
+    line: Optional[int] = None
+    message: Optional[str] = None
+    file: Optional[str] = None
+
+
+class PRCodeReviewSecurityFinding(BaseModel):
+    """A security finding from OWASP pattern scanning."""
+
+    title: Optional[str] = None
+    description: Optional[str] = None
+    file_path: Optional[str] = None
+    line: Optional[int] = None
+    file: Optional[str] = None
+
+
+class PRCodeReviewFindings(BaseModel):
+    """Aggregated findings from PR code review."""
+
+    smells: List[PRCodeReviewSmell] = []
+    security: List[PRCodeReviewSecurityFinding] = []
+    secrets: List[Any] = []
+
+
+class PRCodeReviewComplexityDelta(BaseModel):
+    """Cyclomatic complexity change for a function across a PR."""
+
+    file: str
+    function: str
+    ccDelta: int
+    locDelta: int
+
+
+class PRCodeReviewFormatted(BaseModel):
+    """GitHub-ready formatted review body and event."""
+
+    body: str
+    event: str  # 'APPROVE' | 'COMMENT' | 'REQUEST_CHANGES'
+
+
+class PRCodeReviewPR(BaseModel):
+    """PR metadata returned by PR code review."""
+
+    number: int
+    title: str
+    url: str
+    author: Optional[str] = None
+    additions: int
+    deletions: int
+    changedFiles: int
+
+
+class PRCodeReviewResult(BaseModel):
+    """AST-level PR code review — quality score, grade, smells, and security findings."""
+
+    pr: PRCodeReviewPR
+    qualityScore: int
+    grade: str  # 'A' | 'B' | 'C' | 'D' | 'F'
+    findings: PRCodeReviewFindings
+    structuralDiff: List[Any] = []
+    complexityDeltas: List[PRCodeReviewComplexityDelta] = []
+    analyzedFiles: int
+    skippedFiles: int
+    formatted: Optional[PRCodeReviewFormatted] = None

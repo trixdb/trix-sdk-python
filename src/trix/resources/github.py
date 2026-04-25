@@ -78,6 +78,7 @@ from .github_types import (
     BusFactorResult,
     ReviewNetworkResult,
     ReviewDepthResult,
+    PRCodeReviewResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -835,4 +836,22 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/review-depth",
             params={"days": days},
             response_model=ReviewDepthResult,
+        )
+
+    def review_pr_code(
+        self,
+        project_id: str,
+        pr_number: int,
+        *,
+        repo_full_name: Optional[str] = None,
+        format: bool = False,
+    ) -> PRCodeReviewResult:
+        """AST-level PR code review — quality score (0-100), grade (A-F), smells, security."""
+        body: Dict[str, Any] = {"prNumber": pr_number, "format": format}
+        if repo_full_name is not None:
+            body["repoFullName"] = repo_full_name
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/pr-review",
+            json=body,
+            response_model=PRCodeReviewResult,
         )
