@@ -1283,6 +1283,76 @@ class PRTaskAlignmentResult(BaseModel):
     lookback_days: int
 
 
+# ── DORA Metrics (ADR-152 Phase 4 extension) ──────────────────────────────────
+
+
+class DORADeployFreqWeek(BaseModel):
+    """One week of deployment frequency data."""
+
+    week: str
+    merges: int
+
+
+class DORALeadTimeWeek(BaseModel):
+    """One week of lead time data."""
+
+    week: str
+    avg_hours: Optional[int] = None
+
+
+class DORAcfrWeek(BaseModel):
+    """One week of change failure rate data."""
+
+    week: str
+    total: int
+    failures: int
+    pct: int
+
+
+class DORADeployFrequency(BaseModel):
+    per_day: float
+    per_week: float
+    total_merges: int
+    rating: str  # 'elite' | 'high' | 'medium' | 'low'
+
+
+class DORALeadTime(BaseModel):
+    median_hours: Optional[int] = None
+    avg_hours: Optional[int] = None
+    sample_size: int
+    rating: Optional[str] = None
+
+
+class DORAChangeFailureRate(BaseModel):
+    pct: int
+    failure_merges: int
+    total_merges: int
+    rating: str
+
+
+class DORAMttr(BaseModel):
+    median_hours: Optional[int] = None
+    sample_size: int
+    rating: Optional[str] = None
+
+
+class DORAWeeklyTrend(BaseModel):
+    deploy_freq: List[DORADeployFreqWeek] = []
+    lead_time: List[DORALeadTimeWeek] = []
+    change_failure_rate: List[DORAcfrWeek] = []
+
+
+class DORAResult(BaseModel):
+    """DORA engineering excellence metrics — deploy frequency, lead time, CFR, MTTR."""
+
+    deployment_frequency: DORADeployFrequency
+    lead_time: DORALeadTime
+    change_failure_rate: DORAChangeFailureRate
+    mttr: DORAMttr
+    weekly_trend: DORAWeeklyTrend
+    lookback_days: int
+
+
 # ── Test Gap (ADR-152 Phase 4) ─────────────────────────────────────────────
 
 

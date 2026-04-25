@@ -73,6 +73,7 @@ from .github_types import (
     AssigneeCycleTimeResult,
     PRTaskAlignmentResult,
     TestGapResult,
+    DORAResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -790,4 +791,12 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/test-gap",
             params={"days": days},
             response_model=TestGapResult,
+        )
+
+    def get_dora_metrics(self, project_id: str, days: int = 90) -> DORAResult:
+        """DORA engineering excellence metrics — deploy frequency, lead time, CFR, MTTR."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/dora-metrics",
+            params={"days": days},
+            response_model=DORAResult,
         )

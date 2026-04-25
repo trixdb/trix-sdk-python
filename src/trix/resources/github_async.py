@@ -74,6 +74,7 @@ from .github_types import (
     AssigneeCycleTimeResult,
     PRTaskAlignmentResult,
     TestGapResult,
+    DORAResult,
 )
 
 
@@ -802,4 +803,12 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/test-gap",
             params={"days": days},
             response_model=TestGapResult,
+        )
+
+    async def get_dora_metrics(self, project_id: str, days: int = 90) -> DORAResult:
+        """DORA engineering excellence metrics — deploy frequency, lead time, CFR, MTTR (async)."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/dora-metrics",
+            params={"days": days},
+            response_model=DORAResult,
         )
