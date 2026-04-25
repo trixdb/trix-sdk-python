@@ -46,6 +46,7 @@ from .github_types import (
     LoadBearingResult,
     BugDensityResult,
     ActiveBranchesResult,
+    ContributorQualityResult,
     PRQualityWeek,
 )
 
@@ -544,4 +545,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return ActiveBranchesResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/branches")
+        )
+
+    async def get_contributor_quality(self, project_id: str) -> ContributorQualityResult:
+        """Per-contributor PR quality stats — avg score, test coverage %, PR count (async)."""
+        validate_id(project_id, "project")
+        return ContributorQualityResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/contributor-quality")
         )

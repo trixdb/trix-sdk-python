@@ -662,3 +662,17 @@ class BranchInfo(BaseModel):
 class ActiveBranchesResult(BaseModel):
     branches: List[BranchInfo] = []
     count: int = 0
+
+
+class ContributorQualityStat(BaseModel):
+    author: str
+    pr_count: int = 0
+    avg_quality: Optional[float] = None
+    with_tests_count: int = 0
+    test_coverage_pct: int = 0
+    last_active_at: Optional[str] = None
+
+
+class ContributorQualityResult(BaseModel):
+    contributors: List[ContributorQualityStat] = []
+    count: int = 0

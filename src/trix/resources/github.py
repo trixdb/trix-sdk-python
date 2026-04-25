@@ -46,6 +46,7 @@ from .github_types import (
     LoadBearingResult,
     BugDensityResult,
     ActiveBranchesResult,
+    ContributorQualityResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -529,4 +530,11 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return ActiveBranchesResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/branches")
+        )
+
+    def get_contributor_quality(self, project_id: str) -> ContributorQualityResult:
+        """Per-contributor PR quality stats — avg score, test coverage %, PR count."""
+        validate_id(project_id, "project")
+        return ContributorQualityResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/contributor-quality")
         )
