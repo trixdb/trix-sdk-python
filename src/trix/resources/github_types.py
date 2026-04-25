@@ -1763,6 +1763,7 @@ CqlFromMode = Literal[
     "clones",
     "metrics",
     "coverage",
+    "tech_debt",
     "summary",
     "history",
 ]
