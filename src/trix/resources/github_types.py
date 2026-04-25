@@ -1769,6 +1769,7 @@ CqlFromMode = Literal[
     "history",
     "file_report",
     "worst_functions",
+    "trend",
 ]
 
 
