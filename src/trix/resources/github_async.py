@@ -71,6 +71,7 @@ from .github_types import (
     ContributorMomentumResult,
     AgentAuditResult,
     ScopeCreepResult,
+    AssigneeCycleTimeResult,
 )
 
 
@@ -768,4 +769,14 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/scope-creep",
             params={"days": days},
             response_model=ScopeCreepResult,
+        )
+
+    async def get_assignee_cycle_time(
+        self, project_id: str, days: int = 90
+    ) -> AssigneeCycleTimeResult:
+        """Get per-assignee issue cycle time with trend vs prior half-period."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/assignee-cycle-time",
+            params={"days": days},
+            response_model=AssigneeCycleTimeResult,
         )

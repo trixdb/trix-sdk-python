@@ -1175,3 +1175,20 @@ class ScopeCreepResult(BaseModel):
     top_prs: List["ScopeCreepPR"]
     by_author: List["ScopeCreepAuthor"]
     weekly_trend: List["ScopeCreepWeek"]
+
+
+class AssigneeStatItem(BaseModel):
+    """Per-assignee issue cycle time with trend."""
+    assignee: str
+    closed_count: int
+    avg_days: Optional[float] = None
+    prev_avg_days: Optional[float] = None
+    trend: str
+    pct_change: Optional[int] = None
+
+
+class AssigneeCycleTimeResult(BaseModel):
+    """Per-assignee issue cycle time comparison result."""
+    assignees: List["AssigneeStatItem"]
+    team_avg_days: Optional[float] = None
+    lookback_days: int

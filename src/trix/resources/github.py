@@ -70,6 +70,7 @@ from .github_types import (
     ContributorMomentumResult,
     AgentAuditResult,
     ScopeCreepResult,
+    AssigneeCycleTimeResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -753,4 +754,14 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/scope-creep",
             params={"days": days},
             response_model=ScopeCreepResult,
+        )
+
+    def get_assignee_cycle_time(
+        self, project_id: str, days: int = 90
+    ) -> AssigneeCycleTimeResult:
+        """Get per-assignee issue cycle time with trend vs prior half-period."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/assignee-cycle-time",
+            params={"days": days},
+            response_model=AssigneeCycleTimeResult,
         )
