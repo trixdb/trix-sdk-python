@@ -50,6 +50,7 @@ from .github_types import (
     PrAgingResult,
     PrSizeDistributionResult,
     ReviewTurnaroundResult,
+    WorkQueueResult,
     PRQualityWeek,
 )
 
@@ -576,4 +577,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return ReviewTurnaroundResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/review-turnaround")
+        )
+
+    async def get_work_queue(self, project_id: str) -> WorkQueueResult:
+        """Prioritized work queue — synthesizes all GitHub signals into action items (async)."""
+        validate_id(project_id, "project")
+        return WorkQueueResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/work-queue")
         )

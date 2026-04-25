@@ -50,6 +50,7 @@ from .github_types import (
     PrAgingResult,
     PrSizeDistributionResult,
     ReviewTurnaroundResult,
+    WorkQueueResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -561,4 +562,11 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return ReviewTurnaroundResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/review-turnaround")
+        )
+
+    def get_work_queue(self, project_id: str) -> WorkQueueResult:
+        """Prioritized work queue — synthesizes all GitHub signals into action items."""
+        validate_id(project_id, "project")
+        return WorkQueueResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/work-queue")
         )

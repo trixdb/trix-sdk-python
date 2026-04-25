@@ -726,3 +726,16 @@ class ReviewTurnaroundResult(BaseModel):
     total_reviewed: int = 0
     unreviewed_count: int = 0
     author_stats: List[ReviewAuthorStat] = []
+
+
+class WorkQueueItem(BaseModel):
+    type: str
+    priority: str
+    title: str
+    detail: str
+    url: Optional[str] = None
+
+
+class WorkQueueResult(BaseModel):
+    items: List[WorkQueueItem] = []
+    count: int = 0
