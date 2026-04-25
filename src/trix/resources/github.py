@@ -74,6 +74,7 @@ from .github_types import (
     PRTaskAlignmentResult,
     TestGapResult,
     DORAResult,
+    AIvsHumanResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -799,4 +800,12 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/dora-metrics",
             params={"days": days},
             response_model=DORAResult,
+        )
+
+    def get_ai_vs_human_quality(self, project_id: str, days: int = 90) -> AIvsHumanResult:
+        """Compare PR quality scores between AI-authored and human-authored PRs."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/ai-vs-human-quality",
+            params={"days": days},
+            response_model=AIvsHumanResult,
         )

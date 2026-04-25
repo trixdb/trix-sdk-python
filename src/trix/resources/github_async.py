@@ -75,6 +75,7 @@ from .github_types import (
     PRTaskAlignmentResult,
     TestGapResult,
     DORAResult,
+    AIvsHumanResult,
 )
 
 
@@ -811,4 +812,12 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/dora-metrics",
             params={"days": days},
             response_model=DORAResult,
+        )
+
+    async def get_ai_vs_human_quality(self, project_id: str, days: int = 90) -> AIvsHumanResult:
+        """Compare PR quality scores between AI-authored and human-authored PRs (async)."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/ai-vs-human-quality",
+            params={"days": days},
+            response_model=AIvsHumanResult,
         )

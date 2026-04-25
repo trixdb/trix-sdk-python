@@ -1404,3 +1404,57 @@ class TestGapResult(BaseModel):
     byAuthor: List[TestGapAuthor]
     weeklyTrend: List[TestGapWeek]
     lookbackDays: int
+
+
+# ── AI vs Human Code Quality (ADR-152 Phase 4 Extension) ──────────────────────
+
+
+class AIvsHumanByAgent(BaseModel):
+    """Per-AI-tool quality breakdown."""
+
+    agent: str
+    avgScore: float
+    prCount: int
+    topScore: float
+
+
+class AIvsHumanWeek(BaseModel):
+    """Weekly side-by-side AI vs human quality data point."""
+
+    week: str
+    aiAvg: Optional[float] = None
+    humanAvg: Optional[float] = None
+    aiCount: int = 0
+    humanCount: int = 0
+
+
+class AIvsHumanTopPR(BaseModel):
+    """Highest-quality AI-authored PR entry."""
+
+    prNumber: str
+    title: str
+    url: str
+    author: str
+    agent: str
+    qualityScore: float
+    createdAt: str
+
+
+class AIvsHumanSummary(BaseModel):
+    """Aggregate AI vs human quality comparison summary."""
+
+    aiAvgScore: Optional[float] = None
+    humanAvgScore: Optional[float] = None
+    scoreDelta: Optional[float] = None
+    aiPrCount: int = 0
+    humanPrCount: int = 0
+
+
+class AIvsHumanResult(BaseModel):
+    """AI vs human code quality comparison result."""
+
+    summary: AIvsHumanSummary
+    byAgent: List[AIvsHumanByAgent] = []
+    weeklyTrend: List[AIvsHumanWeek] = []
+    topAIPRs: List[AIvsHumanTopPR] = []
+    lookbackDays: int
