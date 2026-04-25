@@ -1458,3 +1458,47 @@ class AIvsHumanResult(BaseModel):
     weeklyTrend: List[AIvsHumanWeek] = []
     topAIPRs: List[AIvsHumanTopPR] = []
     lookbackDays: int
+
+
+# ── Bus Factor / Knowledge Concentration Risk (ADR-152) ───────────────────────
+
+
+class BusFactorAtRiskFile(BaseModel):
+    """A hotspot file in an at-risk repo with single-author dominance."""
+
+    filePath: str
+    repo: str
+    owner: str
+    ownerPct: float
+    totalCommits: int
+    uniqueAuthors: int
+    hotspotScore: float
+    loc: int
+
+
+class BusFactorContributor(BaseModel):
+    """A contributor who dominates one or more repos."""
+
+    contributor: str
+    dominatedRepos: List[str]
+    avgDominancePct: float
+    totalCommits: int
+
+
+class BusFactorSummary(BaseModel):
+    """Aggregate bus factor risk summary across all repos."""
+
+    totalRepos: int
+    atRiskRepos: int
+    singleAuthorRepos: int
+    avgAuthorsPerRepo: float
+    threshold: int
+
+
+class BusFactorResult(BaseModel):
+    """Bus factor knowledge concentration risk report."""
+
+    summary: BusFactorSummary
+    atRisk: List[BusFactorAtRiskFile] = []
+    byContributor: List[BusFactorContributor] = []
+    lookbackDays: int

@@ -75,6 +75,7 @@ from .github_types import (
     TestGapResult,
     DORAResult,
     AIvsHumanResult,
+    BusFactorResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -808,4 +809,12 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/ai-vs-human-quality",
             params={"days": days},
             response_model=AIvsHumanResult,
+        )
+
+    def get_bus_factor(self, project_id: str, days: int = 90) -> BusFactorResult:
+        """Identify knowledge concentration risk — repos and files dominated by a single contributor."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/bus-factor",
+            params={"days": days},
+            response_model=BusFactorResult,
         )
