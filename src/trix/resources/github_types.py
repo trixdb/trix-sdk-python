@@ -1925,3 +1925,142 @@ class CustomRuleTestResult(BaseModel):
     hits: List[CustomRuleTestHit] = []
 
     model_config = {"populate_by_name": True}
+
+
+# ── detect_conventions ────────────────────────────────────────────────────────
+
+class NamingStyle(BaseModel):
+    name: str
+    count: int
+    pct: int
+
+
+class FunctionSizeProfile(BaseModel):
+    median_loc: float = Field(alias="medianLoc", default=0)
+    p90_loc: float = Field(alias="p90Loc", default=0)
+    avg_loc: float = Field(alias="avgLoc", default=0)
+    total_functions: int = Field(alias="totalFunctions", default=0)
+
+    model_config = {"populate_by_name": True}
+
+
+class TestPatternProfile(BaseModel):
+    placement: str = "collocated"
+    directories: List[str] = []
+    suffix_patterns: List[str] = Field(alias="suffixPatterns", default=[])
+    test_file_count: int = Field(alias="testFileCount", default=0)
+
+    model_config = {"populate_by_name": True}
+
+
+class ComplexityProfile(BaseModel):
+    median_cc: float = Field(alias="medianCc", default=0)
+    p90_cc: float = Field(alias="p90Cc", default=0)
+    avg_cc: float = Field(alias="avgCc", default=0)
+
+    model_config = {"populate_by_name": True}
+
+
+class ConventionsResult(BaseModel):
+    languages: List[Dict[str, Any]] = []
+    naming: Dict[str, List[NamingStyle]] = {}
+    function_size: Optional[FunctionSizeProfile] = Field(alias="functionSize", default=None)
+    test_patterns: Optional[TestPatternProfile] = Field(alias="testPatterns", default=None)
+    complexity_profile: Optional[ComplexityProfile] = Field(alias="complexityProfile", default=None)
+    insights: List[str] = []
+    data_points: int = Field(alias="dataPoints", default=0)
+
+    model_config = {"populate_by_name": True}
+
+
+# ── generate_tests ────────────────────────────────────────────────────────────
+
+class GenerateTestsResult(BaseModel):
+    test_file_path: str = Field(alias="test_file_path", default="")
+    test_code: str = Field(alias="test_code", default="")
+    language: str = ""
+    framework: str = ""
+    function_count: int = Field(alias="function_count", default=0)
+    functions: List[str] = []
+
+    model_config = {"populate_by_name": True}
+
+
+# ── post_review_findings ──────────────────────────────────────────────────────
+
+class PostReviewFindingsResult(BaseModel):
+    review_url: Optional[str] = Field(alias="review_url", default=None)
+    review_id: Optional[int] = Field(alias="review_id", default=None)
+    event: str = "COMMENT"
+    inline_comments: int = Field(alias="inline_comments", default=0)
+    unmapped_findings: int = Field(alias="unmapped_findings", default=0)
+    dry_run: Optional[bool] = Field(alias="dryRun", default=None)
+
+    model_config = {"populate_by_name": True}
+
+
+# ── create_fix_pr ─────────────────────────────────────────────────────────────
+
+class CreateFixPRResult(BaseModel):
+    pr_url: str = Field(alias="pr_url", default="")
+    pr_number: int = Field(alias="pr_number", default=0)
+    branch: str = ""
+    files_patched: int = Field(alias="files_patched", default=0)
+    fixes_applied: int = Field(alias="fixes_applied", default=0)
+
+    model_config = {"populate_by_name": True}
+
+
+# ── review_dependency_changes ─────────────────────────────────────────────────
+
+class DependencyVulnerability(BaseModel):
+    package: str = ""
+    severity: str = "medium"
+    title: str = ""
+    description: str = ""
+    manifest: str = ""
+    cve_id: Optional[str] = Field(alias="cve_id", default=None)
+    cvss: Optional[float] = None
+    fix_available: bool = Field(alias="fix_available", default=False)
+    fix_version: Optional[str] = Field(alias="fix_version", default=None)
+    ecosystem: Optional[str] = None
+
+    model_config = {"populate_by_name": True}
+
+
+class ReviewDepsResult(BaseModel):
+    manifests_changed: List[Dict[str, Any]] = Field(alias="manifests_changed", default=[])
+    vulnerabilities: List[DependencyVulnerability] = []
+    risk_level: str = Field(alias="risk_level", default="none")
+    summary: str = ""
+
+    model_config = {"populate_by_name": True}
+
+
+# ── analyze_change_impact ─────────────────────────────────────────────────────
+
+class ChangeImpactFile(BaseModel):
+    file_path: str = Field(alias="file_path", default="")
+    status: str = ""
+    additions: int = 0
+    deletions: int = 0
+    risk: str = "low"
+    caller_count: int = Field(alias="caller_count", default=0)
+    hotspot_score: Optional[float] = Field(alias="hotspot_score", default=None)
+    complexity_level: Optional[str] = Field(alias="complexity_level", default=None)
+    cyclomatic_complexity: Optional[int] = Field(alias="cyclomatic_complexity", default=None)
+    semantic_diff: Optional[Dict[str, Any]] = Field(alias="semantic_diff", default=None)
+    review_focus: List[str] = Field(alias="review_focus", default=[])
+
+    model_config = {"populate_by_name": True}
+
+
+class ChangeImpactResult(BaseModel):
+    overall_risk: str = Field(alias="overall_risk", default="low")
+    files_analyzed: int = Field(alias="files_analyzed", default=0)
+    high_risk_files: int = Field(alias="high_risk_files", default=0)
+    files: List[ChangeImpactFile] = []
+    review_priority: List[str] = Field(alias="review_priority", default=[])
+    summary: str = ""
+
+    model_config = {"populate_by_name": True}

@@ -90,6 +90,12 @@ from .github_types import (
     BatchScanCodeResult,
     AnalyzeCodeComplexityResult,
     CqlQuery,
+    ConventionsResult,
+    GenerateTestsResult,
+    PostReviewFindingsResult,
+    CreateFixPRResult,
+    ReviewDepsResult,
+    ChangeImpactResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -1010,4 +1016,83 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/custom-rules/{rule_id}/test",
             json={},
             response_model=CustomRuleTestResult,
+        )
+
+    def detect_conventions(self, project_id: str) -> ConventionsResult:
+        """Detect project coding conventions from indexed symbol and metrics data."""
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/conventions",
+            json={},
+            response_model=ConventionsResult,
+        )
+
+    def generate_tests(
+        self,
+        project_id: str,
+        repo_full_name: str,
+        file_path: str,
+        ref: Optional[str] = None,
+        test_placement: Optional[str] = None,
+        framework: Optional[str] = None,
+    ) -> GenerateTestsResult:
+        """Generate LLM-powered tests for a file using tree-sitter function extraction."""
+        body: Dict[str, Any] = {"repo_full_name": repo_full_name, "file_path": file_path}
+        if ref is not None:
+            body["ref"] = ref
+        if test_placement is not None:
+            body["test_placement"] = test_placement
+        if framework is not None:
+            body["framework"] = framework
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/generate-tests",
+            json=body,
+            response_model=GenerateTestsResult,
+        )
+
+    def post_review_findings(
+        self,
+        project_id: str,
+        pr_number: int,
+        repo_full_name: str,
+        **kwargs: Any,
+    ) -> PostReviewFindingsResult:
+        """Post LLM findings as a real GitHub PR review with inline comments."""
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/post-findings",
+            json={"pr_number": pr_number, "repo_full_name": repo_full_name, **kwargs},
+            response_model=PostReviewFindingsResult,
+        )
+
+    def create_fix_pr(
+        self, project_id: str, repo_full_name: str, fixes: list, **kwargs: Any
+    ) -> CreateFixPRResult:
+        """Create a PR that auto-applies line-range fixes to repository files."""
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/fix-pr",
+            json={"repo_full_name": repo_full_name, "fixes": fixes, **kwargs},
+            response_model=CreateFixPRResult,
+        )
+
+    def review_dependency_changes(
+        self, project_id: str, pr_number: int, repo_full_name: str
+    ) -> ReviewDepsResult:
+        """Audit PR dependency changes for CVEs via npm advisory and OSV APIs."""
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/review-deps",
+            json={"pr_number": pr_number, "repo_full_name": repo_full_name},
+            response_model=ReviewDepsResult,
+        )
+
+    def analyze_change_impact(
+        self,
+        project_id: str,
+        pr_number: int,
+        repo_full_name: str,
+        max_files: int = 10,
+    ) -> ChangeImpactResult:
+        """Analyze blast radius of PR changes via semantic diff, hotspot scores, and caller counts."""
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/change-impact",
+            json={"pr_number": pr_number, "repo_full_name": repo_full_name, "max_files": max_files},
+            response_model=ChangeImpactResult,
         )
