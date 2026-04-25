@@ -710,3 +710,19 @@ class PRSizeBucket(BaseModel):
 class PrSizeDistributionResult(BaseModel):
     distribution: List[PRSizeBucket] = []
     total: int = 0
+
+
+class ReviewAuthorStat(BaseModel):
+    author: str
+    reviewed_count: int = 0
+    avg_hours: Optional[float] = None
+    within_24h_count: int = 0
+    within_24h_pct: int = 0
+
+
+class ReviewTurnaroundResult(BaseModel):
+    avg_hours: Optional[float] = None
+    reviewed_within_24h_pct: int = 0
+    total_reviewed: int = 0
+    unreviewed_count: int = 0
+    author_stats: List[ReviewAuthorStat] = []

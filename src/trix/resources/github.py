@@ -49,6 +49,7 @@ from .github_types import (
     ContributorQualityResult,
     PrAgingResult,
     PrSizeDistributionResult,
+    ReviewTurnaroundResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -553,4 +554,11 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return PrSizeDistributionResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/pr-size-distribution")
+        )
+
+    def get_review_turnaround(self, project_id: str) -> ReviewTurnaroundResult:
+        """Review turnaround time — avg hours from PR open to first review."""
+        validate_id(project_id, "project")
+        return ReviewTurnaroundResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/review-turnaround")
         )

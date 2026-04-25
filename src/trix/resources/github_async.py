@@ -49,6 +49,7 @@ from .github_types import (
     ContributorQualityResult,
     PrAgingResult,
     PrSizeDistributionResult,
+    ReviewTurnaroundResult,
     PRQualityWeek,
 )
 
@@ -568,4 +569,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return PrSizeDistributionResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/pr-size-distribution")
+        )
+
+    async def get_review_turnaround(self, project_id: str) -> ReviewTurnaroundResult:
+        """Review turnaround time — avg hours from PR open to first review (async)."""
+        validate_id(project_id, "project")
+        return ReviewTurnaroundResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/review-turnaround")
         )
