@@ -1770,6 +1770,8 @@ CqlFromMode = Literal[
     "file_report",
     "worst_functions",
     "trend",
+    "import_cycles",
+    "security_hotspots",
 ]
 
 
