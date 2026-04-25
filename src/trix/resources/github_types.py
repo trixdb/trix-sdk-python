@@ -1777,6 +1777,7 @@ CqlFromMode = Literal[
     "contributors",
     "test_quality",
     "dependencies",
+    "refactor_candidates",
 ]
 
 
