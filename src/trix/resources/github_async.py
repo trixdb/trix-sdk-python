@@ -64,6 +64,7 @@ from .github_types import (
     IssueTriageResult,
     IssueFlowResult,
     IssueCycleTimeResult,
+    IssueThroughputResult,
 )
 
 
@@ -691,4 +692,14 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/issue-cycle-time",
             params={"days": days},
             response_model=IssueCycleTimeResult,
+        )
+
+    async def get_issue_throughput(
+        self, project_id: str, weeks: int = 8
+    ) -> IssueThroughputResult:
+        """Get weekly closed issue throughput trend (delivery tracker)."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/issue-throughput",
+            params={"weeks": weeks},
+            response_model=IssueThroughputResult,
         )

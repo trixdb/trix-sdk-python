@@ -996,3 +996,18 @@ class IssueCycleTimeResult(BaseModel):
     """Issue cycle time by label — average/median days from open to close."""
     by_label: List["CycleTimeByLabel"]
     lookback_days: int
+
+
+class IssueThroughputWeek(BaseModel):
+    """One week of issue throughput data."""
+    week_start: str
+    closed_count: int
+    opened_count: int
+
+
+class IssueThroughputResult(BaseModel):
+    """Weekly issue throughput trend."""
+    weeks: List["IssueThroughputWeek"]
+    avg_closed_per_week: float
+    trend: str  # 'improving' | 'stable' | 'declining'
+    lookback_weeks: int
