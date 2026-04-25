@@ -799,3 +799,29 @@ class ApprovedPR(BaseModel):
 class ApprovedPRsResult(BaseModel):
     prs: List[ApprovedPR] = []
     count: int = 0
+
+
+class IssueLabelCount(BaseModel):
+    label: str
+    count: int = 0
+
+
+class BacklogIssue(BaseModel):
+    issue_number: Optional[int] = None
+    title: str = ""
+    author: Optional[str] = None
+    url: Optional[str] = None
+    assignees: List[str] = []
+    labels: List[str] = []
+    milestone: Optional[str] = None
+    age_days: int = 0
+
+
+class IssueBacklogResult(BaseModel):
+    total_open: int = 0
+    unassigned_count: int = 0
+    unlabeled_count: int = 0
+    oldest_age_days: int = 0
+    avg_age_days: int = 0
+    label_distribution: List[IssueLabelCount] = []
+    oldest_issues: List[BacklogIssue] = []

@@ -53,6 +53,7 @@ from .github_types import (
     WorkQueueResult,
     ReviewerWorkloadResult,
     ApprovedPRsResult,
+    IssueBacklogResult,
     PRQualityWeek,
 )
 
@@ -600,4 +601,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return ApprovedPRsResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/approved-prs")
+        )
+
+    async def get_issue_backlog(self, project_id: str) -> IssueBacklogResult:
+        """Issue backlog health — unassigned/unlabeled counts, label distribution, oldest issues (async)."""
+        validate_id(project_id, "project")
+        return IssueBacklogResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/issue-backlog")
         )
