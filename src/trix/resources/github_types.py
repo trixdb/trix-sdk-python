@@ -1772,6 +1772,11 @@ CqlFromMode = Literal[
     "trend",
     "import_cycles",
     "security_hotspots",
+    "action_plan",
+    "custom_rules",
+    "contributors",
+    "test_quality",
+    "dependencies",
 ]
 
 
@@ -1797,6 +1802,14 @@ class CqlQuery(BaseModel):
     pattern: Optional[str] = None
     patterns: Optional[List[str]] = None
     risk: Optional[Literal["high", "medium", "all"]] = None
+    mode: Optional[str] = None
+    """Sub-mode: for contributors: summary|files|silos; for custom_rules: rules|findings"""
+    days: Optional[int] = None
+    """Lookback days for contributors and history modes"""
+    min_complexity: Optional[int] = None
+    """Minimum cyclomatic complexity for test_quality mode"""
+    ecosystem: Optional[str] = None
+    """Ecosystem filter for dependencies: npm|pip|go|cargo|rubygems|maven"""
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to API-ready dict (maps from_ → from)."""
