@@ -640,12 +640,31 @@ class HealthSnapshotOpenPRs(BaseModel):
     avg_quality_score: Optional[int] = None
 
 
+class HealthSnapshotPRQualityTrend(BaseModel):
+    direction: Optional[str] = None  # 'improving' | 'stable' | 'declining' | None
+    current_avg: Optional[int] = None
+    week_delta: Optional[int] = None
+
+
+class HealthSnapshotReviewTurnaround(BaseModel):
+    avg_hours: Optional[int] = None
+    unreviewed_count: int = 0
+
+
+class HealthSnapshotUrgentItems(BaseModel):
+    critical: int = 0
+    urgent_total: int = 0
+
+
 class HealthSnapshotResponse(BaseModel):
     quality_gate: HealthSnapshotQualityGate
     suggestions: HealthSnapshotSuggestions
     velocity: HealthSnapshotVelocity
     open_prs: HealthSnapshotOpenPRs
     top_risks: List[HealthSnapshotRisk] = []
+    pr_quality_trend: Optional[HealthSnapshotPRQualityTrend] = None
+    review_turnaround: Optional[HealthSnapshotReviewTurnaround] = None
+    urgent_items: Optional[HealthSnapshotUrgentItems] = None
 
 
 class BranchInfo(BaseModel):
