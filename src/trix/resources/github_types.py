@@ -670,6 +670,7 @@ class ContributorQualityStat(BaseModel):
     avg_quality: Optional[float] = None
     with_tests_count: int = 0
     test_coverage_pct: int = 0
+    avg_merge_days: Optional[float] = None
     last_active_at: Optional[str] = None
 
 
