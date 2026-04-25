@@ -667,6 +667,12 @@ class HealthSnapshotReviewCoverage(BaseModel):
     lookback_days: int = 30
 
 
+class HealthSnapshotIssueFlow(BaseModel):
+    opened_last_7d: int = 0
+    closed_last_7d: int = 0
+    net_flow_7d: int = 0
+
+
 class HealthSnapshotResponse(BaseModel):
     quality_gate: HealthSnapshotQualityGate
     suggestions: HealthSnapshotSuggestions
@@ -678,6 +684,7 @@ class HealthSnapshotResponse(BaseModel):
     urgent_items: Optional[HealthSnapshotUrgentItems] = None
     issue_backlog: Optional[HealthSnapshotIssueBacklog] = None
     review_coverage: Optional[HealthSnapshotReviewCoverage] = None
+    issue_flow: Optional[HealthSnapshotIssueFlow] = None
 
 
 class BranchInfo(BaseModel):
