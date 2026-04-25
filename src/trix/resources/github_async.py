@@ -51,6 +51,7 @@ from .github_types import (
     PrSizeDistributionResult,
     ReviewTurnaroundResult,
     WorkQueueResult,
+    ReviewerWorkloadResult,
     PRQualityWeek,
 )
 
@@ -584,4 +585,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return WorkQueueResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/work-queue")
+        )
+
+    async def get_reviewer_workload(self, project_id: str) -> ReviewerWorkloadResult:
+        """Reviewer workload — pending review queue and historical speed per reviewer (async)."""
+        validate_id(project_id, "project")
+        return ReviewerWorkloadResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/reviewer-workload")
         )

@@ -762,3 +762,23 @@ class WorkQueueItem(BaseModel):
 class WorkQueueResult(BaseModel):
     items: List[WorkQueueItem] = []
     count: int = 0
+
+class ReviewerPendingPR(BaseModel):
+    pr_number: Optional[int] = None
+    title: Optional[str] = None
+    url: Optional[str] = None
+
+
+class ReviewerWorkloadStat(BaseModel):
+    reviewer: str
+    pending_count: int = 0
+    avg_pending_age_hours: Optional[int] = None
+    pending_prs: List[ReviewerPendingPR] = []
+    total_reviews: int = 0
+    approvals: int = 0
+    avg_response_hours: Optional[float] = None
+
+
+class ReviewerWorkloadResult(BaseModel):
+    reviewers: List[ReviewerWorkloadStat] = []
+    count: int = 0
