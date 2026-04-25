@@ -20,6 +20,7 @@ from .github_types import (
     GitHubConnection,
     GitHubConnectionsResponse,
     GoalProgressResponse,
+    GoalProgressHistoryResponse,
     ImprovementGenerateResponse,
     ImprovementsHistoryItem,
     ImprovementSummaryRow,
@@ -251,6 +252,12 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         response = await self._request("GET", f"/projects/{project_id}/github/goal-progress")
         return GoalProgressResponse.model_validate(response)
+
+    async def get_goal_progress_history(self, project_id: str, limit: int = 20) -> GoalProgressHistoryResponse:
+        """Get chronological feed of GitHub-driven goal progress events (async)."""
+        validate_id(project_id, "project")
+        response = await self._request("GET", f"/projects/{project_id}/github/goal-progress-history?limit={limit}")
+        return GoalProgressHistoryResponse.model_validate(response)
 
     async def update_connection(
         self,

@@ -214,6 +214,21 @@ class GoalProgressResponse(BaseModel):
     goals: List[LinkedGoal]
 
 
+class GoalProgressEvent(BaseModel):
+    id: str
+    goal_id: str
+    goal_title: str
+    goal_status: str
+    previous_progress: float
+    new_progress: float
+    note: Optional[str] = None
+    created_at: str
+
+
+class GoalProgressHistoryResponse(BaseModel):
+    history: List[GoalProgressEvent]
+
+
 class ReleaseReadinessSignals(BaseModel):
     open_prs: int
     blocking_tasks: int
