@@ -52,6 +52,7 @@ from .github_types import (
     ReviewTurnaroundResult,
     WorkQueueResult,
     ReviewerWorkloadResult,
+    ApprovedPRsResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -577,4 +578,11 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return ReviewerWorkloadResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/reviewer-workload")
+        )
+
+    def get_approved_prs(self, project_id: str) -> ApprovedPRsResult:
+        """Approved-but-not-merged PRs — open PRs with ≥1 approval, ready to ship."""
+        validate_id(project_id, "project")
+        return ApprovedPRsResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/approved-prs")
         )

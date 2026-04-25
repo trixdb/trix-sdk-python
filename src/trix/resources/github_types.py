@@ -782,3 +782,20 @@ class ReviewerWorkloadStat(BaseModel):
 class ReviewerWorkloadResult(BaseModel):
     reviewers: List[ReviewerWorkloadStat] = []
     count: int = 0
+
+
+class ApprovedPR(BaseModel):
+    pr_number: Optional[int] = None
+    title: Optional[str] = None
+    author: Optional[str] = None
+    url: Optional[str] = None
+    repo: Optional[str] = None
+    age_days: int = 0
+    approval_count: int = 0
+    approvers: List[str] = []
+    has_changes_requested: bool = False
+
+
+class ApprovedPRsResult(BaseModel):
+    prs: List[ApprovedPR] = []
+    count: int = 0
