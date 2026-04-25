@@ -705,10 +705,12 @@ class OpenPRAging(BaseModel):
     url: Optional[str] = None
     repo: Optional[str] = None
     head_branch: Optional[str] = None
+    requested_reviewers: List[str] = []
     opened_at: Optional[str] = None
     last_updated_at: Optional[str] = None
     age_days: int = 0
     is_stale: bool = False
+    has_review: bool = False
 
 
 class PrAgingResult(BaseModel):
