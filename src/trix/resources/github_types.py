@@ -1804,3 +1804,33 @@ class CqlQuery(BaseModel):
         if "from_" in d:
             d["from"] = d.pop("from_")
         return d
+
+
+class ActionItem(BaseModel):
+    """A single ranked code improvement action item."""
+
+    type: str  # security | performance | refactor | test_coverage | dependency | maintenance
+    priority: str  # critical | high | medium | low
+    title: str
+    detail: str
+    file_path: Optional[str] = None
+    line: Optional[int] = None
+    score: float
+    metadata: Dict[str, Any] = {}
+
+
+class ActionPlanBreakdown(BaseModel):
+    security: int = 0
+    performance: int = 0
+    refactor: int = 0
+    test_coverage: int = 0
+    dependency: int = 0
+    maintenance: int = 0
+
+
+class ActionPlanResult(BaseModel):
+    """Result from get_action_plan / get_action_plan_async."""
+
+    results: List[ActionItem] = []
+    count: int = 0
+    breakdown: ActionPlanBreakdown = ActionPlanBreakdown()

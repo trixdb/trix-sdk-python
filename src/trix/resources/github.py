@@ -81,6 +81,7 @@ from .github_types import (
     PRCodeReviewResult,
     SubmitPRReviewResult,
     QualityGateResult,
+    ActionPlanResult,
     BatchScanFileInput,
     BatchScanCodeResult,
     AnalyzeCodeComplexityResult,
@@ -956,4 +957,11 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/pr-quality-gate",
             json=body,
             response_model=QualityGateResult,
+        )
+
+    def get_action_plan(self, project_id: str) -> ActionPlanResult:
+        """Ranked code improvement action plan — SAST findings, worst functions, uncovered hotspots."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/action-plan",
+            response_model=ActionPlanResult,
         )
