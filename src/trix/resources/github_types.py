@@ -646,3 +646,19 @@ class HealthSnapshotResponse(BaseModel):
     velocity: HealthSnapshotVelocity
     open_prs: HealthSnapshotOpenPRs
     top_risks: List[HealthSnapshotRisk] = []
+
+
+class BranchInfo(BaseModel):
+    name: str
+    repo_full_name: Optional[str] = None
+    last_commit_at: Optional[str] = None
+    commit_count: int = 0
+    open_pr_number: Optional[int] = None
+    open_pr_url: Optional[str] = None
+    is_default: bool = False
+    is_stale: bool = False
+
+
+class ActiveBranchesResult(BaseModel):
+    branches: List[BranchInfo] = []
+    count: int = 0

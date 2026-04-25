@@ -45,6 +45,7 @@ from .github_types import (
     TestCoverageResult,
     LoadBearingResult,
     BugDensityResult,
+    ActiveBranchesResult,
     PRQualityWeek,
 )
 
@@ -537,3 +538,10 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         data = await self._request("GET", f"/projects/{project_id}/github/pr-quality-trend")
         return [PRQualityWeek.model_validate(w) for w in data]
+
+    async def get_active_branches(self, project_id: str) -> ActiveBranchesResult:
+        """Active branches derived from commit memories with staleness detection (>14 days) (async)."""
+        validate_id(project_id, "project")
+        return ActiveBranchesResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/branches")
+        )

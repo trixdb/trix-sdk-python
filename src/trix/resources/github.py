@@ -45,6 +45,7 @@ from .github_types import (
     TestCoverageResult,
     LoadBearingResult,
     BugDensityResult,
+    ActiveBranchesResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -522,3 +523,10 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         data = self._request("GET", f"/projects/{project_id}/github/pr-quality-trend")
         return [PRQualityWeek.model_validate(w) for w in data]
+
+    def get_active_branches(self, project_id: str) -> ActiveBranchesResult:
+        """Active branches derived from commit memories with staleness detection (>14 days)."""
+        validate_id(project_id, "project")
+        return ActiveBranchesResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/branches")
+        )
