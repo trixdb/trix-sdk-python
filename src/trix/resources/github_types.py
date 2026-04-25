@@ -857,6 +857,22 @@ class ReviewCoverageResult(BaseModel):
     by_author: List[AuthorReviewCoverage] = []
 
 
+# ── Label Velocity ──────────────────────────────────────────────────────────
+
+
+class LabelVelocity(BaseModel):
+    label: str
+    opened_count: int = 0
+    closed_count: int = 0
+    total_count: int = 0
+    net_flow: int = 0
+
+
+class LabelVelocityResult(BaseModel):
+    labels: List[LabelVelocity] = []
+    lookback_days: int = 30
+
+
 # ── Commit Leaders ──────────────────────────────────────────────────────────
 
 

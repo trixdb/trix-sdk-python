@@ -57,6 +57,7 @@ from .github_types import (
     ReviewCoverageResult,
     IssueAssigneesResult,
     CommitLeadersResult,
+    LabelVelocityResult,
     MilestonesResult,
     PRQualityWeek,
 )
@@ -619,6 +620,13 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return ReviewCoverageResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/review-coverage")
+        )
+
+    async def get_label_velocity(self, project_id: str, days: int = 30) -> LabelVelocityResult:
+        """Issue label velocity — opened vs closed per label, worst-accumulating first (async)."""
+        validate_id(project_id, "project")
+        return LabelVelocityResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/label-velocity?days={days}")
         )
 
     async def get_commit_leaders(self, project_id: str, days: int = 30) -> CommitLeadersResult:

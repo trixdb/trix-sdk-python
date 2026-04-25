@@ -57,6 +57,7 @@ from .github_types import (
     ReviewCoverageResult,
     IssueAssigneesResult,
     CommitLeadersResult,
+    LabelVelocityResult,
     MilestonesResult,
 )
 
@@ -604,6 +605,13 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return ReviewCoverageResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/review-coverage")
+        )
+
+    def get_label_velocity(self, project_id: str, days: int = 30) -> LabelVelocityResult:
+        """Issue label velocity — opened vs closed per label, worst-accumulating first."""
+        validate_id(project_id, "project")
+        return LabelVelocityResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/label-velocity?days={days}")
         )
 
     def get_commit_leaders(self, project_id: str, days: int = 30) -> CommitLeadersResult:
