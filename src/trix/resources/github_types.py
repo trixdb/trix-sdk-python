@@ -857,6 +857,22 @@ class ReviewCoverageResult(BaseModel):
     by_author: List[AuthorReviewCoverage] = []
 
 
+# ── Commit Leaders ──────────────────────────────────────────────────────────
+
+
+class CommitLeader(BaseModel):
+    author: str
+    commit_count: int = 0
+    active_days: int = 0
+    repos: int = 0
+
+
+class CommitLeadersResult(BaseModel):
+    leaders: List[CommitLeader] = []
+    total_commits: int = 0
+    lookback_days: int = 30
+
+
 # ── Issue Assignee Workload ─────────────────────────────────────────────────
 
 

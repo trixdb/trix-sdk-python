@@ -56,6 +56,7 @@ from .github_types import (
     IssueBacklogResult,
     ReviewCoverageResult,
     IssueAssigneesResult,
+    CommitLeadersResult,
     MilestonesResult,
 )
 
@@ -603,6 +604,13 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return ReviewCoverageResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/review-coverage")
+        )
+
+    def get_commit_leaders(self, project_id: str, days: int = 30) -> CommitLeadersResult:
+        """Commit leaders — top contributors by commit count over the last N days."""
+        validate_id(project_id, "project")
+        return CommitLeadersResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/commit-leaders?days={days}")
         )
 
     def get_issue_assignees(self, project_id: str) -> IssueAssigneesResult:

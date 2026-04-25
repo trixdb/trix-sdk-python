@@ -56,6 +56,7 @@ from .github_types import (
     IssueBacklogResult,
     ReviewCoverageResult,
     IssueAssigneesResult,
+    CommitLeadersResult,
     MilestonesResult,
     PRQualityWeek,
 )
@@ -618,6 +619,13 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return ReviewCoverageResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/review-coverage")
+        )
+
+    async def get_commit_leaders(self, project_id: str, days: int = 30) -> CommitLeadersResult:
+        """Commit leaders — top contributors by commit count over the last N days (async)."""
+        validate_id(project_id, "project")
+        return CommitLeadersResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/commit-leaders?days={days}")
         )
 
     async def get_issue_assignees(self, project_id: str) -> IssueAssigneesResult:
