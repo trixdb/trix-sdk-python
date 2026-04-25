@@ -61,6 +61,7 @@ from .github_types import (
     MilestonesResult,
     PRQualityWeek,
     WeekOverWeekResult,
+    IssueTriageResult,
 )
 
 
@@ -656,4 +657,15 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return WeekOverWeekResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/week-over-week")
+        )
+
+    async def get_issue_triage(self, project_id: str, days: int = 7) -> IssueTriageResult:
+        """Issue triage — recently-opened issues missing labels, assignee, or milestone (async).
+
+        Args:
+            days: Lookback window in days (default 7; options: 7, 14, 30)
+        """
+        validate_id(project_id, "project")
+        return IssueTriageResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/issue-triage?days={days}")
         )

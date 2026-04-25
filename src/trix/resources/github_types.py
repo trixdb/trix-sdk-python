@@ -937,3 +937,22 @@ class WeekOverWeekResult(BaseModel):
     prs: WeekStat
     issues: WeekStat
     commits: WeekStat
+
+
+# ── Issue Triage ───────────────────────────────────────────────────────────────
+
+
+class TriageIssue(BaseModel):
+    issue_number: str
+    title: str
+    url: Optional[str] = None
+    repo: Optional[str] = None
+    author: Optional[str] = None
+    age_hours: int = 0
+    missing: List[Literal["labels", "assignee", "milestone"]] = []
+
+
+class IssueTriageResult(BaseModel):
+    issues: List[TriageIssue] = []
+    count: int = 0
+    lookback_days: int = 7

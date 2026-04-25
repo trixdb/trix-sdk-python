@@ -60,6 +60,7 @@ from .github_types import (
     LabelVelocityResult,
     MilestonesResult,
     WeekOverWeekResult,
+    IssueTriageResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -641,4 +642,15 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return WeekOverWeekResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/week-over-week")
+        )
+
+    def get_issue_triage(self, project_id: str, days: int = 7) -> IssueTriageResult:
+        """Issue triage — recently-opened issues missing labels, assignee, or milestone.
+
+        Args:
+            days: Lookback window in days (default 7; options: 7, 14, 30)
+        """
+        validate_id(project_id, "project")
+        return IssueTriageResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/issue-triage?days={days}")
         )
