@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-
 # ── Connections ────────────────────────────────────────────────────────────
 
 
@@ -72,7 +71,7 @@ class FunctionComplexityMetric(BaseModel):
     cyclomatic: int
     cognitive: int
     caller_count: Optional[int] = None  # files that call this fn (load-bearing indicator)
-    clone_count: Optional[int] = None   # structurally identical functions found
+    clone_count: Optional[int] = None  # structurally identical functions found
     clone_hash: Optional[str] = None
     clone_partners: Optional[List[str]] = None
 
@@ -647,7 +646,6 @@ class BugDensityResult(BaseModel):
     count: int = 0
 
 
-
 # ── Health Snapshot ─────────────────────────────────────────────────────────
 
 
@@ -834,6 +832,7 @@ class WorkQueueItem(BaseModel):
 class WorkQueueResult(BaseModel):
     items: List[WorkQueueItem] = []
     count: int = 0
+
 
 class ReviewerPendingPR(BaseModel):
     pr_number: Optional[int] = None
@@ -1038,6 +1037,7 @@ class IssueFlowResult(BaseModel):
 
 class CycleTimeByLabel(BaseModel):
     """Cycle time stats for a single GitHub label."""
+
     label: str
     issue_count: int
     avg_days: float
@@ -1045,14 +1045,17 @@ class CycleTimeByLabel(BaseModel):
     min_days: float
     max_days: float
 
+
 class IssueCycleTimeResult(BaseModel):
     """Issue cycle time by label — average/median days from open to close."""
+
     by_label: List["CycleTimeByLabel"]
     lookback_days: int
 
 
 class IssueThroughputWeek(BaseModel):
     """One week of issue throughput data."""
+
     week_start: str
     closed_count: int
     opened_count: int
@@ -1060,6 +1063,7 @@ class IssueThroughputWeek(BaseModel):
 
 class IssueThroughputResult(BaseModel):
     """Weekly issue throughput trend."""
+
     weeks: List["IssueThroughputWeek"]
     avg_closed_per_week: float
     trend: str  # 'improving' | 'stable' | 'declining'
@@ -1071,6 +1075,7 @@ class IssueThroughputResult(BaseModel):
 
 class IssueResolver(BaseModel):
     """One entry in the issue resolver leaderboard."""
+
     login: str
     closed_count: int
     pct: float
@@ -1078,6 +1083,7 @@ class IssueResolver(BaseModel):
 
 class IssueResolversResult(BaseModel):
     """Issue resolver leaderboard — top contributors by closed issue count."""
+
     resolvers: List["IssueResolver"]
     total_closed: int
     lookback_days: int
@@ -1088,6 +1094,7 @@ class IssueResolversResult(BaseModel):
 
 class CycleTimeTrendWeek(BaseModel):
     """One week of cycle time data."""
+
     week_start: str
     avg_days: Optional[float] = None
     issue_count: int
@@ -1095,6 +1102,7 @@ class CycleTimeTrendWeek(BaseModel):
 
 class CycleTimeTrendResult(BaseModel):
     """Weekly average issue cycle time trend."""
+
     weeks: List["CycleTimeTrendWeek"]
     trend: str  # 'improving' | 'stable' | 'declining'
     overall_avg_days: Optional[float] = None
@@ -1103,6 +1111,7 @@ class CycleTimeTrendResult(BaseModel):
 
 class MergeTimeBucket(BaseModel):
     """Count of PRs in a merge-time bucket."""
+
     label: str
     key: str
     count: int
@@ -1110,6 +1119,7 @@ class MergeTimeBucket(BaseModel):
 
 class MergeTimeAuthor(BaseModel):
     """Per-author PR merge time stats."""
+
     author: str
     pr_count: int
     avg_hours: Optional[float] = None
@@ -1117,6 +1127,7 @@ class MergeTimeAuthor(BaseModel):
 
 class PrMergeTimeResult(BaseModel):
     """PR open→merge cycle time distribution."""
+
     p25: Optional[float] = None
     p50: Optional[float] = None
     p75: Optional[float] = None
@@ -1130,6 +1141,7 @@ class PrMergeTimeResult(BaseModel):
 
 class ContributorMomentum(BaseModel):
     """Per-contributor commit momentum vs prior period."""
+
     author: str
     recent_commits: int
     previous_commits: int
@@ -1139,12 +1151,14 @@ class ContributorMomentum(BaseModel):
 
 class ContributorMomentumResult(BaseModel):
     """Contributor commit momentum comparison."""
+
     contributors: List["ContributorMomentum"]
     period_days: int
 
 
 class AgentBreakdown(BaseModel):
     """Per-AI-assistant PR attribution count."""
+
     agent: str
     tag: str
     label: str
@@ -1154,6 +1168,7 @@ class AgentBreakdown(BaseModel):
 
 class AgentWeeklyTrend(BaseModel):
     """Weekly AI-attributed PR trend data point."""
+
     week: str
     total: int
     agent_count: int
@@ -1162,6 +1177,7 @@ class AgentWeeklyTrend(BaseModel):
 
 class AgentAuditResult(BaseModel):
     """AI coding assistant audit trail for a project."""
+
     total_prs: int
     agent_prs: int
     agent_pct: int
@@ -1172,6 +1188,7 @@ class AgentAuditResult(BaseModel):
 
 class ScopeCreepSummary(BaseModel):
     """Summary counts for scope creep detection."""
+
     total_prs: int
     scope_creep_count: int
     large_count: int
@@ -1181,6 +1198,7 @@ class ScopeCreepSummary(BaseModel):
 
 class ScopeCreepPR(BaseModel):
     """A PR that exceeded the scope creep threshold."""
+
     title: str
     author: str
     url: str
@@ -1194,6 +1212,7 @@ class ScopeCreepPR(BaseModel):
 
 class ScopeCreepAuthor(BaseModel):
     """Per-author scope creep statistics."""
+
     author: str
     total_prs: int
     scope_creep_count: int
@@ -1203,6 +1222,7 @@ class ScopeCreepAuthor(BaseModel):
 
 class ScopeCreepWeek(BaseModel):
     """Weekly scope creep trend data point."""
+
     week: str
     scope_creep_count: int
     large_count: int
@@ -1210,6 +1230,7 @@ class ScopeCreepWeek(BaseModel):
 
 class ScopeCreepResult(BaseModel):
     """Scope creep detection report for a project."""
+
     summary: ScopeCreepSummary
     lookback_days: int
     top_prs: List["ScopeCreepPR"]
@@ -1219,6 +1240,7 @@ class ScopeCreepResult(BaseModel):
 
 class AssigneeStatItem(BaseModel):
     """Per-assignee issue cycle time with trend."""
+
     assignee: str
     closed_count: int
     avg_days: Optional[float] = None
@@ -1229,6 +1251,7 @@ class AssigneeStatItem(BaseModel):
 
 class AssigneeCycleTimeResult(BaseModel):
     """Per-assignee issue cycle time comparison result."""
+
     assignees: List["AssigneeStatItem"]
     team_avg_days: Optional[float] = None
     lookback_days: int
@@ -1258,3 +1281,56 @@ class PRTaskAlignmentResult(BaseModel):
     drifted: List[AlignmentEntry]
     partial: List[AlignmentEntry]
     lookback_days: int
+
+
+# ── Test Gap (ADR-152 Phase 4) ─────────────────────────────────────────────
+
+
+class TestGapPR(BaseModel):
+    """A merged PR that had no associated test changes."""
+
+    prNumber: str
+    title: str
+    url: str
+    author: str
+    repo: str
+    agent: Optional[str] = None
+    createdAt: str
+
+
+class TestGapAuthor(BaseModel):
+    """Per-author test gap statistics."""
+
+    author: str
+    totalPRs: int
+    noTestsCount: int
+    hasTestsCount: int
+    noTestsPct: int
+
+
+class TestGapWeek(BaseModel):
+    """Weekly test gap trend data point."""
+
+    week: str
+    total: int
+    noTestsCount: int
+    noTestsPct: int
+
+
+class TestGapSummary(BaseModel):
+    """Aggregate test gap summary counts."""
+
+    totalBriefs: int
+    noTestsCount: int
+    hasTestsCount: int
+    noTestsPct: int
+
+
+class TestGapResult(BaseModel):
+    """Test coverage gap report — PRs merged without any test changes."""
+
+    summary: TestGapSummary
+    topGaps: List[TestGapPR]
+    byAuthor: List[TestGapAuthor]
+    weeklyTrend: List[TestGapWeek]
+    lookbackDays: int

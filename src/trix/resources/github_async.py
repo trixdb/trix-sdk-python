@@ -73,6 +73,7 @@ from .github_types import (
     ScopeCreepResult,
     AssigneeCycleTimeResult,
     PRTaskAlignmentResult,
+    TestGapResult,
 )
 
 
@@ -100,7 +101,11 @@ class AsyncGitHubResource(BaseAsyncResource):
     ) -> LinkRepoResponse:
         """Link a GitHub repo to a project (async)."""
         validate_id(project_id, "project")
-        data = {"connection_id": connection_id, "repo_id": repo_id, "repo_full_name": repo_full_name}
+        data = {
+            "connection_id": connection_id,
+            "repo_id": repo_id,
+            "repo_full_name": repo_full_name,
+        }
         response = await self._request("POST", f"/projects/{project_id}/github", json=data)
         return LinkRepoResponse.model_validate(response)
 
@@ -132,9 +137,7 @@ class AsyncGitHubResource(BaseAsyncResource):
         params: Dict[str, Any] = {"limit": limit}
         if repo is not None:
             params["repo"] = repo
-        response = await self._request(
-            "GET", f"/projects/{project_id}/github/churn", params=params
-        )
+        response = await self._request("GET", f"/projects/{project_id}/github/churn", params=params)
         return ChurnFilesResponse.model_validate(response)
 
     async def get_file_complexity(
@@ -280,10 +283,14 @@ class AsyncGitHubResource(BaseAsyncResource):
         response = await self._request("GET", f"/projects/{project_id}/github/goal-progress")
         return GoalProgressResponse.model_validate(response)
 
-    async def get_goal_progress_history(self, project_id: str, limit: int = 20) -> GoalProgressHistoryResponse:
+    async def get_goal_progress_history(
+        self, project_id: str, limit: int = 20
+    ) -> GoalProgressHistoryResponse:
         """Get chronological feed of GitHub-driven goal progress events (async)."""
         validate_id(project_id, "project")
-        response = await self._request("GET", f"/projects/{project_id}/github/goal-progress-history?limit={limit}")
+        response = await self._request(
+            "GET", f"/projects/{project_id}/github/goal-progress-history?limit={limit}"
+        )
         return GoalProgressHistoryResponse.model_validate(response)
 
     async def update_connection(
@@ -410,25 +417,19 @@ class AsyncGitHubResource(BaseAsyncResource):
     async def get_improvements_summary(self, project_id: str) -> List[ImprovementSummaryRow]:
         """Get priority/category summary counts for open suggestions (async)."""
         validate_id(project_id, "project")
-        response = await self._request(
-            "GET", f"/projects/{project_id}/github/improvements/summary"
-        )
+        response = await self._request("GET", f"/projects/{project_id}/github/improvements/summary")
         return [ImprovementSummaryRow.model_validate(r) for r in response.get("summary", [])]
 
     async def get_improvements_history(self, project_id: str) -> List[ImprovementsHistoryItem]:
         """Get historical code quality metric snapshots (async)."""
         validate_id(project_id, "project")
-        response = await self._request(
-            "GET", f"/projects/{project_id}/github/improvements/history"
-        )
+        response = await self._request("GET", f"/projects/{project_id}/github/improvements/history")
         return [ImprovementsHistoryItem.model_validate(r) for r in response.get("history", [])]
 
     async def get_repo_stats(self, project_id: str) -> RepoStatsResponse:
         """Fetch live repo stats: stars, languages, contributors, LOC, README preview (async)."""
         validate_id(project_id, "project")
-        response = await self._request(
-            "GET", f"/projects/{project_id}/github/improvements/stats"
-        )
+        response = await self._request("GET", f"/projects/{project_id}/github/improvements/stats")
         return RepoStatsResponse.model_validate(response)
 
     async def get_review_stats(self, project_id: str) -> ReviewStats:
@@ -441,7 +442,10 @@ class AsyncGitHubResource(BaseAsyncResource):
         """Get daily commit/PR/issue counts for the last 52 weeks (heatmap data) (async)."""
         validate_id(project_id, "project")
         response = await self._request("GET", f"/projects/{project_id}/github/activity/weekly")
-        return [WeeklyActivityDay.model_validate(d) for d in (response if isinstance(response, list) else [])]
+        return [
+            WeeklyActivityDay.model_validate(d)
+            for d in (response if isinstance(response, list) else [])
+        ]
 
     async def get_code_debt(self, project_id: str) -> TechnicalDebt:
         """Get technical debt aggregated by category (minutes + hours) (async)."""
@@ -452,7 +456,9 @@ class AsyncGitHubResource(BaseAsyncResource):
     async def get_quality_gate(self, project_id: str) -> QualityGate:
         """Evaluate quality gate — returns pass/fail with per-check detail (async)."""
         validate_id(project_id, "project")
-        response = await self._request("GET", f"/projects/{project_id}/github/improvements/quality-gate")
+        response = await self._request(
+            "GET", f"/projects/{project_id}/github/improvements/quality-gate"
+        )
         return QualityGate.model_validate(response)
 
     async def query_code(self, project_id: str, query: Dict[str, Any]) -> Dict[str, Any]:
@@ -474,7 +480,12 @@ class AsyncGitHubResource(BaseAsyncResource):
         response = await self._request(
             "POST",
             f"/projects/{project_id}/github/review-pr",
-            json={"connection_id": connection_id, "pr_number": pr_number, "event": event, "dry_run": dry_run},
+            json={
+                "connection_id": connection_id,
+                "pr_number": pr_number,
+                "event": event,
+                "dry_run": dry_run,
+            },
         )
         return PRReviewResult.model_validate(response)
 
@@ -495,7 +506,15 @@ class AsyncGitHubResource(BaseAsyncResource):
         response = await self._request(
             "POST",
             f"/projects/{project_id}/github/create-pr",
-            json={"connection_id": connection_id, "branch_name": branch_name, "base_branch": base_branch, "commit_message": commit_message, "pr_title": pr_title, "pr_body": pr_body, "changes": changes},
+            json={
+                "connection_id": connection_id,
+                "branch_name": branch_name,
+                "base_branch": base_branch,
+                "commit_message": commit_message,
+                "pr_title": pr_title,
+                "pr_body": pr_body,
+                "changes": changes,
+            },
         )
         return AgentPRResult.model_validate(response)
 
@@ -662,6 +681,7 @@ class AsyncGitHubResource(BaseAsyncResource):
         return MilestonesResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/milestones")
         )
+
     async def get_week_over_week(self, project_id: str) -> WeekOverWeekResult:
         """Week-over-week velocity comparison — PRs merged, issues closed, and commits
         in the current 7-day window vs the previous 7-day window (async)."""
@@ -692,9 +712,7 @@ class AsyncGitHubResource(BaseAsyncResource):
             await self._request("GET", f"/projects/{project_id}/github/issue-flow?days={days}")
         )
 
-    async def get_issue_cycle_time(
-        self, project_id: str, days: int = 90
-    ) -> IssueCycleTimeResult:
+    async def get_issue_cycle_time(self, project_id: str, days: int = 90) -> IssueCycleTimeResult:
         """Get issue cycle time by label (avg/median days open to close)."""
         return await self._client.get(
             f"/v1/projects/{project_id}/github/issue-cycle-time",
@@ -702,9 +720,7 @@ class AsyncGitHubResource(BaseAsyncResource):
             response_model=IssueCycleTimeResult,
         )
 
-    async def get_issue_throughput(
-        self, project_id: str, weeks: int = 8
-    ) -> IssueThroughputResult:
+    async def get_issue_throughput(self, project_id: str, weeks: int = 8) -> IssueThroughputResult:
         """Get weekly closed issue throughput trend (delivery tracker)."""
         return await self._client.get(
             f"/v1/projects/{project_id}/github/issue-throughput",
@@ -712,9 +728,7 @@ class AsyncGitHubResource(BaseAsyncResource):
             response_model=IssueThroughputResult,
         )
 
-    async def get_issue_resolvers(
-        self, project_id: str, days: int = 30
-    ) -> IssueResolversResult:
+    async def get_issue_resolvers(self, project_id: str, days: int = 30) -> IssueResolversResult:
         """Get issue resolver leaderboard — top contributors by closed issue count."""
         return await self._client.get(
             f"/v1/projects/{project_id}/github/issue-resolvers",
@@ -722,9 +736,7 @@ class AsyncGitHubResource(BaseAsyncResource):
             response_model=IssueResolversResult,
         )
 
-    async def get_cycle_time_trend(
-        self, project_id: str, weeks: int = 8
-    ) -> CycleTimeTrendResult:
+    async def get_cycle_time_trend(self, project_id: str, weeks: int = 8) -> CycleTimeTrendResult:
         """Get weekly average issue cycle time trend — are we getting faster or slower?"""
         return await self._client.get(
             f"/v1/projects/{project_id}/github/cycle-time-trend",
@@ -732,9 +744,7 @@ class AsyncGitHubResource(BaseAsyncResource):
             response_model=CycleTimeTrendResult,
         )
 
-    async def get_pr_merge_time(
-        self, project_id: str, days: int = 90
-    ) -> PrMergeTimeResult:
+    async def get_pr_merge_time(self, project_id: str, days: int = 90) -> PrMergeTimeResult:
         """Get PR open→merge time distribution: p25/p50/p75/p95, buckets, per-author avg."""
         return await self._client.get(
             f"/v1/projects/{project_id}/github/pr-merge-time",
@@ -752,9 +762,7 @@ class AsyncGitHubResource(BaseAsyncResource):
             response_model=ContributorMomentumResult,
         )
 
-    async def get_agent_audit_trail(
-        self, project_id: str, days: int = 90
-    ) -> AgentAuditResult:
+    async def get_agent_audit_trail(self, project_id: str, days: int = 90) -> AgentAuditResult:
         """Get AI coding assistant attribution audit trail for a project."""
         return await self._client.get(
             f"/v1/projects/{project_id}/github/agent-audit",
@@ -762,9 +770,7 @@ class AsyncGitHubResource(BaseAsyncResource):
             response_model=AgentAuditResult,
         )
 
-    async def get_scope_creep(
-        self, project_id: str, days: int = 90
-    ) -> ScopeCreepResult:
+    async def get_scope_creep(self, project_id: str, days: int = 90) -> ScopeCreepResult:
         """Get scope creep detection report — PRs that changed >20 or >50 files."""
         return await self._client.get(
             f"/v1/projects/{project_id}/github/scope-creep",
@@ -782,12 +788,18 @@ class AsyncGitHubResource(BaseAsyncResource):
             response_model=AssigneeCycleTimeResult,
         )
 
-    async def get_pr_task_alignment(
-        self, project_id: str, days: int = 90
-    ) -> PRTaskAlignmentResult:
+    async def get_pr_task_alignment(self, project_id: str, days: int = 90) -> PRTaskAlignmentResult:
         """Detect semantic drift between PRs and their linked issues."""
         return await self._client.get(
             f"/v1/projects/{project_id}/github/pr-task-alignment",
             params={"days": days},
             response_model=PRTaskAlignmentResult,
+        )
+
+    async def get_test_gap(self, project_id: str, days: int = 90) -> TestGapResult:
+        """Test coverage gap — merged PRs without test changes, by author and week (async)."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/test-gap",
+            params={"days": days},
+            response_model=TestGapResult,
         )

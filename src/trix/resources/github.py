@@ -72,11 +72,11 @@ from .github_types import (
     ScopeCreepResult,
     AssigneeCycleTimeResult,
     PRTaskAlignmentResult,
+    TestGapResult,
 )
 
 # Re-export all types so existing imports from this module still work
 from .github_types import *  # noqa: F401,F403
-
 
 # ── Sync resource ──────────────────────────────────────────────────────────
 
@@ -105,7 +105,11 @@ class GitHubResource(BaseSyncResource):
     ) -> LinkRepoResponse:
         """Link a GitHub repo to a project."""
         validate_id(project_id, "project")
-        data = {"connection_id": connection_id, "repo_id": repo_id, "repo_full_name": repo_full_name}
+        data = {
+            "connection_id": connection_id,
+            "repo_id": repo_id,
+            "repo_full_name": repo_full_name,
+        }
         response = self._request("POST", f"/projects/{project_id}/github", json=data)
         return LinkRepoResponse.model_validate(response)
 
@@ -254,9 +258,7 @@ class GitHubResource(BaseSyncResource):
             params["max_quality_score"] = max_quality_score
         if agent is not None:
             params["agent"] = agent
-        response = self._request(
-            "GET", f"/projects/{project_id}/github/pr-briefs", params=params
-        )
+        response = self._request("GET", f"/projects/{project_id}/github/pr-briefs", params=params)
         return PRBriefsResponse.model_validate(response)
 
     def get_cycle_time(self, project_id: str) -> CycleTimeResponse:
@@ -277,10 +279,14 @@ class GitHubResource(BaseSyncResource):
         response = self._request("GET", f"/projects/{project_id}/github/goal-progress")
         return GoalProgressResponse.model_validate(response)
 
-    def get_goal_progress_history(self, project_id: str, limit: int = 20) -> GoalProgressHistoryResponse:
+    def get_goal_progress_history(
+        self, project_id: str, limit: int = 20
+    ) -> GoalProgressHistoryResponse:
         """Get chronological feed of GitHub-driven goal progress events."""
         validate_id(project_id, "project")
-        response = self._request("GET", f"/projects/{project_id}/github/goal-progress-history?limit={limit}")
+        response = self._request(
+            "GET", f"/projects/{project_id}/github/goal-progress-history?limit={limit}"
+        )
         return GoalProgressHistoryResponse.model_validate(response)
 
     def update_connection(
@@ -304,7 +310,9 @@ class GitHubResource(BaseSyncResource):
             data["sync_pull_requests"] = sync_pull_requests
         if sync_issues is not None:
             data["sync_issues"] = sync_issues
-        response = self._request("PATCH", f"/projects/{project_id}/github/{connection_id}", json=data)
+        response = self._request(
+            "PATCH", f"/projects/{project_id}/github/{connection_id}", json=data
+        )
         return GitHubConnection.model_validate(response)
 
     def generate_narrative(
@@ -376,9 +384,7 @@ class GitHubResource(BaseSyncResource):
         )
         return CodeImprovementsResponse.model_validate(response)
 
-    def create_issue_from_suggestion(
-        self, project_id: str, suggestion_id: str
-    ) -> Dict[str, Any]:
+    def create_issue_from_suggestion(self, project_id: str, suggestion_id: str) -> Dict[str, Any]:
         """Push a code quality finding to GitHub Issues and mark it in_progress."""
         validate_id(project_id, "project")
         validate_id(suggestion_id, "suggestion")
@@ -428,7 +434,10 @@ class GitHubResource(BaseSyncResource):
         """Get daily commit/PR/issue counts for the last 52 weeks (heatmap data)."""
         validate_id(project_id, "project")
         response = self._request("GET", f"/projects/{project_id}/github/activity/weekly")
-        return [WeeklyActivityDay.model_validate(d) for d in (response if isinstance(response, list) else [])]
+        return [
+            WeeklyActivityDay.model_validate(d)
+            for d in (response if isinstance(response, list) else [])
+        ]
 
     def get_code_debt(self, project_id: str) -> TechnicalDebt:
         """Get technical debt aggregated by category (minutes + hours)."""
@@ -461,7 +470,12 @@ class GitHubResource(BaseSyncResource):
         response = self._request(
             "POST",
             f"/projects/{project_id}/github/review-pr",
-            json={"connection_id": connection_id, "pr_number": pr_number, "event": event, "dry_run": dry_run},
+            json={
+                "connection_id": connection_id,
+                "pr_number": pr_number,
+                "event": event,
+                "dry_run": dry_run,
+            },
         )
         return PRReviewResult.model_validate(response)
 
@@ -482,7 +496,15 @@ class GitHubResource(BaseSyncResource):
         response = self._request(
             "POST",
             f"/projects/{project_id}/github/create-pr",
-            json={"connection_id": connection_id, "branch_name": branch_name, "base_branch": base_branch, "commit_message": commit_message, "pr_title": pr_title, "pr_body": pr_body, "changes": changes},
+            json={
+                "connection_id": connection_id,
+                "branch_name": branch_name,
+                "base_branch": base_branch,
+                "commit_message": commit_message,
+                "pr_title": pr_title,
+                "pr_body": pr_body,
+                "changes": changes,
+            },
         )
         return AgentPRResult.model_validate(response)
 
@@ -530,7 +552,9 @@ class GitHubResource(BaseSyncResource):
         """Functions called by many files — high blast-radius, risky to change."""
         validate_id(project_id, "project")
         return LoadBearingResult.model_validate(
-            self._request("GET", f"/projects/{project_id}/github/load-bearing?min_callers={min_callers}")
+            self._request(
+                "GET", f"/projects/{project_id}/github/load-bearing?min_callers={min_callers}"
+            )
         )
 
     def get_bug_density(self, project_id: str) -> BugDensityResult:
@@ -647,6 +671,7 @@ class GitHubResource(BaseSyncResource):
         return MilestonesResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/milestones")
         )
+
     def get_week_over_week(self, project_id: str) -> WeekOverWeekResult:
         """Week-over-week velocity comparison — PRs merged, issues closed, and commits
         in the current 7-day window vs the previous 7-day window."""
@@ -677,9 +702,7 @@ class GitHubResource(BaseSyncResource):
             self._request("GET", f"/projects/{project_id}/github/issue-flow?days={days}")
         )
 
-    def get_issue_cycle_time(
-        self, project_id: str, days: int = 90
-    ) -> IssueCycleTimeResult:
+    def get_issue_cycle_time(self, project_id: str, days: int = 90) -> IssueCycleTimeResult:
         """Get issue cycle time by label (avg/median days open to close)."""
         return self._client.get(
             f"/v1/projects/{project_id}/github/issue-cycle-time",
@@ -687,9 +710,7 @@ class GitHubResource(BaseSyncResource):
             response_model=IssueCycleTimeResult,
         )
 
-    def get_issue_throughput(
-        self, project_id: str, weeks: int = 8
-    ) -> IssueThroughputResult:
+    def get_issue_throughput(self, project_id: str, weeks: int = 8) -> IssueThroughputResult:
         """Get weekly closed issue throughput trend (delivery tracker)."""
         return self._client.get(
             f"/v1/projects/{project_id}/github/issue-throughput",
@@ -697,9 +718,7 @@ class GitHubResource(BaseSyncResource):
             response_model=IssueThroughputResult,
         )
 
-    def get_issue_resolvers(
-        self, project_id: str, days: int = 30
-    ) -> IssueResolversResult:
+    def get_issue_resolvers(self, project_id: str, days: int = 30) -> IssueResolversResult:
         """Get issue resolver leaderboard — top contributors by closed issue count."""
         return self._client.get(
             f"/v1/projects/{project_id}/github/issue-resolvers",
@@ -707,9 +726,7 @@ class GitHubResource(BaseSyncResource):
             response_model=IssueResolversResult,
         )
 
-    def get_cycle_time_trend(
-        self, project_id: str, weeks: int = 8
-    ) -> CycleTimeTrendResult:
+    def get_cycle_time_trend(self, project_id: str, weeks: int = 8) -> CycleTimeTrendResult:
         """Get weekly average issue cycle time trend — are we getting faster or slower?"""
         return self._client.get(
             f"/v1/projects/{project_id}/github/cycle-time-trend",
@@ -717,9 +734,7 @@ class GitHubResource(BaseSyncResource):
             response_model=CycleTimeTrendResult,
         )
 
-    def get_pr_merge_time(
-        self, project_id: str, days: int = 90
-    ) -> PrMergeTimeResult:
+    def get_pr_merge_time(self, project_id: str, days: int = 90) -> PrMergeTimeResult:
         """Get PR open→merge time distribution: p25/p50/p75/p95, buckets, per-author avg."""
         return self._client.get(
             f"/v1/projects/{project_id}/github/pr-merge-time",
@@ -737,9 +752,7 @@ class GitHubResource(BaseSyncResource):
             response_model=ContributorMomentumResult,
         )
 
-    def get_agent_audit_trail(
-        self, project_id: str, days: int = 90
-    ) -> AgentAuditResult:
+    def get_agent_audit_trail(self, project_id: str, days: int = 90) -> AgentAuditResult:
         """Get AI coding assistant attribution audit trail for a project."""
         return self._client.get(
             f"/v1/projects/{project_id}/github/agent-audit",
@@ -747,9 +760,7 @@ class GitHubResource(BaseSyncResource):
             response_model=AgentAuditResult,
         )
 
-    def get_scope_creep(
-        self, project_id: str, days: int = 90
-    ) -> ScopeCreepResult:
+    def get_scope_creep(self, project_id: str, days: int = 90) -> ScopeCreepResult:
         """Get scope creep detection report — PRs that changed >20 or >50 files."""
         return self._client.get(
             f"/v1/projects/{project_id}/github/scope-creep",
@@ -757,9 +768,7 @@ class GitHubResource(BaseSyncResource):
             response_model=ScopeCreepResult,
         )
 
-    def get_assignee_cycle_time(
-        self, project_id: str, days: int = 90
-    ) -> AssigneeCycleTimeResult:
+    def get_assignee_cycle_time(self, project_id: str, days: int = 90) -> AssigneeCycleTimeResult:
         """Get per-assignee issue cycle time with trend vs prior half-period."""
         return self._client.get(
             f"/v1/projects/{project_id}/github/assignee-cycle-time",
@@ -767,12 +776,18 @@ class GitHubResource(BaseSyncResource):
             response_model=AssigneeCycleTimeResult,
         )
 
-    def get_pr_task_alignment(
-        self, project_id: str, days: int = 90
-    ) -> PRTaskAlignmentResult:
+    def get_pr_task_alignment(self, project_id: str, days: int = 90) -> PRTaskAlignmentResult:
         """Detect semantic drift between PRs and their linked issues."""
         return self._client.get(
             f"/v1/projects/{project_id}/github/pr-task-alignment",
             params={"days": days},
             response_model=PRTaskAlignmentResult,
+        )
+
+    def get_test_gap(self, project_id: str, days: int = 90) -> TestGapResult:
+        """Test coverage gap — merged PRs without test changes, by author and week."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/test-gap",
+            params={"days": days},
+            response_model=TestGapResult,
         )
