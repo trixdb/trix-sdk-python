@@ -1724,9 +1724,20 @@ class CodeSmellItem(BaseModel):
 class CodeComplexitySummary(BaseModel):
     functionCount: int = 0
     smellCount: int = 0
+    designIssues: int = 0
     critical: int = 0
     high: int = 0
     avgCyclomatic: Optional[str] = None
+
+
+class DesignFinding(BaseModel):
+    category: str = ""
+    priority: str = "medium"
+    title: str = ""
+    description: str = ""
+    file_path: str = ""
+    evidence: Dict[str, Any] = {}
+    generated_by: str = "rule"
 
 
 class AnalyzeCodeComplexityResult(BaseModel):
@@ -1735,6 +1746,7 @@ class AnalyzeCodeComplexityResult(BaseModel):
     metrics: CodeComplexityMetrics = CodeComplexityMetrics()
     functions: List[Dict[str, Any]] = []
     smells: List[CodeSmellItem] = []
+    design: List[DesignFinding] = []
     summary: CodeComplexitySummary = CodeComplexitySummary()
 
 
