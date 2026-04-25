@@ -505,3 +505,13 @@ class GitHubResource(BaseSyncResource):
         return BugDensityResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/bug-density")
         )
+
+    def get_pr_quality_trend(self, project_id: str) -> List[PRQualityWeek]:
+        """Weekly PR quality score trend (12-week rolling window).
+
+        Returns one data point per week that had at least one reviewed PR.
+        Use this to track whether code quality is improving or declining over time.
+        """
+        validate_id(project_id, "project")
+        data = self._request("GET", f"/projects/{project_id}/github/pr-quality-trend")
+        return [PRQualityWeek.model_validate(w) for w in data]

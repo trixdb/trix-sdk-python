@@ -401,6 +401,17 @@ class QualityGate(BaseModel):
     score: int = 0
 
 
+class PRQualityWeek(BaseModel):
+    """One data point in the 12-week PR quality score trend."""
+
+    week_start: str
+    """ISO date (YYYY-MM-DD) for the Monday of this week."""
+    avg_quality: int
+    """Average PR quality score (0-100) across reviewed PRs that week."""
+    pr_count: int
+    """Number of PRs with a quality score that week."""
+
+
 class AgentPRResult(BaseModel):
     pr_number: int
     pr_url: str
