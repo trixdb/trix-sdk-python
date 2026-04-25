@@ -71,6 +71,7 @@ from .github_types import (
     AgentAuditResult,
     ScopeCreepResult,
     AssigneeCycleTimeResult,
+    PRTaskAlignmentResult,
 )
 
 # Re-export all types so existing imports from this module still work
@@ -764,4 +765,14 @@ class GitHubResource(BaseSyncResource):
             f"/v1/projects/{project_id}/github/assignee-cycle-time",
             params={"days": days},
             response_model=AssigneeCycleTimeResult,
+        )
+
+    def get_pr_task_alignment(
+        self, project_id: str, days: int = 90
+    ) -> PRTaskAlignmentResult:
+        """Detect semantic drift between PRs and their linked issues."""
+        return self._client.get(
+            f"/v1/projects/{project_id}/github/pr-task-alignment",
+            params={"days": days},
+            response_model=PRTaskAlignmentResult,
         )

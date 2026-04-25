@@ -72,6 +72,7 @@ from .github_types import (
     AgentAuditResult,
     ScopeCreepResult,
     AssigneeCycleTimeResult,
+    PRTaskAlignmentResult,
 )
 
 
@@ -779,4 +780,14 @@ class AsyncGitHubResource(BaseAsyncResource):
             f"/v1/projects/{project_id}/github/assignee-cycle-time",
             params={"days": days},
             response_model=AssigneeCycleTimeResult,
+        )
+
+    async def get_pr_task_alignment(
+        self, project_id: str, days: int = 90
+    ) -> PRTaskAlignmentResult:
+        """Detect semantic drift between PRs and their linked issues."""
+        return await self._client.get(
+            f"/v1/projects/{project_id}/github/pr-task-alignment",
+            params={"days": days},
+            response_model=PRTaskAlignmentResult,
         )

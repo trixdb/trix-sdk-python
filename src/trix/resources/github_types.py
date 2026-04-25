@@ -1232,3 +1232,29 @@ class AssigneeCycleTimeResult(BaseModel):
     assignees: List["AssigneeStatItem"]
     team_avg_days: Optional[float] = None
     lookback_days: int
+
+
+class AlignmentEntry(BaseModel):
+    pr_number: str
+    pr_title: str
+    pr_url: str
+    author: str
+    issue_number: str
+    issue_title: str
+    similarity: float
+    signal: str  # 'aligned' | 'partial' | 'drifted'
+
+
+class PRTaskAlignmentSummary(BaseModel):
+    analyzed: int
+    aligned_count: int
+    partial_count: int
+    drifted_count: int
+    unchecked_count: int
+
+
+class PRTaskAlignmentResult(BaseModel):
+    summary: PRTaskAlignmentSummary
+    drifted: List[AlignmentEntry]
+    partial: List[AlignmentEntry]
+    lookback_days: int
