@@ -55,6 +55,7 @@ from .github_types import (
     ApprovedPRsResult,
     IssueBacklogResult,
     ReviewCoverageResult,
+    IssueAssigneesResult,
     MilestonesResult,
     PRQualityWeek,
 )
@@ -617,6 +618,13 @@ class AsyncGitHubResource(BaseAsyncResource):
         validate_id(project_id, "project")
         return ReviewCoverageResult.model_validate(
             await self._request("GET", f"/projects/{project_id}/github/review-coverage")
+        )
+
+    async def get_issue_assignees(self, project_id: str) -> IssueAssigneesResult:
+        """Issue assignee workload — open issue counts per contributor, most overloaded first (async)."""
+        validate_id(project_id, "project")
+        return IssueAssigneesResult.model_validate(
+            await self._request("GET", f"/projects/{project_id}/github/issue-assignees")
         )
 
     async def get_milestones(self, project_id: str) -> MilestonesResult:

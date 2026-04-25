@@ -857,6 +857,21 @@ class ReviewCoverageResult(BaseModel):
     by_author: List[AuthorReviewCoverage] = []
 
 
+# ── Issue Assignee Workload ─────────────────────────────────────────────────
+
+
+class AssigneeStat(BaseModel):
+    assignee: str
+    open_count: int = 0
+    oldest_days: int = 0
+    avg_days: int = 0
+
+
+class IssueAssigneesResult(BaseModel):
+    assignees: List[AssigneeStat] = []
+    total_assignees: int = 0
+
+
 # ── Milestone Progress ──────────────────────────────────────────────────────
 
 

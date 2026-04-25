@@ -55,6 +55,7 @@ from .github_types import (
     ApprovedPRsResult,
     IssueBacklogResult,
     ReviewCoverageResult,
+    IssueAssigneesResult,
     MilestonesResult,
 )
 
@@ -602,6 +603,13 @@ class GitHubResource(BaseSyncResource):
         validate_id(project_id, "project")
         return ReviewCoverageResult.model_validate(
             self._request("GET", f"/projects/{project_id}/github/review-coverage")
+        )
+
+    def get_issue_assignees(self, project_id: str) -> IssueAssigneesResult:
+        """Issue assignee workload — open issue counts per contributor, most overloaded first."""
+        validate_id(project_id, "project")
+        return IssueAssigneesResult.model_validate(
+            self._request("GET", f"/projects/{project_id}/github/issue-assignees")
         )
 
     def get_milestones(self, project_id: str) -> MilestonesResult:
