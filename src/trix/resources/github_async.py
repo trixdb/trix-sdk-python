@@ -1622,3 +1622,23 @@ class AsyncGitHubResource(BaseAsyncResource):
         if file_path_contains:
             query["file_path_contains"] = file_path_contains
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_testability(
+        self,
+        project_id: str,
+        mode: str = "files",
+        language: str = "",
+        file_path_contains: str = "",
+        limit: int = 30,
+    ) -> Any:
+        """Score how easy each file is to test (0-100, 100 = very easy to test).
+
+        mode: 'files' (worst-first) | 'summary' (grade dist + worst_5) | 'critical' (score < 40 only)
+        Returns: { results[], count } — each result has testability_score, grade, barriers[]
+        """
+        query: Dict[str, Any] = {"from": "testability", "mode": mode, "limit": limit}
+        if language:
+            query["language"] = language
+        if file_path_contains:
+            query["file_path_contains"] = file_path_contains
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
