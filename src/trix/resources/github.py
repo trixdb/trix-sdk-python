@@ -1843,3 +1843,25 @@ class GitHubResource(BaseSyncResource):
         if repo_full_name:
             query["repoFullName"] = repo_full_name
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def get_design_patterns(
+        self,
+        project_id: str,
+        kind: str = "all",
+        pattern: str = "",
+        confidence: str = "",
+        limit: int = 30,
+    ) -> Any:
+        """Detect design patterns and anti-patterns from stored code metrics.
+
+        kind: 'all' | 'pattern' | 'anti_pattern'
+        pattern: factory|observer|singleton|god_object|spaghetti_code|magic_numbers|golden_hammer|lava_flow
+        confidence: 'high' | 'medium' | 'low' (minimum)
+        Returns: { results[], count, summary: { total_detections, patterns_found, anti_patterns_found, by_pattern, total_debt_minutes } }
+        """
+        query: Dict[str, Any] = {"from": "design_patterns", "kind": kind, "limit": limit}
+        if pattern:
+            query["pattern"] = pattern
+        if confidence:
+            query["confidence"] = confidence
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)

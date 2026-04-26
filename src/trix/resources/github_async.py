@@ -1556,3 +1556,24 @@ class AsyncGitHubResource(BaseAsyncResource):
         if repo_full_name:
             query["repoFullName"] = repo_full_name
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_design_patterns(
+        self,
+        project_id: str,
+        kind: str = "all",
+        pattern: str = "",
+        confidence: str = "",
+        limit: int = 30,
+    ) -> Any:
+        """Detect design patterns and anti-patterns from stored code metrics.
+
+        kind: 'all' | 'pattern' | 'anti_pattern'
+        pattern: factory|observer|singleton|god_object|spaghetti_code|magic_numbers|golden_hammer|lava_flow
+        confidence: 'high' | 'medium' | 'low' (minimum)
+        """
+        query: Dict[str, Any] = {"from": "design_patterns", "kind": kind, "limit": limit}
+        if pattern:
+            query["pattern"] = pattern
+        if confidence:
+            query["confidence"] = confidence
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
