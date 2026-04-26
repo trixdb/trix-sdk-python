@@ -1368,6 +1368,42 @@ class AsyncGitHubResource(BaseAsyncResource):
             query["language"] = language
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    async def get_smell_trend(
+        self,
+        project_id: str,
+        mode: str = "regressing",
+        min_delta: int = 0,
+        language: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Per-file smell count delta across two scan snapshots.
+
+        trend_score = smell_delta × 3 + suggestion_delta.
+        mode: 'regressing' | 'improving' | 'all' | 'summary'
+        """
+        query: Dict[str, Any] = {"from": "smell_trend", "mode": mode, "min_delta": min_delta, "limit": limit}
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_coupling_analysis(
+        self,
+        project_id: str,
+        mode: str = "bottlenecks",
+        language: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """File-level coupling analysis — fan-in bottlenecks.
+
+        Fan-in = sum of callerCounts across all functions in the file.
+        Tiers: CRITICAL (≥30), HIGH (≥15), MODERATE (≥5), LOW (<5).
+        mode: 'bottlenecks' | 'all' | 'summary'
+        """
+        query: Dict[str, Any] = {"from": "coupling_analysis", "mode": mode, "limit": limit}
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     async def batch_mark_findings(
         self,
         project_id: str,

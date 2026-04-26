@@ -1611,6 +1611,52 @@ class GitHubResource(BaseSyncResource):
             query["language"] = language
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    def get_smell_trend(
+        self,
+        project_id: str,
+        mode: str = "regressing",
+        min_delta: int = 0,
+        language: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Per-file smell count delta across two scan snapshots.
+
+        trend_score = smell_delta × 3 + suggestion_delta.
+        Positive = regressing (more smells), negative = improving.
+        mode: 'regressing' | 'improving' | 'all' | 'summary'
+        """
+        query: Dict[str, Any] = {
+            "from": "smell_trend",
+            "mode": mode,
+            "min_delta": min_delta,
+            "limit": limit,
+        }
+        if language:
+            query["language"] = language
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def get_coupling_analysis(
+        self,
+        project_id: str,
+        mode: str = "bottlenecks",
+        language: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """File-level coupling analysis — fan-in bottlenecks and architectural load-bearing files.
+
+        Fan-in = sum of callerCounts across all functions in the file.
+        Tiers: CRITICAL (≥30), HIGH (≥15), MODERATE (≥5), LOW (<5).
+        mode: 'bottlenecks' | 'all' | 'summary'
+        """
+        query: Dict[str, Any] = {
+            "from": "coupling_analysis",
+            "mode": mode,
+            "limit": limit,
+        }
+        if language:
+            query["language"] = language
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     def batch_mark_findings(
         self,
         project_id: str,
