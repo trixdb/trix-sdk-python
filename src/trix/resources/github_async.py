@@ -1707,3 +1707,24 @@ class AsyncGitHubResource(BaseAsyncResource):
         if dir:
             query["where"]["dir"] = dir
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_function_outliers(
+        self,
+        project_id: str,
+        mode: str = "files",
+        threshold: float = 2.0,
+        language: str = "",
+        limit: int = 30,
+    ) -> Any:
+        """Find statistical complexity outliers within each file using Z-score analysis.
+
+        mode: 'files' (all outliers) | 'by_file' (worst per file) | 'summary'
+        threshold: Z-score cutoff (default 2.0; lower = more outliers)
+        Returns: functions with outlier_dimensions[], z_scores, severity (triple/double/single)
+        """
+        query: Dict[str, Any] = {
+            "from": "function_outliers", "mode": mode, "threshold": threshold, "limit": limit
+        }
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
