@@ -2023,3 +2023,27 @@ class GitHubResource(BaseSyncResource):
         if language:
             query["language"] = language
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def find_dead_code(
+        self,
+        project_id: str,
+        mode: str = "functions",
+        language: str = "",
+        risk: str = "",
+        limit: int = 50,
+    ) -> Any:
+        """Find unused public functions with callerCount=0 across all languages.
+
+        mode: 'functions' (list) | 'files' (ranked by dead count) | 'summary'
+        risk: filter by tier — 'high' (CC>5 or LOC>40), 'medium', 'low'
+        Returns: function_name, file_path, risk, suggested_action
+        (safe_to_remove | deprecate | audit_before_removing)
+        """
+        query: Dict[str, Any] = {
+            "from": "dead_exports", "mode": mode, "limit": limit
+        }
+        if language:
+            query["language"] = language
+        if risk:
+            query["risk"] = risk
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
