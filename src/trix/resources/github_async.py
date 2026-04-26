@@ -1334,6 +1334,40 @@ class AsyncGitHubResource(BaseAsyncResource):
             },
         )
 
+    async def get_project_health_score(
+        self,
+        project_id: str,
+        mode: str = "summary",
+    ) -> Dict[str, Any]:
+        """Composite project health score (0–100) with A–F grade.
+
+        mode: 'summary' | 'breakdown' (per-signal scores with weights)
+        """
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/query-code",
+            json={"from": "project_health_score", "mode": mode},
+        )
+
+    async def get_test_smell(
+        self,
+        project_id: str,
+        mode: str = "files",
+        kind: str = "",
+        language: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Detect antipatterns in test code (test smells).
+
+        Detects: GOD_TEST_CLASS, COMPLEX_TEST_LOGIC, LARGE_TEST, ASSERTION_ROULETTE.
+        mode: 'files' | 'summary'
+        """
+        query: Dict[str, Any] = {"from": "test_smell", "mode": mode, "limit": limit}
+        if kind:
+            query["kind"] = kind
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     async def batch_mark_findings(
         self,
         project_id: str,

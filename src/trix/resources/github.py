@@ -1570,6 +1570,47 @@ class GitHubResource(BaseSyncResource):
             },
         )
 
+    def get_project_health_score(
+        self,
+        project_id: str,
+        mode: str = "summary",
+    ) -> Dict[str, Any]:
+        """Composite project health score (0–100) with A–F grade.
+
+        Aggregates 7 signals: complexity (20%), maintainability (20%), hotspots (15%),
+        smells (15%), test_coverage (15%), debt (10%), toxic_files (5%).
+        mode: 'summary' (default) | 'breakdown' (per-signal scores + weights)
+        """
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/query-code",
+            json={"from": "project_health_score", "mode": mode},
+        )
+
+    def get_test_smell(
+        self,
+        project_id: str,
+        mode: str = "files",
+        kind: str = "",
+        language: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Detect antipatterns in test code (test smells).
+
+        Detects: GOD_TEST_CLASS, COMPLEX_TEST_LOGIC, LARGE_TEST, ASSERTION_ROULETTE,
+        EAGER_TEST, MYSTERY_GUEST. Severity: high/medium.
+        mode: 'files' (ranked by smell_score) | 'summary' (totals + worst_5)
+        """
+        query: Dict[str, Any] = {
+            "from": "test_smell",
+            "mode": mode,
+            "limit": limit,
+        }
+        if kind:
+            query["kind"] = kind
+        if language:
+            query["language"] = language
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     def batch_mark_findings(
         self,
         project_id: str,
