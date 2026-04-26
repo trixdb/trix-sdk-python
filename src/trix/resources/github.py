@@ -1788,6 +1788,30 @@ class GitHubResource(BaseSyncResource):
                     results["failed"] += 1
         return results
 
+    def get_naming_violations(
+        self,
+        project_id: str,
+        rule: str = "all",
+        language: str = "",
+        repo_full_name: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Naming convention violations — nondescript, numbered, generic, inconsistent casing.
+
+        Ranks files by violation_score. Returns violations[] (rule, name, line) per file.
+        rule: all | nondescript | numbered | generic | inconsistent
+        """
+        query: Dict[str, Any] = {
+            "from": "naming_violations",
+            "rule": rule,
+            "limit": limit,
+        }
+        if language:
+            query["language"] = language
+        if repo_full_name:
+            query["repoFullName"] = repo_full_name
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     def get_solid_analysis(
         self,
         project_id: str,

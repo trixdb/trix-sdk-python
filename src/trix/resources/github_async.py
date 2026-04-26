@@ -1509,6 +1509,30 @@ class AsyncGitHubResource(BaseAsyncResource):
                 results["succeeded"] += 1
         return results
 
+    async def get_naming_violations(
+        self,
+        project_id: str,
+        rule: str = "all",
+        language: str = "",
+        repo_full_name: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Naming convention violations (async) — nondescript, numbered, generic, inconsistent.
+
+        rule: all | nondescript | numbered | generic | inconsistent
+        Returns files ranked by violation_score with violations[] per file.
+        """
+        query: Dict[str, Any] = {
+            "from": "naming_violations",
+            "rule": rule,
+            "limit": limit,
+        }
+        if language:
+            query["language"] = language
+        if repo_full_name:
+            query["repoFullName"] = repo_full_name
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     async def get_solid_analysis(
         self,
         project_id: str,
