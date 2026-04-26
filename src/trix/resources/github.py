@@ -1844,6 +1844,34 @@ class GitHubResource(BaseSyncResource):
             query["repoFullName"] = repo_full_name
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    def get_clean_code(
+        self,
+        project_id: str,
+        mode: str = "summary",
+        min_score: int = 90,
+        rule: str = "",
+        language: str = "",
+        limit: int = 20,
+    ) -> Any:
+        """Measure Clean Code adherence (function length, param count, naming quality, SRP).
+
+        mode: 'summary' | 'files' | 'violations'
+        min_score: only return files below this score (default 90)
+        rule: long_function|too_many_params|poor_naming|too_many_responsibilities
+        Returns: { summary: { grade, avg_score, by_rule, worst_5 }, results[], count }
+        """
+        query: Dict[str, Any] = {
+            "from": "clean_code",
+            "mode": mode,
+            "min_score": min_score,
+            "limit": limit,
+        }
+        if rule and rule != "all":
+            query["rule"] = rule
+        if language:
+            query["language"] = language
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     def get_design_patterns(
         self,
         project_id: str,
