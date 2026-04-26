@@ -1635,6 +1635,30 @@ class GitHubResource(BaseSyncResource):
             query["language"] = language
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    def get_refactor_priority(
+        self,
+        project_id: str,
+        mode: str = "files",
+        language: str = "",
+        min_score: float = 0,
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Composite refactoring urgency ranking (0-100).
+
+        Signals: smell_density(30%) + coupling fan-in(25%) + hotspot(20%) + CC(15%) + no_test(10%).
+        Scores are relative to the codebase max — tells you the highest-priority file to fix NOW.
+        mode: 'files' (ranked) | 'summary'
+        """
+        query: Dict[str, Any] = {
+            "from": "refactor_priority",
+            "mode": mode,
+            "min_score": min_score,
+            "limit": limit,
+        }
+        if language:
+            query["language"] = language
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     def get_hotspot_matrix(
         self,
         project_id: str,
