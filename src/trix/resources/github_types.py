@@ -1778,6 +1778,15 @@ CqlFromMode = Literal[
     "test_quality",
     "dependencies",
     "refactor_candidates",
+    "churn_vulnerability",
+    "rating",
+    "new_issues",
+    "risk_profile",
+    "velocity",
+    "pr_context",
+    "smell_summary",
+    "cognitive_breakdown",
+    "problematic_files",
 ]
 
 
@@ -1811,6 +1820,16 @@ class CqlQuery(BaseModel):
     """Minimum cyclomatic complexity for test_quality mode"""
     ecosystem: Optional[str] = None
     """Ecosystem filter for dependencies: npm|pip|go|cargo|rubygems|maven"""
+    since: Optional[str] = None
+    """Baseline for new_issues mode: relative ("7d", "14d", "30d") or ISO date ("2026-04-01")"""
+    dimension: Optional[Literal["reliability", "security", "maintainability"]] = None
+    """Focus on a single dimension for rating mode"""
+    breakdown: Optional[bool] = None
+    """Include per-signal score breakdown in risk_profile results"""
+    weeks: Optional[int] = None
+    """Look-back window in weeks for velocity mode (default: 4, max: 52)"""
+    threshold: Optional[int] = None
+    """Minimum cognitive complexity for cognitive_breakdown mode (default: 1)"""
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to API-ready dict (maps from_ → from)."""
