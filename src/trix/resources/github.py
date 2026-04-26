@@ -2047,3 +2047,25 @@ class GitHubResource(BaseSyncResource):
         if risk:
             query["risk"] = risk
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def analyze_contributor_quality(
+        self,
+        project_id: str,
+        mode: str = "contributors",
+        author: str = "",
+        min_files: int = 2,
+        limit: int = 30,
+    ) -> Any:
+        """Code quality metrics aggregated by primary contributor.
+
+        mode: 'contributors' (ranked list) | 'summary' | 'files' (with author param)
+        author: filter to specific contributor name/email
+        min_files: minimum files owned to include (noise filter)
+        Returns: avg_cc, avg_mi, avg_hotspot, high_cc_count, low_mi_count, debt_score
+        """
+        query: Dict[str, Any] = {
+            "from": "contributor_quality", "mode": mode, "min_files": min_files, "limit": limit
+        }
+        if author:
+            query["author"] = author
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
