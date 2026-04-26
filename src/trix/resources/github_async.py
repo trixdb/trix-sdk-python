@@ -1386,6 +1386,26 @@ class AsyncGitHubResource(BaseAsyncResource):
             query["language"] = language
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    async def get_hotspot_matrix(
+        self,
+        project_id: str,
+        mode: str = "files",
+        quadrant: str = "",
+        language: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """2D risk matrix: churn frequency × cyclomatic complexity.
+
+        Quadrants: DANGER_ZONE, WORKHORSE, SLEEPING_GIANT, SAFE.
+        mode: 'files' | 'summary'
+        """
+        query: Dict[str, Any] = {"from": "hotspot_matrix", "mode": mode, "limit": limit}
+        if quadrant:
+            query["quadrant"] = quadrant
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     async def get_coupling_analysis(
         self,
         project_id: str,
