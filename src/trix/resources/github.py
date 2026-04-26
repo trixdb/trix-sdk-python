@@ -2069,3 +2069,26 @@ class GitHubResource(BaseSyncResource):
         if author:
             query["author"] = author
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def get_abstraction_quality(
+        self,
+        project_id: str,
+        mode: str = "functions",
+        kind: str = "",
+        language: str = "",
+        limit: int = 50,
+    ) -> Any:
+        """Detect abstraction quality violations (leaky, thin, god patterns).
+
+        kind filter: 'leaky' (params≥6+CC>3), 'thin' (pass-through+many callers),
+                     'god' (params≥5+LOC≥40+CC≥8)
+        Returns: function_name, kind, score, reason per violation
+        """
+        query: Dict[str, Any] = {
+            "from": "abstraction_quality", "mode": mode, "limit": limit
+        }
+        if kind:
+            query["kind"] = kind
+        if language:
+            query["language"] = language
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)

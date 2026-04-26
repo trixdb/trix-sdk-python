@@ -1771,3 +1771,21 @@ class AsyncGitHubResource(BaseAsyncResource):
         if author:
             query["author"] = author
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_abstraction_quality(
+        self,
+        project_id: str,
+        mode: str = "functions",
+        kind: str = "",
+        language: str = "",
+        limit: int = 50,
+    ) -> Any:
+        """Detect abstraction quality violations (leaky, thin, god patterns)."""
+        query: Dict[str, Any] = {
+            "from": "abstraction_quality", "mode": mode, "limit": limit
+        }
+        if kind:
+            query["kind"] = kind
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
