@@ -2092,3 +2092,29 @@ class GitHubResource(BaseSyncResource):
         if language:
             query["language"] = language
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def scope_analysis(
+        self,
+        project_id: str,
+        file_paths: Optional[List[str]] = None,
+        dir: Optional[str] = None,
+    ) -> Any:
+        """Analyze PR scope: FOCUSED / MIXED / SCATTERED.
+
+        Detects directory entropy, concern mixing (source/test/migration/config/infra/docs/build),
+        and complexity spread. Returns scatter_score + recommendation.
+
+        Args:
+            project_id: Project UUID.
+            file_paths: Changed file paths (e.g. from git diff --name-only).
+            dir: Analyze all files under this directory prefix instead.
+
+        Returns: scatter_score, scope_label, concerns[], directories[], recommendation
+        """
+        query: Dict[str, Any] = {
+            "from": "scope_analysis",
+            "where": {"file_paths": file_paths or []},
+        }
+        if dir:
+            query["where"]["dir"] = dir
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)

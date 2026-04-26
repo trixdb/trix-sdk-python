@@ -1789,3 +1789,22 @@ class AsyncGitHubResource(BaseAsyncResource):
         if language:
             query["language"] = language
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def scope_analysis(
+        self,
+        project_id: str,
+        file_paths: Optional[List[str]] = None,
+        dir: Optional[str] = None,
+    ) -> Any:
+        """Analyze PR scope: FOCUSED / MIXED / SCATTERED.
+
+        Detects directory entropy, concern mixing, and complexity spread.
+        Returns scatter_score, scope_label, concerns[], directories[], recommendation.
+        """
+        query: Dict[str, Any] = {
+            "from": "scope_analysis",
+            "where": {"file_paths": file_paths or []},
+        }
+        if dir:
+            query["where"]["dir"] = dir
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
