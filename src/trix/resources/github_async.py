@@ -1018,3 +1018,260 @@ class AsyncGitHubResource(BaseAsyncResource):
             json={},
             response_model=CustomRuleTestResult,
         )
+
+    async def get_quality_profile(self, project_id: str) -> Dict[str, Any]:
+        """Fetch the stored quality gate profile (preset + thresholds) for a project."""
+        return await self._client.get(f"/v1/projects/{project_id}/github/quality-profile")
+
+    async def set_quality_profile(
+        self,
+        project_id: str,
+        preset_name: str,
+        conditions: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Save per-project quality gate thresholds. preset_name: strict/standard/relaxed/custom."""
+        body: Dict[str, Any] = {"preset_name": preset_name}
+        if conditions is not None:
+            body["conditions"] = conditions
+        return await self._client.put(
+            f"/v1/projects/{project_id}/github/quality-profile", json=body
+        )
+
+    async def update_finding_status(
+        self,
+        project_id: str,
+        suggestion_id: str,
+        status: str,
+        fp_reason: Optional[str] = None,
+        lifecycle_note: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Update lifecycle status of a SAST finding (false_positive/confirmed/resolved/open)."""
+        body: Dict[str, Any] = {"status": status}
+        if fp_reason is not None:
+            body["fp_reason"] = fp_reason
+        if lifecycle_note is not None:
+            body["lifecycle_note"] = lifecycle_note
+        return await self._client.patch(
+            f"/v1/projects/{project_id}/github/improvements/{suggestion_id}", json=body
+        )
+
+    async def suggest_reviewers(
+        self,
+        project_id: str,
+        file_paths: Optional[List[str]] = None,
+        days: int = 90,
+        limit: int = 5,
+    ) -> Dict[str, Any]:
+        """Suggest PR reviewers ranked by commit-level file expertise."""
+        query: Dict[str, Any] = {"from": "code_ownership", "days": days, "limit": limit}
+        if file_paths:
+            query["where"] = {"file_paths": file_paths}
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_refactor_candidates(
+        self,
+        project_id: str,
+        language: Optional[str] = None,
+        limit: int = 15,
+    ) -> Dict[str, Any]:
+        """Return files ranked by refactor ROI: CC×2 + CogC×1.5 + smells×10 + issues×5 + hotspot×0.5."""
+        query: Dict[str, Any] = {"from": "refactor_candidates", "limit": limit}
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def deep_pr_review(
+        self,
+        project_id: str,
+        pr_number: int,
+        repo_full_name: Optional[str] = None,
+        limit_files: int = 30,
+        include_inline_smells: bool = True,
+    ) -> Dict[str, Any]:
+        """One-call CQL PR review using stored metrics (pr_impact + smells + MI)."""
+        body: Dict[str, Any] = {"prNumber": pr_number, "limitFiles": limit_files, "includeInlineSmells": include_inline_smells}
+        if repo_full_name:
+            body["repoFullName"] = repo_full_name
+        return await self._client.post(f"/v1/projects/{project_id}/github/deep-pr-review", json=body)
+
+    async def orchestrate_pr_review(
+        self,
+        project_id: str,
+        pr_number: int,
+        repo_full_name: Optional[str] = None,
+        limit_files: int = 30,
+        include_inline_smells: bool = True,
+    ) -> Dict[str, Any]:
+        """Most comprehensive one-call PR review — 4 CQL signals in parallel."""
+        body: Dict[str, Any] = {"prNumber": pr_number, "limitFiles": limit_files, "includeInlineSmells": include_inline_smells}
+        if repo_full_name:
+            body["repoFullName"] = repo_full_name
+        return await self._client.post(f"/v1/projects/{project_id}/github/orchestrate-pr-review", json=body)
+
+    async def generate_pr_description(
+        self,
+        project_id: str,
+        file_paths: Optional[List[str]] = None,
+        pr_number: Optional[int] = None,
+        repo_full_name: Optional[str] = None,
+        commit_messages: Optional[List[str]] = None,
+        pr_title: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Generate a professional PR description using LLM + CQL code metrics."""
+        if not file_paths and not pr_number:
+            raise ValueError("Either file_paths or pr_number is required")
+        body: Dict[str, Any] = {}
+        if file_paths:
+            body["filePaths"] = file_paths
+        if pr_number:
+            body["prNumber"] = pr_number
+        if repo_full_name:
+            body["repoFullName"] = repo_full_name
+        if commit_messages:
+            body["commitMessages"] = commit_messages
+        if pr_title:
+            body["prTitle"] = pr_title
+        return await self._client.post(f"/v1/projects/{project_id}/github/generate-pr-description", json=body)
+
+    async def generate_ci_workflow(
+        self,
+        project_id: str,
+        workflow_type: str = "full",
+        gate: str = "standard",
+        main_branch: str = "main",
+        post_inline_comments: bool = True,
+        block_on_fail: bool = True,
+    ) -> Dict[str, Any]:
+        """Generate GitHub Actions CI workflow YAML files for Trix quality gates."""
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/generate-ci-workflow",
+            json={"type": workflow_type, "gate": gate, "mainBranch": main_branch, "postInlineComments": post_inline_comments, "blockOnFail": block_on_fail},
+        )
+
+    async def get_test_coverage_gap(
+        self,
+        project_id: str,
+        mode: str = "files",
+        min_cc: int = 1,
+        language: Optional[str] = None,
+        file_contains: Optional[str] = None,
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Risk-weighted test coverage gap — gap_risk = (1-covered) × CC × (1 + hotspot/10)."""
+        query: Dict[str, Any] = {"from": "test_coverage_gap", "mode": mode, "min_cc": min_cc, "limit": limit}
+        if language:
+            query["language"] = language
+        if file_contains:
+            query["file_contains"] = file_contains
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_change_risk(
+        self,
+        project_id: str,
+        file_paths: List[str],
+        include_actions: bool = True,
+    ) -> Dict[str, Any]:
+        """Pre-change blast radius risk assessment — CC + MI + hotspot + debt + coverage gap."""
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/query",
+            json={"from": "change_risk", "file_paths": file_paths, "include_actions": include_actions},
+        )
+
+    async def get_module_complexity(
+        self,
+        project_id: str,
+        mode: str = "summary",
+        depth: int = 1,
+        module: Optional[str] = None,
+        sort_by: str = "module_score",
+        language: Optional[str] = None,
+        limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Directory-level complexity aggregation — SonarQube-style module quality view."""
+        query: Dict[str, Any] = {"from": "module_complexity", "mode": mode, "depth": depth, "sort_by": sort_by, "limit": limit}
+        if module:
+            query["module"] = module
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_toxic_files(
+        self,
+        project_id: str,
+        mode: str = "files",
+        min_score: int = 3,
+        language: Optional[str] = None,
+        limit: int = 25,
+        cc_threshold: Optional[int] = None,
+        mi_threshold: Optional[int] = None,
+        hotspot_threshold: Optional[float] = None,
+        debt_threshold: Optional[int] = None,
+        loc_threshold: Optional[int] = None,
+    ) -> Dict[str, Any]:
+        """Multi-dimensional hall of shame — files failing multiple quality dimensions.
+
+        Each dimension scores 1 point: high_cc, low_mi, high_hotspot, high_debt, no_test, large_file.
+        mode: 'files' (ranked) | 'summary' (buckets + top dims + worst_5)
+        min_score: 1-6, default 3
+        """
+        query: Dict[str, Any] = {"from": "toxic_files", "mode": mode, "min_score": min_score, "limit": limit}
+        if language:
+            query["language"] = language
+        if cc_threshold is not None:
+            query["cc_threshold"] = cc_threshold
+        if mi_threshold is not None:
+            query["mi_threshold"] = mi_threshold
+        if hotspot_threshold is not None:
+            query["hotspot_threshold"] = hotspot_threshold
+        if debt_threshold is not None:
+            query["debt_threshold"] = debt_threshold
+        if loc_threshold is not None:
+            query["loc_threshold"] = loc_threshold
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def evaluate_quality_gate(
+        self,
+        project_id: str,
+        preset: str = "standard",
+        conditions: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """SonarQube-style quality gate — PASSED / FAILED verdict with per-condition breakdown.
+
+        preset: 'strict' | 'standard' (default) | 'relaxed'
+        conditions: override specific thresholds e.g. {'avg_cc_lte': 12}
+        Returns gate_status, conditions_evaluated[], blocking_conditions[].
+        """
+        query: Dict[str, Any] = {"from": "quality_gate", "preset": preset}
+        if conditions:
+            query["conditions"] = conditions
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def batch_mark_findings(
+        self,
+        project_id: str,
+        findings: List[Dict[str, Any]],
+    ) -> Dict[str, Any]:
+        """Mark multiple SAST findings concurrently.
+
+        Each finding: {suggestion_id, status, fp_reason?, lifecycle_note?}
+        Returns: {succeeded, failed, total}
+        """
+        import asyncio
+        results = {"succeeded": 0, "failed": 0, "total": len(findings)}
+        tasks = [
+            self.update_finding_status(
+                project_id,
+                f["suggestion_id"],
+                f["status"],
+                f.get("fp_reason"),
+                f.get("lifecycle_note"),
+            )
+            for f in findings
+        ]
+        settled = await asyncio.gather(*tasks, return_exceptions=True)
+        for r in settled:
+            if isinstance(r, Exception):
+                results["failed"] += 1
+            else:
+                results["succeeded"] += 1
+        return results
