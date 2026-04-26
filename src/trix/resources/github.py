@@ -1482,6 +1482,94 @@ class GitHubResource(BaseSyncResource):
             query["conditions"] = conditions
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    def get_complexity_trend(
+        self,
+        project_id: str,
+        mode: str = "summary",
+        min_delta: int = 0,
+        limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Per-file complexity regression detection across two scan snapshots.
+
+        Compares latest vs previous scan; trend_score = cc_delta*3 + hotspot_delta*2 - mi_delta + debt_delta.
+        mode: 'regressing' | 'recovering' | 'all' | 'summary' (default)
+        Returns summary with regressing_count, recovering_count, worst_5, best_5.
+        """
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/query",
+            json={"from": "complexity_trend", "mode": mode, "min_delta": min_delta, "limit": limit},
+        )
+
+    def get_contributor_risk(
+        self,
+        project_id: str,
+        mode: str = "summary",
+        min_risk: str = "",
+        depth: int = 2,
+        limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Bus factor and knowledge concentration risk per module.
+
+        departure_risk: HIGH (bus_factor=1), MEDIUM (=2), LOW (>=3).
+        knowledge_gap_score = top_author_pct * (1/bus_factor) * complexity_weight.
+        mode: 'modules' (default) | 'files' | 'summary'
+        """
+        query: Dict[str, Any] = {
+            "from": "contributor_risk",
+            "mode": mode,
+            "depth": depth,
+            "limit": limit,
+        }
+        if min_risk:
+            query["min_risk"] = min_risk
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def get_smell_density(
+        self,
+        project_id: str,
+        mode: str = "summary",
+        min_grade: str = "",
+        depth: int = 2,
+        limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Normalized smell density — smells per KLOC and per function.
+
+        Grades: CRITICAL (>=50/kloc or >=2.0/fn), HIGH (>=20), MEDIUM (>=10), LOW.
+        mode: 'files' | 'modules' | 'summary' (default)
+        min_grade: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'
+        """
+        query: Dict[str, Any] = {
+            "from": "smell_density",
+            "mode": mode,
+            "depth": depth,
+            "limit": limit,
+        }
+        if min_grade:
+            query["min_grade"] = min_grade
+        return self._client.post(f"/v1/projects/{project_id}/github/query-code", json=query)
+
+    def pre_pr_checklist(
+        self,
+        project_id: str,
+        file_paths: List[str],
+        gate_preset: str = "standard",
+        include_smells: bool = True,
+    ) -> Dict[str, Any]:
+        """One-call pre-PR health check — GO / CAUTION / HOLD verdict.
+
+        Runs 5 checks in parallel: change_risk, quality_gate, test_coverage_gap,
+        toxic_files, function_smells. Returns verdict + blocking_checks[] + recommended_actions[].
+        """
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/query-code",
+            json={
+                "from": "pre_pr_checklist",
+                "file_paths": file_paths,
+                "gate_preset": gate_preset,
+                "include_smells": include_smells,
+            },
+        )
+
     def batch_mark_findings(
         self,
         project_id: str,

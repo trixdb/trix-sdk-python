@@ -1246,6 +1246,94 @@ class AsyncGitHubResource(BaseAsyncResource):
             query["conditions"] = conditions
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    async def get_complexity_trend(
+        self,
+        project_id: str,
+        mode: str = "summary",
+        min_delta: int = 0,
+        limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Per-file complexity regression detection across two scan snapshots.
+
+        mode: 'regressing' | 'recovering' | 'all' | 'summary' (default)
+        Returns regressing_count, recovering_count, worst_5, best_5.
+        """
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/query",
+            json={"from": "complexity_trend", "mode": mode, "min_delta": min_delta, "limit": limit},
+        )
+
+    async def get_contributor_risk(
+        self,
+        project_id: str,
+        mode: str = "summary",
+        min_risk: str = "",
+        depth: int = 2,
+        limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Bus factor and knowledge concentration risk per module.
+
+        departure_risk: HIGH (bus_factor=1), MEDIUM (=2), LOW (>=3).
+        mode: 'modules' | 'files' | 'summary' (default)
+        """
+        query: Dict[str, Any] = {
+            "from": "contributor_risk",
+            "mode": mode,
+            "depth": depth,
+            "limit": limit,
+        }
+        if min_risk:
+            query["min_risk"] = min_risk
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_smell_density(
+        self,
+        project_id: str,
+        mode: str = "summary",
+        min_grade: str = "",
+        depth: int = 2,
+        limit: int = 20,
+    ) -> Dict[str, Any]:
+        """Normalized smell density — smells per KLOC and per function.
+
+        Grades: CRITICAL (>=50/kloc or >=2.0/fn), HIGH (>=20), MEDIUM (>=10), LOW.
+        mode: 'files' | 'modules' | 'summary' (default)
+        """
+        query: Dict[str, Any] = {
+            "from": "smell_density",
+            "mode": mode,
+            "depth": depth,
+            "limit": limit,
+        }
+        if min_grade:
+            query["min_grade"] = min_grade
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/query-code", json=query
+        )
+
+    async def pre_pr_checklist(
+        self,
+        project_id: str,
+        file_paths: List[str],
+        gate_preset: str = "standard",
+        include_smells: bool = True,
+    ) -> Dict[str, Any]:
+        """One-call pre-PR health check — GO / CAUTION / HOLD verdict.
+
+        Runs 5 checks in parallel: change_risk, quality_gate, test_coverage_gap,
+        toxic_files, function_smells.
+        Returns verdict + blocking_checks[] + recommended_actions[].
+        """
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/query-code",
+            json={
+                "from": "pre_pr_checklist",
+                "file_paths": file_paths,
+                "gate_preset": gate_preset,
+                "include_smells": include_smells,
+            },
+        )
+
     async def batch_mark_findings(
         self,
         project_id: str,
