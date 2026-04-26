@@ -1642,3 +1642,26 @@ class AsyncGitHubResource(BaseAsyncResource):
         if file_path_contains:
             query["file_path_contains"] = file_path_contains
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_api_surface(
+        self,
+        project_id: str,
+        mode: str = "all",
+        min_callers: int = 3,
+        language: str = "",
+        file_path_contains: str = "",
+        limit: int = 50,
+    ) -> Any:
+        """Analyze public API surface — functions with many callers — and rate their design quality.
+
+        mode: 'all' (by callerCount) | 'summary' (risk dist + worst_5) | 'risky' (high breaking_change_risk)
+        Returns: { results[], count } — each result has design_score, breaking_change_risk, issues[]
+        """
+        query: Dict[str, Any] = {
+            "from": "api_surface", "mode": mode, "min_callers": min_callers, "limit": limit
+        }
+        if language:
+            query["language"] = language
+        if file_path_contains:
+            query["file_path_contains"] = file_path_contains
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
