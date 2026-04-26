@@ -1893,3 +1893,27 @@ class GitHubResource(BaseSyncResource):
         if confidence:
             query["confidence"] = confidence
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def get_function_profile(
+        self,
+        project_id: str,
+        mode: str = "all",
+        min_risk: int = 0,
+        language: str = "",
+        file_path_contains: str = "",
+        limit: int = 50,
+    ) -> Any:
+        """Deep per-function quality profile combining CC, cognitive, LOC, params, callers, clones, and naming.
+
+        mode: 'all' (global ranking) | 'summary' (distribution + worst_10) | 'files' (worst fn per file)
+        min_risk: only return functions with risk_score >= this (0-100)
+        Returns: { results[], count } — each result has risk_score, risk_tier, issues[], clean_code_score
+        """
+        query: Dict[str, Any] = {"from": "function_profile", "mode": mode, "limit": limit}
+        if min_risk > 0:
+            query["min_risk"] = min_risk
+        if language:
+            query["language"] = language
+        if file_path_contains:
+            query["file_path_contains"] = file_path_contains
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
