@@ -1386,6 +1386,24 @@ class AsyncGitHubResource(BaseAsyncResource):
             query["language"] = language
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    async def get_module_smell_heat(
+        self,
+        project_id: str,
+        mode: str = "modules",
+        depth: int = 2,
+        language: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """Directory-level smell heat map.
+
+        smell_score = severity-weighted smells per file (critical×4, high×3, medium×2, low×1).
+        mode: 'modules' | 'summary'. depth: 1-5 directory grouping depth.
+        """
+        query: Dict[str, Any] = {"from": "module_smell_heat", "mode": mode, "depth": depth, "limit": limit}
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     async def get_refactor_priority(
         self,
         project_id: str,
