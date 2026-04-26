@@ -1665,3 +1665,20 @@ class AsyncGitHubResource(BaseAsyncResource):
         if file_path_contains:
             query["file_path_contains"] = file_path_contains
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    async def get_module_cohesion(
+        self,
+        project_id: str,
+        mode: str = "files",
+        language: str = "",
+        limit: int = 30,
+    ) -> Any:
+        """Analyze module cohesion — identify files violating Single Responsibility Principle.
+
+        mode: 'files' (sorted by cohesion score) | 'candidates' (split-recommended) | 'summary'
+        Returns: { results[], count } — each result has cohesion_score, concern_groups, recommendation
+        """
+        query: Dict[str, Any] = {"from": "module_cohesion", "mode": mode, "limit": limit}
+        if language:
+            query["language"] = language
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
