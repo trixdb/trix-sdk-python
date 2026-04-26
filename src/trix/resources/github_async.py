@@ -1386,6 +1386,25 @@ class AsyncGitHubResource(BaseAsyncResource):
             query["language"] = language
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    async def get_top_rules(
+        self,
+        project_id: str,
+        mode: str = "rules",
+        category: str = "",
+        severity: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """SAST rule/kind breakdown ranked by occurrence.
+
+        mode: 'rules' | 'files'. category/severity for filtering.
+        """
+        query: Dict[str, Any] = {"from": "top_rules", "mode": mode, "limit": limit}
+        if category:
+            query["category"] = category
+        if severity:
+            query["severity"] = severity
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     async def get_module_smell_heat(
         self,
         project_id: str,

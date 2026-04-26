@@ -1635,6 +1635,32 @@ class GitHubResource(BaseSyncResource):
             query["language"] = language
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
+    def get_top_rules(
+        self,
+        project_id: str,
+        mode: str = "rules",
+        category: str = "",
+        severity: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """SAST rule/kind breakdown ranked by occurrence.
+
+        Groups open findings by evidence.kind to show which rules trigger the most.
+        mode: 'rules' (prevalence ranking) | 'files' (files with most unique rules)
+        category: security, smell, bug, performance, style, etc.
+        severity: critical, high, medium, low
+        """
+        query: Dict[str, Any] = {
+            "from": "top_rules",
+            "mode": mode,
+            "limit": limit,
+        }
+        if category:
+            query["category"] = category
+        if severity:
+            query["severity"] = severity
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
     def get_module_smell_heat(
         self,
         project_id: str,
