@@ -1508,3 +1508,27 @@ class AsyncGitHubResource(BaseAsyncResource):
             else:
                 results["succeeded"] += 1
         return results
+
+    async def get_solid_analysis(
+        self,
+        project_id: str,
+        principle: str = "all",
+        min_severity: str = "warning",
+        repo_full_name: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """SOLID principle violations + OOP anti-patterns (async).
+
+        principle: all | srp | ocp | isp | dip | lsp
+        min_severity: info | warning | critical
+        Returns violations[] with principle, kind, severity, file_path, message, refactoring.
+        """
+        query: Dict[str, Any] = {
+            "from": "solid_analysis",
+            "principle": principle,
+            "minSeverity": min_severity,
+            "limit": limit,
+        }
+        if repo_full_name:
+            query["repoFullName"] = repo_full_name
+        return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)

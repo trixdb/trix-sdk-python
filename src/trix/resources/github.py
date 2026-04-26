@@ -1787,3 +1787,35 @@ class GitHubResource(BaseSyncResource):
                 else:
                     results["failed"] += 1
         return results
+
+    def get_solid_analysis(
+        self,
+        project_id: str,
+        principle: str = "all",
+        min_severity: str = "warning",
+        repo_full_name: str = "",
+        limit: int = 25,
+    ) -> Dict[str, Any]:
+        """SOLID principle violations + OOP anti-patterns.
+
+        Detects violations of all five SOLID principles and Clean Code OOP rules:
+          SRP — god_module, feature_envy, data_clumps
+          OCP — switch_on_type (large switch/match on type field)
+          ISP — fat interfaces (fn_count >= 25)
+          DIP — concrete_dependency (new ConcreteClass() in business logic)
+          LSP — anemic_domain_model (class with only getters/setters)
+
+        principle: all | srp | ocp | isp | dip | lsp
+        min_severity: info | warning | critical
+        Returns violations[] with principle, kind, severity, file_path, message, refactoring hint.
+        summary: { total_violations, by_principle, top_files }
+        """
+        query: Dict[str, Any] = {
+            "from": "solid_analysis",
+            "principle": principle,
+            "minSeverity": min_severity,
+            "limit": limit,
+        }
+        if repo_full_name:
+            query["repoFullName"] = repo_full_name
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
