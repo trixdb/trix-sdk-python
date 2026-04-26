@@ -1977,3 +1977,28 @@ class GitHubResource(BaseSyncResource):
         if language:
             query["language"] = language
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def get_function_risk_delta(
+        self,
+        project_id: str,
+        file_paths: Optional[List[str]] = None,
+        dir: str = "",
+        mode: str = "top",
+        limit: int = 15,
+    ) -> Any:
+        """Score functions in PR-changed files by review attention priority.
+
+        file_paths: list of changed file paths from a PR diff
+        dir: directory prefix as alternative to file_paths
+        mode: 'top' (highest priority) | 'all' (all scored) | 'summary' (per-file)
+        Returns: functions ranked by review_attention_score with risk_factors and review_note
+        """
+        query: Dict[str, Any] = {
+            "from": "function_risk_delta",
+            "where": {"file_paths": file_paths or []},
+            "mode": mode,
+            "limit": limit,
+        }
+        if dir:
+            query["where"]["dir"] = dir
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
