@@ -2118,3 +2118,42 @@ class GitHubResource(BaseSyncResource):
         if dir:
             query["where"]["dir"] = dir
         return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
+
+    def dead_code_ratio(
+        self,
+        project_id: str,
+        mode: str = "files",
+        tier: Optional[str] = None,
+        language: Optional[str] = None,
+        min_functions: int = 3,
+        limit: int = 50,
+    ) -> Any:
+        """Detect zombie files — files where most functions have zero callers.
+
+        Distinct from get_dead_exports which lists individual dead functions by risk.
+        This method focuses on the FILE-LEVEL ratio of dead code.
+
+        Tiers: zombie (≥50% unused), hollow (25-50% unused), lean (<25% unused).
+
+        Args:
+            project_id: Project UUID.
+            mode: 'files' (ranked list) or 'summary' (tier counts + overall_dead_ratio + worst_5).
+            tier: Filter by tier: zombie, hollow, or lean.
+            language: Filter by language.
+            min_functions: Minimum functions per file to include (default 3).
+            limit: Max results (default 50).
+
+        Returns: Ranked files with dead_ratio, tier, zombie_score, hotspot_score.
+        """
+        where: Dict[str, Any] = {"min_functions": min_functions}
+        if tier:
+            where["tier"] = tier
+        if language:
+            where["language"] = language
+        query: Dict[str, Any] = {
+            "from": "dead_code_ratio",
+            "mode": mode,
+            "where": where,
+            "limit": limit,
+        }
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
