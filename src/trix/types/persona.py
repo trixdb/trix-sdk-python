@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .base import BaseResponse
 
@@ -86,6 +86,11 @@ class PersonaAddSpace(BaseModel):
 
 
 class PersonaList(BaseResponse):
-    """List of personas."""
+    """List of personas.
 
-    data: List[Persona]
+    Personas resolve from the agents endpoint, which returns the collection
+    under the ``agents`` key; the alias maps it onto ``.data``
+    (``populate_by_name`` keeps the legacy ``data`` key working).
+    """
+
+    data: List[Persona] = Field(alias="agents", default_factory=list)

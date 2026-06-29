@@ -40,13 +40,14 @@ class TestBotsResource:
     def test_list_bots(self):
         """Test listing bots."""
         mock_client = Mock()
-        mock_client._request.return_value = {"bots": [BOT_RESPONSE]}
+        # Agents API returns the collection under the ``agents`` key.
+        mock_client._request.return_value = {"agents": [BOT_RESPONSE]}
 
         resource = BotsResource(mock_client)
         result = resource.list()
 
         call_args = mock_client._request.call_args
-        assert call_args[0] == ("GET", "/bots")
+        assert call_args[0] == ("GET", "/agents")
         assert call_args[1]["params"]["limit"] == 100
         assert len(result.bots) == 1
 
@@ -70,7 +71,7 @@ class TestBotsResource:
         result = resource.get("bot_123")
 
         call_args = mock_client._request.call_args
-        assert call_args[0] == ("GET", "/bots/bot_123")
+        assert call_args[0] == ("GET", "/agents/bot_123")
         assert result.id == "bot_123"
         assert result.name == "Summarizer"
 
@@ -84,7 +85,7 @@ class TestBotsResource:
 
         call_args = mock_client._request.call_args
         assert call_args[0][0] == "POST"
-        assert call_args[0][1] == "/bots"
+        assert call_args[0][1] == "/agents"
         assert result.name == "Summarizer"
 
     def test_run_bot(self):
@@ -96,7 +97,7 @@ class TestBotsResource:
         result = resource.run("bot_123", message="Summarize today")
 
         call_args = mock_client._request.call_args
-        assert call_args[0] == ("POST", "/bots/bot_123/run")
+        assert call_args[0] == ("POST", "/agents/bot_123/run")
         assert result.id == "run_456"
         assert result.status == "running"
 
@@ -109,7 +110,7 @@ class TestBotsResource:
         result = resource.list_runs("bot_123")
 
         call_args = mock_client._request.call_args
-        assert call_args[0] == ("GET", "/bots/bot_123/runs")
+        assert call_args[0] == ("GET", "/agents/bot_123/runs")
         assert len(result.runs) == 1
 
     def test_get_run(self):
@@ -121,7 +122,7 @@ class TestBotsResource:
         result = resource.get_run("bot_123", "run_456")
 
         call_args = mock_client._request.call_args
-        assert call_args[0] == ("GET", "/bots/bot_123/runs/run_456")
+        assert call_args[0] == ("GET", "/agents/runs/run_456")
         assert result.status == "completed"
 
     def test_delete_bot(self):
@@ -133,7 +134,7 @@ class TestBotsResource:
         resource.delete("bot_123")
 
         call_args = mock_client._request.call_args
-        assert call_args[0] == ("DELETE", "/bots/bot_123")
+        assert call_args[0] == ("DELETE", "/agents/bot_123")
 
     def test_update_bot(self):
         """Test updating a bot."""
@@ -144,7 +145,7 @@ class TestBotsResource:
         result = resource.update("bot_123", name="Updated Bot")
 
         call_args = mock_client._request.call_args
-        assert call_args[0] == ("PATCH", "/bots/bot_123")
+        assert call_args[0] == ("PATCH", "/agents/bot_123")
         assert result.name == "Updated Bot"
 
 
@@ -155,7 +156,7 @@ class TestAsyncBotsResource:
     async def test_list_bots(self):
         """Test listing bots asynchronously."""
         mock_client = AsyncMock()
-        mock_client._request.return_value = {"bots": [BOT_RESPONSE]}
+        mock_client._request.return_value = {"agents": [BOT_RESPONSE]}
 
         resource = AsyncBotsResource(mock_client)
         result = await resource.list()

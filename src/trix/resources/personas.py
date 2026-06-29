@@ -55,8 +55,13 @@ class PersonasResource(BaseSyncResource):
         return Persona.model_validate(response)
 
     def list(self) -> PersonaList:
-        """List all personas."""
-        response = self._request("GET", "/personas")
+        """List all personas.
+
+        Personas were merged into the agents namespace; ``/personas`` is now
+        410 Gone. Resolution reads from the agents list (attribution still
+        flows through the ``X-Persona-Id`` header set via ``set_persona``).
+        """
+        response = self._request("GET", "/agents")
         return PersonaList.model_validate(response)
 
     def get(self, id: str) -> Persona:
@@ -165,8 +170,13 @@ class AsyncPersonasResource(BaseAsyncResource):
         return Persona.model_validate(response)
 
     async def list(self) -> PersonaList:
-        """List all personas (async)."""
-        response = await self._request("GET", "/personas")
+        """List all personas (async).
+
+        Personas were merged into the agents namespace; ``/personas`` is now
+        410 Gone. Resolution reads from the agents list (attribution still
+        flows through the ``X-Persona-Id`` header set via ``set_persona``).
+        """
+        response = await self._request("GET", "/agents")
         return PersonaList.model_validate(response)
 
     async def get(self, id: str) -> Persona:

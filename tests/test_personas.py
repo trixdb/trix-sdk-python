@@ -28,8 +28,12 @@ def mock_persona_data():
 
 @pytest.fixture
 def mock_persona_list_data(mock_persona_data):
-    """Mock persona list response data."""
-    return {"data": [mock_persona_data]}
+    """Mock persona list response data.
+
+    Personas resolve from the agents endpoint, which returns the collection
+    under the ``agents`` key.
+    """
+    return {"agents": [mock_persona_data]}
 
 
 @pytest.fixture
@@ -143,7 +147,7 @@ class TestPersonaList:
             client.close()
 
     def test_list_sends_correct_request(self, mock_persona_list_data):
-        """Test that list sends GET /personas."""
+        """Test that list resolves personas via GET /agents (personas merged in)."""
         with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_persona_list_data
             client = Trix(api_key="test_key")
@@ -152,7 +156,7 @@ class TestPersonaList:
 
             call_args = mock_request.call_args
             assert call_args[0][0] == "GET"
-            assert call_args[0][1] == "/personas"
+            assert call_args[0][1] == "/agents"
             client.close()
 
     @pytest.mark.asyncio

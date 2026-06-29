@@ -19,6 +19,7 @@ from .client_base import (
     RequestInterceptor,
     ResponseContext,
     ResponseInterceptor,
+    normalize_base_url,
 )
 from .client_transport_async import AsyncTransportMixin
 from .resources.agent import AsyncAgentResource
@@ -127,7 +128,7 @@ class AsyncTrix(AsyncTransportMixin):
         from environment variables.
         """
         self._auth = Auth(api_key=api_key, jwt_token=jwt_token)
-        self._base_url = validate_base_url(base_url, allow_http=allow_insecure)
+        self._base_url = normalize_base_url(validate_base_url(base_url, allow_http=allow_insecure))
         self._timeout = timeout
         self._retry_config = retry_config or RetryConfig(max_retries=max_retries)
         self._pool_config = pool_config or PoolConfig()

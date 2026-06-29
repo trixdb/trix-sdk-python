@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .base import BaseResponse
 
@@ -147,9 +147,13 @@ class BotUpdate(BaseModel):
 
 
 class BotList(BaseResponse):
-    """List of bots."""
+    """List of bots.
 
-    bots: List[Bot]
+    The agents API returns the collection under the ``agents`` key; the alias
+    maps it onto ``.bots`` (``populate_by_name`` keeps the legacy key working).
+    """
+
+    bots: List[Bot] = Field(alias="agents", default_factory=list)
 
 
 class BotRunList(BaseResponse):

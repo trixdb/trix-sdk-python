@@ -16,6 +16,7 @@ from .client_base import (
     _safe_log_params,
     check_api_version,
     handle_response,
+    versioned_path,
 )
 from .exceptions import APIError, ConnectionError, RateLimitError, ServerError, TimeoutError
 from .utils.retry import RetryConfig
@@ -84,7 +85,7 @@ class SyncTransportMixin:
         logger.debug(f"Request: {ctx.method} {ctx.path} params={_safe_log_params(ctx.params)}")
         return self._client.request(
             method=ctx.method,
-            url=ctx.path,
+            url=versioned_path(ctx.path),
             params=ctx.params,
             json=ctx.json,
             headers=ctx.headers,
@@ -160,7 +161,7 @@ class SyncTransportMixin:
         try:
             logger.debug(f"Request (raw): {method} {path} params={_safe_log_params(params)}")
             response = self._client.request(
-                method=method, url=path, params=params, timeout=request_timeout
+                method=method, url=versioned_path(path), params=params, timeout=request_timeout
             )
             logger.debug(f"Response (raw): {response.status_code}")
             check_api_version(response)
@@ -186,7 +187,7 @@ class SyncTransportMixin:
         try:
             logger.debug(f"Request (stream): {method} {path} params={_safe_log_params(params)}")
             with self._client.stream(
-                method=method, url=path, params=params, timeout=request_timeout
+                method=method, url=versioned_path(path), params=params, timeout=request_timeout
             ) as response:
                 logger.debug(f"Response (stream): {response.status_code}")
                 check_api_version(response)
@@ -216,7 +217,7 @@ class SyncTransportMixin:
             headers = {k: v for k, v in self._get_headers().items() if k.lower() != "content-type"}
             response = self._client.request(
                 method=method,
-                url=path,
+                url=versioned_path(path),
                 data=data,
                 files=files,
                 params=params,
