@@ -23,6 +23,40 @@ from .exceptions import (
 )
 from .utils.security import redact_sensitive_data
 
+API_VERSION_PREFIX = "/v1"
+
+
+def versioned_path(path: str) -> str:
+    """Prepend the ``/v1`` API-version prefix to a request path (idempotent).
+
+    Resource files use leading-slash paths such as ``/goals``. With httpx a
+    leading-slash request path *replaces* the base_url path, so any ``/v1`` a
+    caller put in ``base_url`` is silently dropped and the request 404s against
+    the versioned API. Prefixing here guarantees every request is versioned.
+
+    Paths already starting with ``/v1`` (e.g. the GitHub resource) are returned
+    unchanged to avoid producing ``/v1/v1``.
+    """
+    if path == API_VERSION_PREFIX or path.startswith(API_VERSION_PREFIX + "/"):
+        return path
+    if not path.startswith("/"):
+        path = "/" + path
+    return API_VERSION_PREFIX + path
+
+
+def normalize_base_url(base_url: str) -> str:
+    """Drop a trailing ``/v1`` (and slashes) from a base URL.
+
+    The transport prepends ``/v1`` to every path and httpx *concatenates* the
+    base-URL path with the request path (a leading-slash request path does not
+    replace it). Stripping a caller-supplied ``/v1`` suffix here keeps exactly
+    one ``/v1`` segment whether or not the base URL already included it.
+    """
+    trimmed = base_url.rstrip("/")
+    if trimmed.endswith(API_VERSION_PREFIX):
+        trimmed = trimmed[: -len(API_VERSION_PREFIX)]
+    return trimmed
+
 
 @dataclass
 class RequestContext:

@@ -43,7 +43,7 @@ def test_graph_expand_basic(sync_client, respx_mock):
         "scoring": None,
     }
 
-    respx_mock.post("https://test.api.com/graph/expand").mock(
+    respx_mock.post("https://test.api.com/v1/graph/expand").mock(
         return_value=Response(200, json=mock_response)
     )
 
@@ -78,7 +78,7 @@ def test_graph_expand_with_options(sync_client, respx_mock):
         "scoring": None,
     }
 
-    respx_mock.post("https://test.api.com/graph/expand").mock(
+    respx_mock.post("https://test.api.com/v1/graph/expand").mock(
         return_value=Response(200, json=mock_response)
     )
 
@@ -135,7 +135,7 @@ def test_graph_expand_with_hybrid_scoring(sync_client, respx_mock):
         },
     }
 
-    respx_mock.post("https://test.api.com/graph/expand").mock(
+    respx_mock.post("https://test.api.com/v1/graph/expand").mock(
         return_value=Response(200, json=mock_response)
     )
 
@@ -186,7 +186,7 @@ async def test_graph_expand_async_basic(async_client, respx_mock):
         "scoring": None,
     }
 
-    respx_mock.post("https://test.api.com/graph/expand").mock(
+    respx_mock.post("https://test.api.com/v1/graph/expand").mock(
         return_value=Response(200, json=mock_response)
     )
 
@@ -228,7 +228,7 @@ def test_relationship_strength_and_weight_fields(sync_client, respx_mock):
         "scoring": None,
     }
 
-    respx_mock.post("https://test.api.com/graph/expand").mock(
+    respx_mock.post("https://test.api.com/v1/graph/expand").mock(
         return_value=Response(200, json=mock_response_strength)
     )
 
