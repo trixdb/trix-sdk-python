@@ -121,6 +121,51 @@ def test_personas_resource_resolves_via_v1_agents():
     client.close()
 
 
+def test_personas_get_resolves_via_v1_agents_not_personas():
+    """personas.get must hit /v1/agents/:id, never the 410 Gone /personas."""
+    client, captured = _capturing_client()
+    try:
+        client.personas.get("persona_123")
+    except Exception:  # noqa: BLE001
+        pass
+    assert captured[-1].url.path == "/v1/agents/persona_123"
+    assert "/personas" not in captured[-1].url.path
+    client.close()
+
+
+def test_facts_memory_scoped_paths_are_versioned():
+    """facts memory-scoped read/create hit /v1/memories/:id/facts."""
+    client, captured = _capturing_client()
+    mem = "11111111-1111-1111-1111-111111111111"
+    calls = [
+        lambda: client.facts.list_for_memory(mem),
+        lambda: client.facts.create_for_memory(mem, content="x", importance=5),
+    ]
+    for call in calls:
+        try:
+            call()
+        except Exception:  # noqa: BLE001 - URL captured before parsing
+            pass
+        assert captured[-1].url.path == f"/v1/memories/{mem}/facts"
+    client.close()
+
+
+def test_entities_knowledge_paths_are_versioned():
+    """entities get_facts/merge hit the real /v1/knowledge/entities surface."""
+    client, captured = _capturing_client()
+    try:
+        client.entities.get_facts("ent_1")
+    except Exception:  # noqa: BLE001
+        pass
+    assert captured[-1].url.path == "/v1/knowledge/entities/ent_1/facts"
+    try:
+        client.entities.merge("ent_1", "ent_2")
+    except Exception:  # noqa: BLE001
+        pass
+    assert captured[-1].url.path == "/v1/knowledge/entities/merge"
+    client.close()
+
+
 def test_goals_path_is_exactly_v1_goals():
     client, captured = _capturing_client()
     try:

@@ -99,7 +99,7 @@ class TestPersonaCreate:
             client.close()
 
     def test_create_sends_correct_request(self, mock_persona_data):
-        """Test that create sends POST /personas with correct JSON body."""
+        """Test that create sends POST /agents (personas merged into agents)."""
         with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_persona_data
             client = Trix(api_key="test_key")
@@ -108,7 +108,7 @@ class TestPersonaCreate:
 
             call_args = mock_request.call_args
             assert call_args[0][0] == "POST"
-            assert call_args[0][1] == "/personas"
+            assert call_args[0][1] == "/agents"
             json_data = call_args[1]["json"]
             assert json_data["name"] == "Research"
             assert json_data["purpose"] == "Academic research"
@@ -192,7 +192,7 @@ class TestPersonaGet:
             client.close()
 
     def test_get_sends_correct_request(self, mock_persona_data):
-        """Test that get sends GET /personas/{id}."""
+        """Test that get sends GET /agents/{id} (was 410 Gone /personas/{id})."""
         with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_persona_data
             client = Trix(api_key="test_key")
@@ -201,7 +201,7 @@ class TestPersonaGet:
 
             call_args = mock_request.call_args
             assert call_args[0][0] == "GET"
-            assert call_args[0][1] == "/personas/persona_123"
+            assert call_args[0][1] == "/agents/persona_123"
             client.close()
 
     def test_get_validates_id(self):
@@ -243,7 +243,7 @@ class TestPersonaGetBySlug:
             assert persona.slug == "research"
             call_args = mock_request.call_args
             assert call_args[0][0] == "GET"
-            assert call_args[0][1] == "/personas/slug/research"
+            assert call_args[0][1] == "/agents/research"
             client.close()
 
     def test_get_by_slug_validates_empty(self):
@@ -321,7 +321,7 @@ class TestPersonaUpdate:
             client.close()
 
     def test_update_sends_correct_request(self, mock_persona_data):
-        """Test that update sends PATCH /personas/{id}."""
+        """Test that update sends PATCH /agents/{id} (was 410 Gone /personas/{id})."""
         with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_persona_data
             client = Trix(api_key="test_key")
@@ -330,7 +330,7 @@ class TestPersonaUpdate:
 
             call_args = mock_request.call_args
             assert call_args[0][0] == "PATCH"
-            assert call_args[0][1] == "/personas/persona_123"
+            assert call_args[0][1] == "/agents/persona_123"
             client.close()
 
     @pytest.mark.asyncio
@@ -365,7 +365,7 @@ class TestPersonaDelete:
             client.close()
 
     def test_delete_sends_correct_request(self):
-        """Test that delete sends DELETE /personas/{id}."""
+        """Test that delete sends DELETE /agents/{id} (was 410 Gone /personas/{id})."""
         with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = None
             client = Trix(api_key="test_key")
@@ -374,7 +374,7 @@ class TestPersonaDelete:
 
             call_args = mock_request.call_args
             assert call_args[0][0] == "DELETE"
-            assert call_args[0][1] == "/personas/persona_123"
+            assert call_args[0][1] == "/agents/persona_123"
             client.close()
 
     @pytest.mark.asyncio
@@ -432,7 +432,7 @@ class TestPersonaAddSpace:
             client.close()
 
     def test_add_space_sends_correct_request(self, mock_persona_space_data):
-        """Test that add_space sends POST /personas/{id}/spaces."""
+        """Test that add_space sends POST /agents/{id}/spaces."""
         with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = mock_persona_space_data
             client = Trix(api_key="test_key")
@@ -441,7 +441,7 @@ class TestPersonaAddSpace:
 
             call_args = mock_request.call_args
             assert call_args[0][0] == "POST"
-            assert call_args[0][1] == "/personas/persona_123/spaces"
+            assert call_args[0][1] == "/agents/persona_123/spaces"
             json_data = call_args[1]["json"]
             assert json_data["space_id"] == "space_456"
             assert json_data["role"] == "member"
@@ -477,7 +477,7 @@ class TestPersonaRemoveSpace:
             client.close()
 
     def test_remove_space_sends_correct_request(self):
-        """Test that remove_space sends DELETE /personas/{id}/spaces/{sid}."""
+        """Test that remove_space sends DELETE /agents/{id}/spaces/{sid}."""
         with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = None
             client = Trix(api_key="test_key")
@@ -486,7 +486,7 @@ class TestPersonaRemoveSpace:
 
             call_args = mock_request.call_args
             assert call_args[0][0] == "DELETE"
-            assert call_args[0][1] == "/personas/persona_123/spaces/space_456"
+            assert call_args[0][1] == "/agents/persona_123/spaces/space_456"
             client.close()
 
     @pytest.mark.asyncio
@@ -500,3 +500,33 @@ class TestPersonaRemoveSpace:
 
             assert result is None
             await client.close()
+
+
+class TestPersonasNeverHitGonePersonasNamespace:
+    """Regression guard: no persona method may target the 410 Gone /personas."""
+
+    def test_all_methods_resolve_via_agents(self, mock_persona_data, mock_persona_space_data):
+        """Every persona call must route to /agents, never /personas."""
+        with patch.object(Trix, "_request") as mock_request:
+            client = Trix(api_key="test_key")
+
+            calls = [
+                (lambda: client.personas.create(name="Research"), mock_persona_data),
+                (lambda: client.personas.get("persona_123"), mock_persona_data),
+                (lambda: client.personas.get_by_slug("research"), mock_persona_data),
+                (lambda: client.personas.update("persona_123", name="x"), mock_persona_data),
+                (lambda: client.personas.delete("persona_123"), None),
+                (
+                    lambda: client.personas.add_space("persona_123", "space_456"),
+                    mock_persona_space_data,
+                ),
+                (lambda: client.personas.remove_space("persona_123", "space_456"), None),
+            ]
+            for call, response in calls:
+                mock_request.return_value = response
+                call()
+                path = mock_request.call_args[0][1]
+                assert path.startswith("/agents"), path
+                assert not path.startswith("/personas"), path
+
+            client.close()

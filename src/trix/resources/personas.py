@@ -51,7 +51,7 @@ class PersonasResource(BaseSyncResource):
             is_default=is_default,
             can_create_spaces=can_create_spaces,
         )
-        response = self._request("POST", "/personas", json=data.model_dump(exclude_none=True))
+        response = self._request("POST", "/agents", json=data.model_dump(exclude_none=True))
         return Persona.model_validate(response)
 
     def list(self) -> PersonaList:
@@ -67,14 +67,14 @@ class PersonasResource(BaseSyncResource):
     def get(self, id: str) -> Persona:
         """Get a persona by ID."""
         validate_id(id, "persona")
-        response = self._request("GET", f"/personas/{id}")
+        response = self._request("GET", f"/agents/{id}")
         return Persona.model_validate(response)
 
     def get_by_slug(self, slug: str) -> Persona:
-        """Get a persona by slug."""
+        """Get a persona by slug (resolved via the merged agents endpoint)."""
         if not slug:
             raise ValueError("persona slug cannot be empty")
-        response = self._request("GET", f"/personas/slug/{slug}")
+        response = self._request("GET", f"/agents/{slug}")
         return Persona.model_validate(response)
 
     def update(
@@ -103,15 +103,13 @@ class PersonasResource(BaseSyncResource):
             is_default=is_default,
             can_create_spaces=can_create_spaces,
         )
-        response = self._request(
-            "PATCH", f"/personas/{id}", json=data.model_dump(exclude_none=True)
-        )
+        response = self._request("PATCH", f"/agents/{id}", json=data.model_dump(exclude_none=True))
         return Persona.model_validate(response)
 
     def delete(self, id: str) -> None:
         """Delete a persona."""
         validate_id(id, "persona")
-        self._request("DELETE", f"/personas/{id}")
+        self._request("DELETE", f"/agents/{id}")
 
     def add_space(
         self,
@@ -129,14 +127,14 @@ class PersonasResource(BaseSyncResource):
             can_create_memories=can_create_memories,
             can_delete_memories=can_delete_memories,
         )
-        response = self._request("POST", f"/personas/{persona_id}/spaces", json=data.model_dump())
+        response = self._request("POST", f"/agents/{persona_id}/spaces", json=data.model_dump())
         return PersonaSpace.model_validate(response)
 
     def remove_space(self, persona_id: str, space_id: str) -> None:
         """Remove a space from a persona."""
         validate_id(persona_id, "persona")
         validate_id(space_id, "space")
-        self._request("DELETE", f"/personas/{persona_id}/spaces/{space_id}")
+        self._request("DELETE", f"/agents/{persona_id}/spaces/{space_id}")
 
 
 class AsyncPersonasResource(BaseAsyncResource):
@@ -166,7 +164,7 @@ class AsyncPersonasResource(BaseAsyncResource):
             is_default=is_default,
             can_create_spaces=can_create_spaces,
         )
-        response = await self._request("POST", "/personas", json=data.model_dump(exclude_none=True))
+        response = await self._request("POST", "/agents", json=data.model_dump(exclude_none=True))
         return Persona.model_validate(response)
 
     async def list(self) -> PersonaList:
@@ -182,14 +180,14 @@ class AsyncPersonasResource(BaseAsyncResource):
     async def get(self, id: str) -> Persona:
         """Get a persona by ID (async)."""
         validate_id(id, "persona")
-        response = await self._request("GET", f"/personas/{id}")
+        response = await self._request("GET", f"/agents/{id}")
         return Persona.model_validate(response)
 
     async def get_by_slug(self, slug: str) -> Persona:
-        """Get a persona by slug (async)."""
+        """Get a persona by slug (async; resolved via the merged agents endpoint)."""
         if not slug:
             raise ValueError("persona slug cannot be empty")
-        response = await self._request("GET", f"/personas/slug/{slug}")
+        response = await self._request("GET", f"/agents/{slug}")
         return Persona.model_validate(response)
 
     async def update(
@@ -219,14 +217,14 @@ class AsyncPersonasResource(BaseAsyncResource):
             can_create_spaces=can_create_spaces,
         )
         response = await self._request(
-            "PATCH", f"/personas/{id}", json=data.model_dump(exclude_none=True)
+            "PATCH", f"/agents/{id}", json=data.model_dump(exclude_none=True)
         )
         return Persona.model_validate(response)
 
     async def delete(self, id: str) -> None:
         """Delete a persona (async)."""
         validate_id(id, "persona")
-        await self._request("DELETE", f"/personas/{id}")
+        await self._request("DELETE", f"/agents/{id}")
 
     async def add_space(
         self,
@@ -245,7 +243,7 @@ class AsyncPersonasResource(BaseAsyncResource):
             can_delete_memories=can_delete_memories,
         )
         response = await self._request(
-            "POST", f"/personas/{persona_id}/spaces", json=data.model_dump()
+            "POST", f"/agents/{persona_id}/spaces", json=data.model_dump()
         )
         return PersonaSpace.model_validate(response)
 
@@ -253,4 +251,4 @@ class AsyncPersonasResource(BaseAsyncResource):
         """Remove a space from a persona (async)."""
         validate_id(persona_id, "persona")
         validate_id(space_id, "space")
-        await self._request("DELETE", f"/personas/{persona_id}/spaces/{space_id}")
+        await self._request("DELETE", f"/agents/{persona_id}/spaces/{space_id}")

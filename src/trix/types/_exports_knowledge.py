@@ -27,16 +27,11 @@ from .goal import (
 # Fact Models
 # =============================================================================
 from .fact import (
-    ExtractedFact,
     Fact,
-    FactCreate,
-    FactExtractionResult,
     FactList,
-    FactQueryResult,
     FactSource,
-    FactUpdate,
-    FactVerificationResult,
-    ScoredFact,
+    MemoryFactCreate,
+    MemoryFactsResult,
 )
 
 # =============================================================================
@@ -44,19 +39,9 @@ from .fact import (
 # =============================================================================
 from .entity import (
     Entity,
-    EntityCreate,
-    EntityExtractionResult,
     EntityFactsResult,
     EntityList,
-    EntityMemoryLinkResult,
     EntityMergeResult,
-    EntityResolutionResult,
-    EntitySearchResult,
-    EntityTypeInfo,
-    EntityTypesResult,
-    EntityUpdate,
-    ExtractedEntity,
-    ScoredEntity,
 )
 
 # =============================================================================
@@ -123,31 +108,16 @@ __all__ = [
     "ProgressHistoryEntry",
     "ProgressHistoryList",
     # Fact
-    "ExtractedFact",
     "Fact",
-    "FactCreate",
-    "FactExtractionResult",
     "FactList",
-    "FactQueryResult",
     "FactSource",
-    "FactUpdate",
-    "FactVerificationResult",
-    "ScoredFact",
+    "MemoryFactCreate",
+    "MemoryFactsResult",
     # Entity
     "Entity",
-    "EntityCreate",
-    "EntityExtractionResult",
     "EntityFactsResult",
     "EntityList",
-    "EntityMemoryLinkResult",
     "EntityMergeResult",
-    "EntityResolutionResult",
-    "EntitySearchResult",
-    "EntityTypeInfo",
-    "EntityTypesResult",
-    "EntityUpdate",
-    "ExtractedEntity",
-    "ScoredEntity",
     # Enrichment
     "Enrichment",
     "EnrichmentList",
