@@ -6,9 +6,10 @@ Used as a mixin by the Trix class.
 
 import logging
 import time
-from typing import Any, BinaryIO, Dict, Iterator, Optional, Tuple, Union
+from typing import Any, BinaryIO, Dict, Iterator, Optional, Tuple, Type, Union
 
 import httpx
+from pydantic import BaseModel
 
 from .client_base import (
     RequestContext,
@@ -234,3 +235,89 @@ class SyncTransportMixin:
             raise ConnectionError(f"Network error: {e}") from e
         except httpx.HTTPError as e:
             raise APIError(f"HTTP error: {e}") from e
+
+    def _typed_request(
+        self,
+        method: str,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a request and optionally validate the body into a pydantic model.
+
+        Backs the ``get``/``post``/``put``/``patch``/``delete`` verb helpers so
+        resources can call ``self._client.get(path, response_model=Model)`` and
+        receive a parsed model. ``path`` may already carry the ``/v1`` prefix;
+        ``versioned_path`` (invoked inside ``_request``) is idempotent.
+        """
+        result = self._request(method, path, params=params, json=json)
+        if response_model is not None:
+            return response_model.model_validate(result)
+        return result
+
+    def get(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a GET request (see :meth:`_typed_request`)."""
+        return self._typed_request(
+            "GET", path, params=params, json=json, response_model=response_model
+        )
+
+    def post(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a POST request (see :meth:`_typed_request`)."""
+        return self._typed_request(
+            "POST", path, params=params, json=json, response_model=response_model
+        )
+
+    def put(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a PUT request (see :meth:`_typed_request`)."""
+        return self._typed_request(
+            "PUT", path, params=params, json=json, response_model=response_model
+        )
+
+    def patch(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a PATCH request (see :meth:`_typed_request`)."""
+        return self._typed_request(
+            "PATCH", path, params=params, json=json, response_model=response_model
+        )
+
+    def delete(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a DELETE request (see :meth:`_typed_request`)."""
+        return self._typed_request(
+            "DELETE", path, params=params, json=json, response_model=response_model
+        )
