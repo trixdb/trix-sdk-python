@@ -1,8 +1,12 @@
 """Tests for FilesResource."""
 
-from unittest.mock import Mock
+import io
+from unittest.mock import AsyncMock, Mock
 
-from trix.resources.files import FilesResource
+import pytest
+
+from trix.resources.files import AsyncFilesResource, FilesResource
+from trix.types.file import ChatFile
 
 FILE_RESPONSE = {
     "id": "file_123",
@@ -133,3 +137,46 @@ class TestFilesDelete:
         call_args = mock_client._request.call_args
         assert call_args[0] == ("DELETE", "/files/file_123")
         assert result["deleted"] is True
+
+
+class TestAsyncFilesUpload:
+    """Tests for async files.upload() multipart parity (issue #10)."""
+
+    @pytest.mark.asyncio
+    async def test_async_upload_multipart(self):
+        """Async upload posts multipart form data and returns a ChatFile."""
+        mock_client = AsyncMock()
+        mock_client._request_multipart.return_value = FILE_RESPONSE
+
+        resource = AsyncFilesResource(mock_client)
+        result = await resource.upload(
+            io.BytesIO(b"hello world"),
+            filename="photo.jpg",
+            content_type="image/jpeg",
+            conversation_id="conv_123",
+        )
+
+        call_args = mock_client._request_multipart.call_args
+        assert call_args[0] == ("POST", "/files/upload")
+        assert call_args[1]["data"] == {"conversation_id": "conv_123"}
+        fname, _handle, ctype = call_args[1]["files"]["file"]
+        assert fname == "photo.jpg"
+        assert ctype == "image/jpeg"
+        assert isinstance(result, ChatFile)
+        assert result.id == "file_123"
+
+
+class TestFilesResourceParity:
+    """Sync/async public API parity guard (issue #10)."""
+
+    @staticmethod
+    def _public(cls: type) -> set:
+        return {name for name in dir(cls) if not name.startswith("_")}
+
+    def test_async_exposes_upload(self):
+        """AsyncFilesResource must expose upload(), like the sync resource."""
+        assert "upload" in self._public(AsyncFilesResource)
+
+    def test_sync_methods_present_on_async(self):
+        """Every public sync method must have an async counterpart."""
+        assert self._public(FilesResource) <= self._public(AsyncFilesResource)
