@@ -122,6 +122,32 @@ class FilesResource(BaseSyncResource):
 class AsyncFilesResource(BaseAsyncResource):
     """Asynchronous files resource."""
 
+    async def upload(
+        self,
+        file: Union[BinaryIO, Path, str],
+        filename: Optional[str] = None,
+        content_type: Optional[str] = None,
+        conversation_id: Optional[str] = None,
+        message_id: Optional[str] = None,
+    ) -> ChatFile:
+        """Upload a file via multipart form data."""
+        with prepare_file_upload(
+            file,
+            default_filename="file",
+            filename_override=filename,
+            content_type_override=content_type,
+        ) as (file_handle, fname, ctype):
+            data: Dict[str, Any] = {}
+            if conversation_id:
+                data["conversation_id"] = conversation_id
+            if message_id:
+                data["message_id"] = message_id
+            files: Dict[str, Any] = {"file": (fname, file_handle, ctype)}
+            response = await self._client._request_multipart(
+                "POST", "/files/upload", data=data, files=files
+            )
+            return ChatFile.model_validate(response)
+
     async def upload_base64(
         self,
         filename: str,
