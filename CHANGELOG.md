@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Content-Type` into the `httpx` client-level defaults, which overrode the per-request
   multipart boundary. `Content-Type` is now left unset on the client and derived per
   request by httpx from the `json=` / `files=` body. ([#6](https://github.com/trix/trix-python-sdk/issues/6))
+- **Idempotent retries**: the client auto-retries 5xx / 429 responses on all methods, which
+  could duplicate a write when a mutating request's first attempt reached the server but the
+  response was lost. Mutating requests (POST/PUT/PATCH/DELETE) now send a single stable
+  `Idempotency-Key` (generated once, before the retry loop, reused across attempts) so the
+  backend dedupes retries. GET and other non-mutating methods send no key; a caller-supplied
+  key is preserved. ([#7](https://github.com/trix/trix-python-sdk/issues/7))
 
 ## [1.0.0] - 2025-12-25
 
