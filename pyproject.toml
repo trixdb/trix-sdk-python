@@ -55,6 +55,10 @@ Issues = "https://github.com/trix/trix-python-sdk/issues"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+# Ship the PEP 561 marker so downstream type checkers treat trix as typed.
+trix = ["py.typed"]
+
 [tool.black]
 line-length = 100
 target-version = ["py39"]

@@ -23,8 +23,15 @@ Async Example:
     ...     print(memory.id)
 """
 
-# Version constants - must be defined before importing submodules to avoid circular imports
-__version__ = "0.1.1"
+# Version constants - must be defined before importing submodules to avoid circular imports.
+# The version is single-sourced from the installed distribution metadata, which setuptools
+# populates from ``[project] version`` in pyproject.toml — the one authoritative source.
+from importlib.metadata import PackageNotFoundError, version as _dist_version
+
+try:
+    __version__ = _dist_version("trixdb")
+except PackageNotFoundError:  # pragma: no cover - running from a source tree without install
+    __version__ = "0.0.0+unknown"
 __api_version__ = "v1"
 MIN_API_VERSION = "v1"
 MAX_API_VERSION = "v1"
