@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **GitHub resources**: ~144 `client.github.*` methods (e.g. `get_issue_cycle_time`,
+  `dead_code_ratio`, `generate_tests`) raised `AttributeError` at call time because they
+  invoked `self._client.get/post/put/patch/delete`, which the client never implemented.
+  Added these verb helpers to the sync (`Trix`) and async (`AsyncTrix`) clients and to the
+  client protocols, so every GitHub method now issues its request and returns the typed
+  model. ([#5](https://github.com/trix/trix-python-sdk/issues/5))
+
 ## [1.0.0] - 2025-12-25
 
 ### Added

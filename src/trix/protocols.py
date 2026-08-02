@@ -9,9 +9,12 @@ from typing import (
     Optional,
     Protocol,
     Tuple,
+    Type,
     Union,
     runtime_checkable,
 )
+
+from pydantic import BaseModel
 
 
 @runtime_checkable
@@ -70,6 +73,61 @@ class SyncClientProtocol(Protocol):
         """Make a multipart/form-data HTTP request."""
         ...
 
+    def get(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a GET request, optionally validating into a pydantic model."""
+        ...
+
+    def post(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a POST request, optionally validating into a pydantic model."""
+        ...
+
+    def put(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a PUT request, optionally validating into a pydantic model."""
+        ...
+
+    def patch(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a PATCH request, optionally validating into a pydantic model."""
+        ...
+
+    def delete(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a DELETE request, optionally validating into a pydantic model."""
+        ...
+
 
 @runtime_checkable
 class AsyncClientProtocol(Protocol):
@@ -125,6 +183,61 @@ class AsyncClientProtocol(Protocol):
         timeout: Optional[float] = None,
     ) -> Any:
         """Make an async multipart/form-data HTTP request."""
+        ...
+
+    async def get(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a GET request, optionally validating into a pydantic model."""
+        ...
+
+    async def post(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a POST request, optionally validating into a pydantic model."""
+        ...
+
+    async def put(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a PUT request, optionally validating into a pydantic model."""
+        ...
+
+    async def patch(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a PATCH request, optionally validating into a pydantic model."""
+        ...
+
+    async def delete(
+        self,
+        path: str,
+        *,
+        params: Optional[Dict[str, Any]] = None,
+        json: Optional[Dict[str, Any]] = None,
+        response_model: Optional[Type[BaseModel]] = None,
+    ) -> Any:
+        """Issue a DELETE request, optionally validating into a pydantic model."""
         ...
 
 
