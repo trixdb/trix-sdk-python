@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Added these verb helpers to the sync (`Trix`) and async (`AsyncTrix`) clients and to the
   client protocols, so every GitHub method now issues its request and returns the typed
   model. ([#5](https://github.com/trix/trix-python-sdk/issues/5))
+- **Multipart uploads**: file uploads (e.g. `client.files.upload`, image/audio memory
+  uploads) were sent with `Content-Type: application/json` instead of
+  `multipart/form-data`, so the server could not parse the body. `_get_headers()` baked
+  `Content-Type` into the `httpx` client-level defaults, which overrode the per-request
+  multipart boundary. `Content-Type` is now left unset on the client and derived per
+  request by httpx from the `json=` / `files=` body. ([#6](https://github.com/trix/trix-python-sdk/issues/6))
 
 ## [1.0.0] - 2025-12-25
 

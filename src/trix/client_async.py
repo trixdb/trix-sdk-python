@@ -282,9 +282,15 @@ class AsyncTrix(AsyncTransportMixin):
         return err
 
     def _get_headers(self) -> Dict[str, str]:
-        """Get request headers with authentication and versioning."""
+        """Get request headers with authentication and versioning.
+
+        ``Content-Type`` is deliberately NOT set here: these headers become the
+        ``httpx.AsyncClient`` defaults, and a baked-in ``application/json``
+        overrides the ``multipart/form-data; boundary=...`` httpx generates for
+        file uploads. httpx sets the correct ``Content-Type`` per request from
+        the ``json=`` / ``files=`` body, so leaving it unset keeps both right.
+        """
         headers = {
-            "Content-Type": "application/json",
             "Accept": "application/json",
             "User-Agent": f"trix-python-sdk/{__version__}",
             "X-SDK-Version": __version__,
