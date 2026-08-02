@@ -21,7 +21,7 @@ from .client_base import (
     versioned_path,
 )
 from .exceptions import APIError, ConnectionError, RateLimitError, ServerError, TimeoutError
-from .utils.retry import RetryConfig
+from .utils.retry import RetryConfig, coerce_httpx_error, is_retryable
 
 logger = logging.getLogger(__name__)
 
@@ -70,15 +70,12 @@ class SyncTransportMixin:
                 response = self._execute_request(request_context, request_timeout)
                 return self._process_response(response, request_context)
             except (RateLimitError, ServerError) as e:
-                last_exception = self._handle_retry(e, attempt, config, request_context)
-                if last_exception is not None:
-                    raise last_exception
-            except httpx.TimeoutException as e:
-                raise self._handle_httpx_error(e, request_context, "timeout")
-            except httpx.NetworkError as e:
-                raise self._handle_httpx_error(e, request_context, "network")
+                error: Exception = e
             except httpx.HTTPError as e:
-                raise self._handle_httpx_error(e, request_context, "http")
+                error = coerce_httpx_error(e)
+            last_exception = self._handle_retry(error, attempt, config, request_context)
+            if last_exception is not None:
+                raise last_exception
 
         if last_exception:
             raise last_exception
@@ -127,8 +124,12 @@ class SyncTransportMixin:
     def _handle_retry(
         self, error: Exception, attempt: int, config: RetryConfig, ctx: RequestContext
     ) -> Optional[Exception]:
-        """Handle retry logic. Returns exception if should raise."""
-        if attempt >= config.max_retries:
+        """Retry if ``error`` is retryable and attempts remain.
+
+        Returns the (interceptor-processed) exception to raise when the error is
+        not retryable or retries are exhausted, or ``None`` to retry.
+        """
+        if not is_retryable(error, config) or attempt >= config.max_retries:
             return self._run_error_interceptors(error, ctx)
 
         retry_after = getattr(error, "retry_after", None)
@@ -139,19 +140,6 @@ class SyncTransportMixin:
         )
         time.sleep(delay)
         return None
-
-    def _handle_httpx_error(
-        self, error: Exception, ctx: RequestContext, error_type: str
-    ) -> Exception:
-        """Convert httpx errors to Trix errors."""
-        logger.debug(f"Request {error_type} error: {error}")
-        if error_type == "timeout":
-            exc: Exception = TimeoutError(f"Request timed out: {error}")
-        elif error_type == "network":
-            exc = ConnectionError(f"Network error: {error}")
-        else:
-            exc = APIError(f"HTTP error: {error}")
-        return self._run_error_interceptors(exc, ctx)
 
     def _request_raw(
         self,
