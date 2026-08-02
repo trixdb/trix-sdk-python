@@ -1,7 +1,6 @@
 """Tests for GitHubResource — ADR-152 GitHub project integration."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.github import GitHubResource
 
 PROJECT_ID = "proj_abc123"
@@ -54,7 +53,7 @@ class TestGitHubResourceConnections:
     """Tests for connection management methods."""
 
     def test_list_connections(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"connections": [CONNECTION], "count": 1}
 
         resource = GitHubResource(mock_client)
@@ -66,7 +65,7 @@ class TestGitHubResourceConnections:
         assert result.connections[0].repo_full_name == "acme/api"
 
     def test_link_repo_returns_webhook_credentials(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "connection": CONNECTION,
             "webhook_url": "https://api.trixdb.com/webhooks/github/abc",
@@ -87,7 +86,7 @@ class TestGitHubResourceConnections:
         assert result.connection.repo_full_name == "acme/api"
 
     def test_update_connection_sends_patch(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {**CONNECTION, "sync_commits": False}
 
         resource = GitHubResource(mock_client)
@@ -100,7 +99,7 @@ class TestGitHubResourceConnections:
 
     def test_update_connection_omits_none_fields(self):
         """Only explicitly-set fields should appear in the PATCH body."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CONNECTION
 
         resource = GitHubResource(mock_client)
@@ -115,7 +114,7 @@ class TestGitHubResourceActivity:
     """Tests for activity and churn methods."""
 
     def test_get_activity_defaults(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"memories": [], "total": 0, "count": 0}
 
         resource = GitHubResource(mock_client)
@@ -126,7 +125,7 @@ class TestGitHubResourceActivity:
         assert kwargs["params"]["limit"] == 20
 
     def test_get_activity_custom_type(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"memories": [], "total": 0, "count": 0}
 
         resource = GitHubResource(mock_client)
@@ -137,7 +136,7 @@ class TestGitHubResourceActivity:
         assert kwargs["params"]["limit"] == 5
 
     def test_get_churn_files(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "files": [
                 {
@@ -162,7 +161,7 @@ class TestGitHubResourceQuality:
     """Tests for quality analytics methods."""
 
     def test_get_quality_summary(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "summary": {
                 "total_files_tracked": 200,
@@ -180,7 +179,7 @@ class TestGitHubResourceQuality:
         assert result.summary.hotspot_count == 8
 
     def test_search_symbols(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"symbols": [], "count": 0}
 
         resource = GitHubResource(mock_client)
@@ -192,7 +191,7 @@ class TestGitHubResourceQuality:
 
     def test_get_file_symbols_uses_file_param(self):
         """get_file_symbols must pass 'file', not 'file_path', to the API."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"symbols": [], "count": 0}
 
         resource = GitHubResource(mock_client)
@@ -207,7 +206,7 @@ class TestGitHubResourceAnalytics:
     """Tests for Phase 3/4 analytics methods."""
 
     def test_get_velocity(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = VELOCITY
 
         resource = GitHubResource(mock_client)
@@ -219,7 +218,7 @@ class TestGitHubResourceAnalytics:
         assert result.avg_cycle_time_days == 1.5
 
     def test_get_velocity_null_cycle_time(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             **VELOCITY,
             "avg_cycle_time_hours": None,
@@ -231,7 +230,7 @@ class TestGitHubResourceAnalytics:
         assert result.avg_cycle_time_days is None
 
     def test_get_flagged_prs(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "prs": [
                 {
@@ -250,7 +249,7 @@ class TestGitHubResourceAnalytics:
         assert "pr:scope-creep" in result.prs[0].flags
 
     def test_get_flagged_prs_empty(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"prs": []}
 
         resource = GitHubResource(mock_client)
@@ -258,7 +257,7 @@ class TestGitHubResourceAnalytics:
         assert result.prs == []
 
     def test_get_cycle_time(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CYCLE_TIME
 
         resource = GitHubResource(mock_client)
@@ -269,7 +268,7 @@ class TestGitHubResourceAnalytics:
         assert result.open_issue_count == 12
 
     def test_get_agent_attribution(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = ATTRIBUTION
 
         resource = GitHubResource(mock_client)
@@ -280,7 +279,7 @@ class TestGitHubResourceAnalytics:
 
     def test_get_goal_progress(self):
         # progress is stored as 0.0–1.0 (not 0–100)
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "goals": [
                 {
@@ -306,7 +305,7 @@ class TestGitHubResourceAnalytics:
         assert result.goals[0].last_github_updated_at == "2026-04-21T10:00:00Z"
 
     def test_get_release_readiness(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "score": 85,
             "ready": True,
@@ -331,7 +330,7 @@ class TestGitHubResourceScan:
     """Tests for scan and delete operations."""
 
     def test_scan_repo_posts_to_scan_endpoint(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "scanned": True,
             "commits": 12,
@@ -352,7 +351,7 @@ class TestGitHubResourceScan:
         assert result.pr_briefs == 2
 
     def test_scan_repo_returns_errors_list(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "scanned": False,
             "commits": 0,
@@ -372,7 +371,7 @@ class TestGitHubResourceScan:
         assert "rate limit" in result.errors[0]
 
     def test_delete_connection_sends_delete(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = GitHubResource(mock_client)
@@ -386,7 +385,7 @@ class TestGitHubResourceNarrative:
     """Tests for delivery narrative methods."""
 
     def test_generate_narrative_posts_with_window_days(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = NARRATIVE_RESPONSE
 
         resource = GitHubResource(mock_client)
@@ -399,7 +398,7 @@ class TestGitHubResourceNarrative:
         assert "shipped" in result.narrative
 
     def test_generate_narrative_uses_default_window(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = NARRATIVE_RESPONSE
 
         resource = GitHubResource(mock_client)
@@ -409,7 +408,7 @@ class TestGitHubResourceNarrative:
         assert kwargs["json"]["window_days"] == 7
 
     def test_get_latest_narrative(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "narrative": {
                 "id": "mem_n1",
@@ -427,7 +426,7 @@ class TestGitHubResourceNarrative:
         assert "Week 16" in result.narrative.content
 
     def test_get_latest_narrative_when_none_exists(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"narrative": None}
 
         resource = GitHubResource(mock_client)
@@ -439,7 +438,7 @@ class TestGitHubResourceFileComplexity:
     """Tests for file complexity analytics."""
 
     def test_get_file_complexity_returns_metrics(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "files": [
                 {
@@ -469,7 +468,7 @@ class TestGitHubResourceFileComplexity:
         assert result.count == 1
 
     def test_get_file_complexity_with_filters(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"files": [], "count": 0}
 
         resource = GitHubResource(mock_client)
@@ -480,7 +479,7 @@ class TestGitHubResourceFileComplexity:
         assert kwargs["params"]["repo"] == "acme/api"
 
     def test_get_file_complexity_empty_list(self):
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"files": [], "count": 0}
 
         resource = GitHubResource(mock_client)

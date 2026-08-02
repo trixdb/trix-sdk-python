@@ -1,10 +1,10 @@
 """Tests for FilesResource."""
 
 import io
-from unittest.mock import AsyncMock, Mock
 
 import pytest
 
+from tests.support import spec_async_client, spec_client
 from trix.resources.files import AsyncFilesResource, FilesResource
 from trix.types.file import ChatFile
 
@@ -34,7 +34,7 @@ class TestFilesUploadBase64:
 
     def test_upload_base64(self):
         """Test uploading a file via base64."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FILE_RESPONSE
 
         resource = FilesResource(mock_client)
@@ -55,7 +55,7 @@ class TestFilesUploadBase64:
 
     def test_upload_base64_with_conversation(self):
         """Test uploading with conversation and message IDs."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FILE_RESPONSE
 
         resource = FilesResource(mock_client)
@@ -78,7 +78,7 @@ class TestFilesGet:
 
     def test_get_file_metadata(self):
         """Test getting file metadata by ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FILE_RESPONSE
 
         resource = FilesResource(mock_client)
@@ -96,7 +96,7 @@ class TestFilesList:
 
     def test_list_files(self):
         """Test listing files in a conversation."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FILE_LIST_RESPONSE
 
         resource = FilesResource(mock_client)
@@ -110,7 +110,7 @@ class TestFilesList:
 
     def test_list_files_with_filters(self):
         """Test listing files with type filter and pagination."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FILE_LIST_RESPONSE
 
         resource = FilesResource(mock_client)
@@ -128,7 +128,7 @@ class TestFilesDelete:
 
     def test_delete_file(self):
         """Test soft-deleting a file."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = DELETE_RESPONSE
 
         resource = FilesResource(mock_client)
@@ -145,7 +145,7 @@ class TestAsyncFilesUpload:
     @pytest.mark.asyncio
     async def test_async_upload_multipart(self):
         """Async upload posts multipart form data and returns a ChatFile."""
-        mock_client = AsyncMock()
+        mock_client = spec_async_client()
         mock_client._request_multipart.return_value = FILE_RESPONSE
 
         resource = AsyncFilesResource(mock_client)

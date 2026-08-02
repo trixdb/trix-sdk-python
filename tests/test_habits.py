@@ -5,6 +5,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from tests.support import spec_client
 from trix.resources.habits import HabitsResource
 from trix.types.habit import (
     CheckInResult,
@@ -44,7 +45,7 @@ STREAK_DATA = {"current": 5, "longest": 12}
 
 
 def _make_resource() -> tuple[HabitsResource, Mock]:
-    mock_client = Mock()
+    mock_client = spec_client()
     resource = HabitsResource(mock_client)
     return resource, mock_client
 

@@ -4,6 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from tests.support import spec_client
 from trix.resources.crews import CrewsResource
 from trix.types.crew import Crew, CrewList
 
@@ -26,7 +27,7 @@ CREW_DATA = {
 
 
 def _make_resource() -> tuple[CrewsResource, Mock]:
-    mock_client = Mock()
+    mock_client = spec_client()
     resource = CrewsResource(mock_client)
     return resource, mock_client
 

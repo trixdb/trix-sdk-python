@@ -1,7 +1,6 @@
 """Tests for TemplatesResource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.templates import TemplatesResource
 
 TEMPLATE_RESPONSE = {
@@ -38,7 +37,7 @@ class TestTemplatesList:
 
     def test_list_all(self):
         """Test listing all templates."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = TEMPLATE_LIST_RESPONSE
 
         resource = TemplatesResource(mock_client)
@@ -55,7 +54,7 @@ class TestTemplatesList:
 
     def test_list_with_filters(self):
         """Test listing templates with category and status filters."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = TEMPLATE_LIST_RESPONSE
 
         resource = TemplatesResource(mock_client)
@@ -73,7 +72,7 @@ class TestTemplatesGet:
 
     def test_get_by_id(self):
         """Test getting a template by ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = TEMPLATE_RESPONSE
 
         resource = TemplatesResource(mock_client)
@@ -91,7 +90,7 @@ class TestTemplatesCreate:
 
     def test_create_basic(self):
         """Test creating a template with just a name."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = TEMPLATE_RESPONSE
 
         resource = TemplatesResource(mock_client)
@@ -105,7 +104,7 @@ class TestTemplatesCreate:
 
     def test_create_with_options(self):
         """Test creating a template with all options."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = TEMPLATE_RESPONSE
 
         resource = TemplatesResource(mock_client)
@@ -131,7 +130,7 @@ class TestTemplatesDelete:
 
     def test_delete_by_id(self):
         """Test deleting a template."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = TemplatesResource(mock_client)

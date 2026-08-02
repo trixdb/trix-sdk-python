@@ -1,7 +1,6 @@
 """Tests for Tasks resource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.tasks import TasksResource
 
 TASK_RESPONSE = {
@@ -20,7 +19,7 @@ class TestTasksResource:
 
     def test_create_task(self):
         """Test creating a task."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = TASK_RESPONSE
 
         resource = TasksResource(mock_client)
@@ -33,7 +32,7 @@ class TestTasksResource:
 
     def test_list_tasks(self):
         """Test listing tasks."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "data": [TASK_RESPONSE],
             "total": 1,
@@ -51,7 +50,7 @@ class TestTasksResource:
 
     def test_list_tasks_with_status_filter(self):
         """Test listing tasks filtered by status."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "data": [],
             "total": 0,
@@ -67,7 +66,7 @@ class TestTasksResource:
 
     def test_get_task(self):
         """Test getting a task by ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = TASK_RESPONSE
 
         resource = TasksResource(mock_client)
@@ -79,7 +78,7 @@ class TestTasksResource:
 
     def test_update_task(self):
         """Test updating a task."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {**TASK_RESPONSE, "status": "in_progress"}
 
         resource = TasksResource(mock_client)
@@ -91,7 +90,7 @@ class TestTasksResource:
 
     def test_complete_task(self):
         """Test completing a task."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             **TASK_RESPONSE,
             "status": "done",
@@ -107,7 +106,7 @@ class TestTasksResource:
 
     def test_delete_task(self):
         """Test deleting a task."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = TasksResource(mock_client)
@@ -118,7 +117,7 @@ class TestTasksResource:
 
     def test_create_subtask(self):
         """Test creating a subtask."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             **TASK_RESPONSE,
             "id": "task_456",
@@ -135,7 +134,7 @@ class TestTasksResource:
 
     def test_handoff_task(self):
         """Test handing off a task to another agent."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "handoff_id": "handoff_789",
             "task": TASK_RESPONSE,
@@ -155,7 +154,7 @@ class TestTasksResource:
 
     def test_suggested_tasks(self):
         """Test getting AI-suggested tasks."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "data": [
                 {

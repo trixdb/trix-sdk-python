@@ -1,7 +1,6 @@
 """Tests for Workflows resource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.workflows import WorkflowsResource
 
 WORKFLOW_RESPONSE = {
@@ -29,7 +28,7 @@ class TestWorkflowsResource:
 
     def test_create_workflow(self):
         """Test creating a workflow."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = WORKFLOW_RESPONSE
 
         resource = WorkflowsResource(mock_client)
@@ -45,7 +44,7 @@ class TestWorkflowsResource:
 
     def test_list_workflows(self):
         """Test listing workflows."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "workflows": [WORKFLOW_RESPONSE],
             "total": 1,
@@ -62,7 +61,7 @@ class TestWorkflowsResource:
 
     def test_list_workflows_with_filter(self):
         """Test listing workflows filtered by status."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "workflows": [],
             "total": 0,
@@ -78,7 +77,7 @@ class TestWorkflowsResource:
 
     def test_get_workflow(self):
         """Test getting a workflow by ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = WORKFLOW_RESPONSE
 
         resource = WorkflowsResource(mock_client)
@@ -90,7 +89,7 @@ class TestWorkflowsResource:
 
     def test_update_workflow(self):
         """Test updating a workflow."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             **WORKFLOW_RESPONSE,
             "name": "Weekly Summary",
@@ -106,7 +105,7 @@ class TestWorkflowsResource:
 
     def test_delete_workflow(self):
         """Test deleting a workflow."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = WorkflowsResource(mock_client)
@@ -117,7 +116,7 @@ class TestWorkflowsResource:
 
     def test_trigger_workflow(self):
         """Test triggering a workflow run."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = RUN_RESPONSE
 
         resource = WorkflowsResource(mock_client)
@@ -130,7 +129,7 @@ class TestWorkflowsResource:
 
     def test_list_runs(self):
         """Test listing workflow runs."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "runs": [{**RUN_RESPONSE, "status": "completed"}],
             "total": 1,
@@ -147,7 +146,7 @@ class TestWorkflowsResource:
 
     def test_create_trigger(self):
         """Test creating a workflow trigger."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "id": "trigger_456",
             "workflow_id": "wf_123",
@@ -165,7 +164,7 @@ class TestWorkflowsResource:
 
     def test_delete_trigger(self):
         """Test deleting a workflow trigger."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = WorkflowsResource(mock_client)

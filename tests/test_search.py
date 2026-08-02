@@ -1,7 +1,6 @@
 """Tests for SearchResource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.search import SearchResource
 
 SEARCH_RESULT_DATA = {
@@ -51,7 +50,7 @@ class TestSearchQuery:
 
     def test_query_basic(self):
         """Test basic semantic search query."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = SEARCH_RESULT_DATA
 
         resource = SearchResource(mock_client)
@@ -67,7 +66,7 @@ class TestSearchQuery:
 
     def test_query_with_filters(self):
         """Test search query with tags, threshold, and limit."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = SEARCH_RESULT_DATA
 
         resource = SearchResource(mock_client)
@@ -89,7 +88,7 @@ class TestSearchQuery:
 
     def test_query_with_cluster_scale(self):
         """Test search query filtered by cluster scale."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = SEARCH_RESULT_DATA
 
         resource = SearchResource(mock_client)
@@ -100,7 +99,7 @@ class TestSearchQuery:
 
     def test_query_empty_results(self):
         """Test search query returning no results."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = EMPTY_SEARCH_RESULTS
 
         resource = SearchResource(mock_client)
@@ -115,7 +114,7 @@ class TestSearchSimilar:
 
     def test_similar_basic(self):
         """Test finding similar memories by memory ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = SEARCH_RESULT_DATA
 
         resource = SearchResource(mock_client)
@@ -128,7 +127,7 @@ class TestSearchSimilar:
 
     def test_similar_with_threshold(self):
         """Test similar search with threshold and limit."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = SEARCH_RESULT_DATA
 
         resource = SearchResource(mock_client)
@@ -145,7 +144,7 @@ class TestSearchEmbed:
 
     def test_embed_memory_ids(self):
         """Test generating embeddings for specific memories."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = EMBEDDING_RESPONSE
 
         resource = SearchResource(mock_client)
@@ -159,7 +158,7 @@ class TestSearchEmbed:
 
     def test_embed_all_default_batch(self):
         """Test embed_all with default batch size."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = EMBED_ALL_RESPONSE
 
         resource = SearchResource(mock_client)
@@ -173,7 +172,7 @@ class TestSearchEmbed:
 
     def test_embed_all_custom_batch(self):
         """Test embed_all with custom batch size."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = EMBED_ALL_RESPONSE
 
         resource = SearchResource(mock_client)
@@ -188,7 +187,7 @@ class TestSearchByTopic:
 
     def test_by_topic_basic(self):
         """Test searching memories by topic."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = SEARCH_RESULT_DATA
 
         resource = SearchResource(mock_client)
@@ -202,7 +201,7 @@ class TestSearchByTopic:
 
     def test_by_topic_with_space(self):
         """Test searching by topic within a space."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = SEARCH_RESULT_DATA
 
         resource = SearchResource(mock_client)
@@ -219,7 +218,7 @@ class TestSearchConfig:
 
     def test_get_config(self):
         """Test getting search configuration."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = SEARCH_CONFIG
 
         resource = SearchResource(mock_client)

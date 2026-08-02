@@ -1,10 +1,9 @@
 """Tests for Bots resource."""
 
-from unittest.mock import Mock, AsyncMock
-
 import pytest
 
-from trix.resources.bots import BotsResource, AsyncBotsResource
+from tests.support import spec_async_client, spec_client
+from trix.resources.bots import AsyncBotsResource, BotsResource
 
 BOT_RESPONSE = {
     "id": "bot_123",
@@ -39,7 +38,7 @@ class TestBotsResource:
 
     def test_list_bots(self):
         """Test listing bots."""
-        mock_client = Mock()
+        mock_client = spec_client()
         # Agents API returns the collection under the ``agents`` key.
         mock_client._request.return_value = {"agents": [BOT_RESPONSE]}
 
@@ -53,7 +52,7 @@ class TestBotsResource:
 
     def test_list_bots_with_status_filter(self):
         """Test listing bots filtered by status."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"bots": []}
 
         resource = BotsResource(mock_client)
@@ -64,7 +63,7 @@ class TestBotsResource:
 
     def test_get_bot(self):
         """Test getting a bot by ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = BOT_RESPONSE
 
         resource = BotsResource(mock_client)
@@ -77,7 +76,7 @@ class TestBotsResource:
 
     def test_create_bot(self):
         """Test creating a bot."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = BOT_RESPONSE
 
         resource = BotsResource(mock_client)
@@ -90,7 +89,7 @@ class TestBotsResource:
 
     def test_run_bot(self):
         """Test triggering a bot run."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = RUN_RESPONSE
 
         resource = BotsResource(mock_client)
@@ -103,7 +102,7 @@ class TestBotsResource:
 
     def test_list_runs(self):
         """Test listing bot runs."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"runs": [RUN_RESPONSE]}
 
         resource = BotsResource(mock_client)
@@ -115,7 +114,7 @@ class TestBotsResource:
 
     def test_get_run(self):
         """Test getting a specific bot run."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {**RUN_RESPONSE, "status": "completed"}
 
         resource = BotsResource(mock_client)
@@ -127,7 +126,7 @@ class TestBotsResource:
 
     def test_delete_bot(self):
         """Test deleting a bot."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = BotsResource(mock_client)
@@ -138,7 +137,7 @@ class TestBotsResource:
 
     def test_update_bot(self):
         """Test updating a bot."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {**BOT_RESPONSE, "name": "Updated Bot"}
 
         resource = BotsResource(mock_client)
@@ -155,7 +154,7 @@ class TestAsyncBotsResource:
     @pytest.mark.asyncio
     async def test_list_bots(self):
         """Test listing bots asynchronously."""
-        mock_client = AsyncMock()
+        mock_client = spec_async_client()
         mock_client._request.return_value = {"agents": [BOT_RESPONSE]}
 
         resource = AsyncBotsResource(mock_client)
@@ -167,7 +166,7 @@ class TestAsyncBotsResource:
     @pytest.mark.asyncio
     async def test_run_bot(self):
         """Test triggering a bot run asynchronously."""
-        mock_client = AsyncMock()
+        mock_client = spec_async_client()
         mock_client._request.return_value = RUN_RESPONSE
 
         resource = AsyncBotsResource(mock_client)

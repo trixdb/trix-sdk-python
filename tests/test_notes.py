@@ -1,7 +1,6 @@
 """Tests for Notes resource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.notes import NotesResource
 
 NOTE_RESPONSE = {
@@ -32,7 +31,7 @@ class TestNotesResource:
 
     def test_create_note(self):
         """Test creating a note."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = NOTE_RESPONSE
 
         resource = NotesResource(mock_client)
@@ -45,7 +44,7 @@ class TestNotesResource:
 
     def test_list_notes(self):
         """Test listing notes."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "notes": [NOTE_RESPONSE],
             "total": 1,
@@ -62,7 +61,7 @@ class TestNotesResource:
 
     def test_list_notes_with_filter(self):
         """Test listing notes filtered by type."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "notes": [],
             "total": 0,
@@ -78,7 +77,7 @@ class TestNotesResource:
 
     def test_get_note(self):
         """Test getting a note by ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = NOTE_RESPONSE
 
         resource = NotesResource(mock_client)
@@ -90,7 +89,7 @@ class TestNotesResource:
 
     def test_update_note(self):
         """Test updating a note."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             **NOTE_RESPONSE,
             "title": "Updated Notes",
@@ -106,7 +105,7 @@ class TestNotesResource:
 
     def test_delete_note(self):
         """Test deleting a note."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = NotesResource(mock_client)
@@ -117,7 +116,7 @@ class TestNotesResource:
 
     def test_add_block(self):
         """Test adding a block to a note."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = BLOCK_RESPONSE
 
         resource = NotesResource(mock_client)
@@ -133,7 +132,7 @@ class TestNotesResource:
 
     def test_update_block(self):
         """Test updating a block in a note."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             **BLOCK_RESPONSE,
             "content": {"text": "Updated content"},
@@ -147,7 +146,7 @@ class TestNotesResource:
 
     def test_delete_block(self):
         """Test deleting a block from a note."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = NotesResource(mock_client)
@@ -158,7 +157,7 @@ class TestNotesResource:
 
     def test_create_link(self):
         """Test creating a link between notes."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "id": "link_789",
             "source_note_id": "note_123",
@@ -175,7 +174,7 @@ class TestNotesResource:
 
     def test_get_daily(self):
         """Test getting a daily note."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = NOTE_RESPONSE
 
         resource = NotesResource(mock_client)

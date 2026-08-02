@@ -4,6 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from tests.support import spec_client
 from trix.resources.hubs_roles import HubRolesResource
 from trix.types.hub import ConvRoleOverride, HubCustomRole
 
@@ -27,7 +28,7 @@ OVERRIDE_DATA = {
 
 
 def _make_resource() -> tuple[HubRolesResource, Mock]:
-    mock_client = Mock()
+    mock_client = spec_client()
     resource = HubRolesResource(mock_client)
     return resource, mock_client
 

@@ -1,7 +1,6 @@
 """Tests for WebhooksResource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.webhooks import WebhooksResource
 from trix.types import WebhookEvent
 
@@ -28,7 +27,7 @@ class TestWebhooksCreate:
 
     def test_create_basic(self):
         """Test creating a webhook with required fields."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = WEBHOOK_RESPONSE
 
         resource = WebhooksResource(mock_client)
@@ -46,7 +45,7 @@ class TestWebhooksCreate:
 
     def test_create_with_options(self):
         """Test creating a webhook with all options."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = WEBHOOK_RESPONSE
 
         resource = WebhooksResource(mock_client)
@@ -71,7 +70,7 @@ class TestWebhooksGet:
 
     def test_get_by_id(self):
         """Test getting a webhook by ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = WEBHOOK_RESPONSE
 
         resource = WebhooksResource(mock_client)
@@ -88,7 +87,7 @@ class TestWebhooksList:
 
     def test_list_all(self):
         """Test listing all webhooks."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = WEBHOOK_LIST_RESPONSE
 
         resource = WebhooksResource(mock_client)
@@ -101,7 +100,7 @@ class TestWebhooksList:
 
     def test_list_empty(self):
         """Test listing when no webhooks exist."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"data": []}
 
         resource = WebhooksResource(mock_client)
@@ -115,7 +114,7 @@ class TestWebhooksUpdate:
 
     def test_update_name(self):
         """Test updating a webhook name."""
-        mock_client = Mock()
+        mock_client = spec_client()
         updated = {**WEBHOOK_RESPONSE, "name": "Updated Name"}
         mock_client._request.return_value = updated
 
@@ -128,7 +127,7 @@ class TestWebhooksUpdate:
 
     def test_update_active_status(self):
         """Test disabling a webhook."""
-        mock_client = Mock()
+        mock_client = spec_client()
         updated = {**WEBHOOK_RESPONSE, "active": False}
         mock_client._request.return_value = updated
 
@@ -146,7 +145,7 @@ class TestWebhooksDelete:
 
     def test_delete_by_id(self):
         """Test deleting a webhook."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = WebhooksResource(mock_client)
@@ -161,7 +160,7 @@ class TestWebhooksTest:
 
     def test_send_test_event(self):
         """Test sending a test webhook event."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "success": True,
             "status_code": 200,
@@ -176,7 +175,7 @@ class TestWebhooksTest:
 
     def test_send_test_event_with_type(self):
         """Test sending a specific event type."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "success": True,
             "status_code": 200,
@@ -194,7 +193,7 @@ class TestWebhooksDeliveries:
 
     def test_get_deliveries(self):
         """Test getting webhook delivery history."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "data": [
                 {
