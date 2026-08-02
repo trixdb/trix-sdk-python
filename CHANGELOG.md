@@ -26,6 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `Idempotency-Key` (generated once, before the retry loop, reused across attempts) so the
   backend dedupes retries. GET and other non-mutating methods send no key; a caller-supplied
   key is preserved. ([#7](https://github.com/trix/trix-python-sdk/issues/7))
+- **Packaging**: the version was duplicated across five places (pyproject.toml,
+  `trix.__version__`, package.json, .release-please-manifest.json, and the built dist) and
+  they disagreed (0.1.1 vs 0.5.0 vs 0.6.0). The version is now single-sourced: pyproject.toml
+  is authoritative and `trix.__version__` is read from the installed distribution metadata,
+  so runtime and dist always match. package.json and .release-please-manifest.json are
+  realigned to the authoritative version.
+- **Typing**: added `src/trix/py.typed` and declared it as package data so the PEP 561 marker
+  ships in the wheel; downstream type checkers now treat `trix` as typed. ([#9](https://github.com/trix/trix-python-sdk/issues/9))
 
 ## [1.0.0] - 2025-12-25
 
