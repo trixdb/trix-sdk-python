@@ -4,9 +4,10 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from tests.support import spec_client
 from trix import AsyncTrix
 from trix.resources.invites import InvitesResource
-from trix.types.invite import InviteCreateResult, InviteList, InviteAcceptResult, InviteRevokeResult
+from trix.types.invite import InviteAcceptResult, InviteCreateResult, InviteList, InviteRevokeResult
 
 NOW = "2026-03-20T00:00:00Z"
 
@@ -23,7 +24,7 @@ INVITE_DATA = {
 
 
 def _make_resource() -> tuple[InvitesResource, Mock]:
-    mock_client = Mock()
+    mock_client = spec_client()
     resource = InvitesResource(mock_client)
     return resource, mock_client
 

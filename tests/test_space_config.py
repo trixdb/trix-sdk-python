@@ -1,7 +1,6 @@
 """Tests for SpaceConfigResource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.space_config import SpaceConfigResource
 
 CONFIG_RESPONSE = {
@@ -66,7 +65,7 @@ class TestSpaceConfigGet:
 
     def test_get_config(self):
         """Test getting full space configuration."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CONFIG_RESPONSE
 
         resource = SpaceConfigResource(mock_client)
@@ -84,7 +83,7 @@ class TestSpaceConfigUpdate:
 
     def test_update_config(self):
         """Test updating space configuration."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CONFIG_RESPONSE
 
         resource = SpaceConfigResource(mock_client)
@@ -98,7 +97,7 @@ class TestSpaceConfigUpdate:
 
     def test_update_with_expected_version(self):
         """Test optimistic concurrency via If-Match header."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CONFIG_RESPONSE
 
         resource = SpaceConfigResource(mock_client)
@@ -113,7 +112,7 @@ class TestSpaceConfigValidate:
 
     def test_validate_valid_config(self):
         """Test validating a valid configuration patch."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = VALIDATION_RESPONSE
 
         resource = SpaceConfigResource(mock_client)
@@ -127,7 +126,7 @@ class TestSpaceConfigValidate:
 
     def test_validate_invalid_config(self):
         """Test validating an invalid configuration patch."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = VALIDATION_ERROR_RESPONSE
 
         resource = SpaceConfigResource(mock_client)
@@ -142,7 +141,7 @@ class TestSpaceConfigAudit:
 
     def test_audit_log(self):
         """Test getting the configuration audit trail."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = AUDIT_RESPONSE
 
         resource = SpaceConfigResource(mock_client)
@@ -159,7 +158,7 @@ class TestSpaceConfigAudit:
 
     def test_audit_with_pagination(self):
         """Test audit log with custom pagination."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = AUDIT_RESPONSE
 
         resource = SpaceConfigResource(mock_client)

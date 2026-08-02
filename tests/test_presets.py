@@ -4,6 +4,7 @@ from unittest.mock import Mock
 
 import pytest
 
+from tests.support import spec_client
 from trix.resources.presets import PresetsResource
 from trix.types.preset import AgentPreset, AgentPresetList
 
@@ -25,7 +26,7 @@ PRESET_DATA = {
 
 
 def _make_resource() -> tuple[PresetsResource, Mock]:
-    mock_client = Mock()
+    mock_client = spec_client()
     resource = PresetsResource(mock_client)
     return resource, mock_client
 

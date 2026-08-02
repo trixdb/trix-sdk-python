@@ -1,9 +1,10 @@
 """Tests for GitHubResource Phase 5 — Code Quality Scanner + Repo Stats (ADR-152)."""
 
-from unittest.mock import Mock, call
+from unittest.mock import Mock
 
 import pytest
 
+from tests.support import spec_client
 from trix.resources.github import GitHubResource
 from trix.resources.github_async import AsyncGitHubResource
 
@@ -65,7 +66,7 @@ REPO_STATS = {
 
 class TestGenerateCodeImprovements:
     def test_posts_to_generate_endpoint(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"generated": 7, "repo": "acme/api"}
         result = GitHubResource(client).generate_code_improvements(PROJECT_ID)
         args, kwargs = client._request.call_args
@@ -77,7 +78,7 @@ class TestGenerateCodeImprovements:
 
 class TestGetCodeImprovements:
     def test_default_status_open(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"suggestions": [SUGGESTION]}
         result = GitHubResource(client).get_code_improvements(PROJECT_ID)
         _, kwargs = client._request.call_args
@@ -85,7 +86,7 @@ class TestGetCodeImprovements:
         assert len(result.suggestions) == 1
 
     def test_filters_by_category_and_priority(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"suggestions": []}
         GitHubResource(client).get_code_improvements(
             PROJECT_ID, category="security", priority="critical", status="open"
@@ -95,7 +96,7 @@ class TestGetCodeImprovements:
         assert kwargs["params"]["priority"] == "critical"
 
     def test_maps_suggestion_fields(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"suggestions": [SUGGESTION]}
         result = GitHubResource(client).get_code_improvements(PROJECT_ID)
         s = result.suggestions[0]
@@ -107,7 +108,7 @@ class TestGetCodeImprovements:
 
 class TestUpdateCodeImprovementStatus:
     def test_patches_correct_endpoint(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"suggestion": {**SUGGESTION, "status": "resolved"}}
         result = GitHubResource(client).update_code_improvement_status(
             PROJECT_ID, SUGGESTION_ID, "resolved"
@@ -118,7 +119,7 @@ class TestUpdateCodeImprovementStatus:
         assert result.status == "resolved"
 
     def test_returns_code_improvement_model(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"suggestion": SUGGESTION}
         result = GitHubResource(client).update_code_improvement_status(
             PROJECT_ID, SUGGESTION_ID, "open"
@@ -128,7 +129,7 @@ class TestUpdateCodeImprovementStatus:
 
 class TestGetImprovementsSummary:
     def test_returns_list_of_summary_rows(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"summary": [SUMMARY_ROW]}
         result = GitHubResource(client).get_improvements_summary(PROJECT_ID)
         assert isinstance(result, list)
@@ -137,7 +138,7 @@ class TestGetImprovementsSummary:
         assert result[0].cnt == "3"
 
     def test_empty_summary(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"summary": []}
         result = GitHubResource(client).get_improvements_summary(PROJECT_ID)
         assert result == []
@@ -145,7 +146,7 @@ class TestGetImprovementsSummary:
 
 class TestGetImprovementsHistory:
     def test_returns_list_of_history_items(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"history": [HISTORY_ITEM]}
         result = GitHubResource(client).get_improvements_history(PROJECT_ID)
         assert isinstance(result, list)
@@ -155,7 +156,7 @@ class TestGetImprovementsHistory:
         assert item.total_files == 200
 
     def test_empty_history(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = {"history": []}
         result = GitHubResource(client).get_improvements_history(PROJECT_ID)
         assert result == []
@@ -163,14 +164,14 @@ class TestGetImprovementsHistory:
 
 class TestGetRepoStats:
     def test_calls_stats_endpoint(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = REPO_STATS
         GitHubResource(client).get_repo_stats(PROJECT_ID)
         args, _ = client._request.call_args
         assert args == ("GET", f"/projects/{PROJECT_ID}/github/improvements/stats")
 
     def test_maps_repo_meta(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = REPO_STATS
         result = GitHubResource(client).get_repo_stats(PROJECT_ID)
         assert result.stats.repo is not None
@@ -178,14 +179,14 @@ class TestGetRepoStats:
         assert result.stats.repo.stars == 42
 
     def test_maps_languages(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = REPO_STATS
         result = GitHubResource(client).get_repo_stats(PROJECT_ID)
         assert len(result.stats.languages) == 1
         assert result.stats.languages[0].name == "Python"
 
     def test_maps_local_metrics(self):
-        client = Mock()
+        client = spec_client()
         client._request.return_value = REPO_STATS
         result = GitHubResource(client).get_repo_stats(PROJECT_ID)
         m = result.stats.local_metrics
@@ -199,7 +200,7 @@ class TestAsyncPhase5:
     """Async variants mirror sync behaviour."""
 
     async def test_async_generate_code_improvements(self):
-        client = Mock()
+        client = spec_client()
         client._request = Mock(return_value={"generated": 4, "repo": "acme/web"})
         from unittest.mock import AsyncMock
         client._request = AsyncMock(return_value={"generated": 4, "repo": "acme/web"})
@@ -208,14 +209,14 @@ class TestAsyncPhase5:
 
     async def test_async_get_code_improvements(self):
         from unittest.mock import AsyncMock
-        client = Mock()
+        client = spec_client()
         client._request = AsyncMock(return_value={"suggestions": [SUGGESTION]})
         result = await AsyncGitHubResource(client).get_code_improvements(PROJECT_ID)
         assert len(result.suggestions) == 1
 
     async def test_async_get_repo_stats(self):
         from unittest.mock import AsyncMock
-        client = Mock()
+        client = spec_client()
         client._request = AsyncMock(return_value=REPO_STATS)
         result = await AsyncGitHubResource(client).get_repo_stats(PROJECT_ID)
         assert result.stats.repo is not None

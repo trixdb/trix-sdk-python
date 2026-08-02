@@ -1,7 +1,6 @@
 """Tests for Goals resource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.goals import GoalsResource
 
 GOAL_RESPONSE = {
@@ -27,7 +26,7 @@ class TestGoalsResource:
 
     def test_create_goal(self):
         """Test creating a goal."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = GOAL_RESPONSE
 
         resource = GoalsResource(mock_client)
@@ -40,7 +39,7 @@ class TestGoalsResource:
 
     def test_list_goals(self):
         """Test listing goals."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "goals": [GOAL_RESPONSE],
             "total": 1,
@@ -57,7 +56,7 @@ class TestGoalsResource:
 
     def test_list_goals_with_status_filter(self):
         """Test listing goals filtered by status."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "goals": [],
             "total": 0,
@@ -73,7 +72,7 @@ class TestGoalsResource:
 
     def test_get_goal(self):
         """Test getting a goal by ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = GOAL_RESPONSE
 
         resource = GoalsResource(mock_client)
@@ -85,7 +84,7 @@ class TestGoalsResource:
 
     def test_update_goal(self):
         """Test updating a goal."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {**GOAL_RESPONSE, "title": "Ship MVP v2"}
 
         resource = GoalsResource(mock_client)
@@ -97,7 +96,7 @@ class TestGoalsResource:
 
     def test_delete_goal(self):
         """Test deleting a goal."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = GoalsResource(mock_client)
@@ -108,7 +107,7 @@ class TestGoalsResource:
 
     def test_update_progress(self):
         """Test updating goal progress."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {**GOAL_RESPONSE, "progress": 0.5}
 
         resource = GoalsResource(mock_client)
@@ -120,7 +119,7 @@ class TestGoalsResource:
 
     def test_transition_status(self):
         """Test transitioning goal status."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {**GOAL_RESPONSE, "status": "completed"}
 
         resource = GoalsResource(mock_client)
@@ -132,7 +131,7 @@ class TestGoalsResource:
 
     def test_get_progress_history(self):
         """Test getting progress history."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "entries": [
                 {
@@ -158,7 +157,7 @@ class TestGoalsResource:
 
     def test_get_pace(self):
         """Test getting pace analysis."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "goal_id": "goal_123",
             "status": "on_track",
@@ -175,7 +174,7 @@ class TestGoalsResource:
 
     def test_add_key_result(self):
         """Test adding a key result to a goal."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             **GOAL_RESPONSE,
             "id": "goal_456",

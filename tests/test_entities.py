@@ -7,8 +7,8 @@ removed; the regression guards below fail if any are re-introduced.
 """
 
 import pytest
-from unittest.mock import Mock, AsyncMock
 
+from tests.support import spec_async_client, spec_client
 from trix.resources.entities import EntitiesResource
 from trix.resources.entities_async import AsyncEntitiesResource
 
@@ -42,7 +42,7 @@ class TestEntitiesResource:
 
     def test_get_entity_hits_knowledge_entities(self):
         """get() must call GET /knowledge/entities/:id."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = ENTITY
 
         resource = EntitiesResource(mock_client)
@@ -54,7 +54,7 @@ class TestEntitiesResource:
 
     def test_list_entities(self):
         """list() must call GET /knowledge/entities."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "data": [ENTITY],
             "total": 1,
@@ -71,7 +71,7 @@ class TestEntitiesResource:
 
     def test_find_by_type_filters_via_list(self):
         """find_by_type() filters through the list endpoint."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"data": [], "total": 0, "limit": 10, "offset": 0}
 
         resource = EntitiesResource(mock_client)
@@ -83,7 +83,7 @@ class TestEntitiesResource:
 
     def test_get_facts_hits_knowledge_entities_facts(self):
         """get_facts() must call GET /knowledge/entities/:id/facts (not /entities/:id/facts)."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "entity_id": "ent_123",
             "facts": [
@@ -108,7 +108,7 @@ class TestEntitiesResource:
 
     def test_merge_posts_both_ids_to_knowledge_entities_merge(self):
         """merge() POSTs both ids to /knowledge/entities/merge (not nested under an id)."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "merged_entity": ENTITY,
             "deleted_id": "ent_2",
@@ -126,7 +126,7 @@ class TestEntitiesResource:
 
     def test_merge_validates_both_ids(self):
         """merge() rejects empty ids before issuing a request."""
-        mock_client = Mock()
+        mock_client = spec_client()
         resource = EntitiesResource(mock_client)
         with pytest.raises(ValueError):
             resource.merge("", "ent_2")
@@ -145,7 +145,7 @@ class TestAsyncEntitiesResource:
 
     @pytest.mark.asyncio
     async def test_get_entity(self):
-        mock_client = AsyncMock()
+        mock_client = spec_async_client()
         mock_client._request.return_value = ENTITY
 
         resource = AsyncEntitiesResource(mock_client)
@@ -157,7 +157,7 @@ class TestAsyncEntitiesResource:
 
     @pytest.mark.asyncio
     async def test_merge(self):
-        mock_client = AsyncMock()
+        mock_client = spec_async_client()
         mock_client._request.return_value = {"merged_entity": ENTITY, "deleted_id": "ent_2"}
 
         resource = AsyncEntitiesResource(mock_client)

@@ -1,7 +1,6 @@
 """Tests for ClustersResource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.clusters import ClustersResource
 
 CLUSTER_RESPONSE = {
@@ -33,7 +32,7 @@ class TestClustersCreate:
 
     def test_create_basic(self):
         """Test creating a cluster with name only."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CLUSTER_RESPONSE
 
         resource = ClustersResource(mock_client)
@@ -47,7 +46,7 @@ class TestClustersCreate:
 
     def test_create_with_all_options(self):
         """Test creating a cluster with all options."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CLUSTER_RESPONSE
 
         resource = ClustersResource(mock_client)
@@ -71,7 +70,7 @@ class TestClustersList:
 
     def test_list_basic(self):
         """Test listing clusters with defaults."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CLUSTER_LIST_RESPONSE
 
         resource = ClustersResource(mock_client)
@@ -85,7 +84,7 @@ class TestClustersList:
 
     def test_list_with_filters(self):
         """Test listing clusters with query and scale filter."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CLUSTER_LIST_RESPONSE
 
         resource = ClustersResource(mock_client)
@@ -100,7 +99,7 @@ class TestClustersList:
 
     def test_list_empty(self):
         """Test listing when no clusters exist."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"data": [], "cursor": None}
 
         resource = ClustersResource(mock_client)
@@ -114,7 +113,7 @@ class TestClustersGet:
 
     def test_get_by_id(self):
         """Test getting a cluster by ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CLUSTER_RESPONSE
 
         resource = ClustersResource(mock_client)
@@ -127,7 +126,7 @@ class TestClustersGet:
 
     def test_get_with_memories(self):
         """Test getting a cluster with included memories."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = CLUSTER_RESPONSE
 
         resource = ClustersResource(mock_client)
@@ -142,7 +141,7 @@ class TestClustersUpdate:
 
     def test_update_name(self):
         """Test updating a cluster name."""
-        mock_client = Mock()
+        mock_client = spec_client()
         updated = {**CLUSTER_RESPONSE, "name": "Updated Name"}
         mock_client._request.return_value = updated
 
@@ -160,7 +159,7 @@ class TestClustersDelete:
 
     def test_delete_by_id(self):
         """Test deleting a cluster."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = ClustersResource(mock_client)
@@ -175,7 +174,7 @@ class TestClustersMemories:
 
     def test_add_memory(self):
         """Test adding a memory to a cluster."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = MEMBERSHIP_RESPONSE
 
         resource = ClustersResource(mock_client)
@@ -190,7 +189,7 @@ class TestClustersMemories:
 
     def test_add_memory_default_confidence(self):
         """Test adding a memory with default confidence."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             **MEMBERSHIP_RESPONSE,
             "confidence": 1.0,
@@ -205,7 +204,7 @@ class TestClustersMemories:
 
     def test_remove_memory(self):
         """Test removing a memory from a cluster."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = ClustersResource(mock_client)
@@ -220,7 +219,7 @@ class TestClustersExpand:
 
     def test_expand_basic(self):
         """Test expanding a cluster with default params."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "suggestions": [
                 {"memory_id": "mem_789", "score": 0.85},

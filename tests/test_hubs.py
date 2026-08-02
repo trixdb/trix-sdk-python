@@ -1,7 +1,6 @@
 """Tests for HubsResource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.hubs import HubsResource
 
 MEMBER_RESPONSE = {
@@ -30,7 +29,7 @@ class TestHubsListMembers:
 
     def test_list_members(self):
         """Test listing all hub members."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = MEMBER_LIST_RESPONSE
 
         resource = HubsResource(mock_client)
@@ -45,7 +44,7 @@ class TestHubsListMembers:
 
     def test_list_members_empty(self):
         """Test listing when no members exist."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"data": []}
 
         resource = HubsResource(mock_client)
@@ -59,7 +58,7 @@ class TestHubsAddMember:
 
     def test_add_member_default_role(self):
         """Test adding a member with default role."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = MEMBER_RESPONSE
 
         resource = HubsResource(mock_client)
@@ -74,7 +73,7 @@ class TestHubsAddMember:
 
     def test_add_member_with_role_and_permissions(self):
         """Test adding a member with custom role and permissions."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = UPDATED_MEMBER_RESPONSE
 
         resource = HubsResource(mock_client)
@@ -96,7 +95,7 @@ class TestHubsUpdateMember:
 
     def test_update_member_role(self):
         """Test updating a hub member's role."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = UPDATED_MEMBER_RESPONSE
 
         resource = HubsResource(mock_client)
@@ -114,7 +113,7 @@ class TestHubsRemoveMember:
 
     def test_remove_member(self):
         """Test removing a member from a hub."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = None
 
         resource = HubsResource(mock_client)
@@ -129,7 +128,7 @@ class TestHubsConversationMembers:
 
     def test_list_conversation_members(self):
         """Test listing conversation members."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "data": [
                 {

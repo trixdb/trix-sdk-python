@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
+from tests.support import spec_client
 from trix import AsyncTrix
 from trix.resources.skills import SkillsResource
 from trix.types.skill import BotSkillAttachment, Skill
@@ -30,7 +31,7 @@ ATTACHMENT_DATA = {
 
 
 def _make_resource() -> tuple[SkillsResource, Mock]:
-    mock_client = Mock()
+    mock_client = spec_client()
     resource = SkillsResource(mock_client)
     return resource, mock_client
 

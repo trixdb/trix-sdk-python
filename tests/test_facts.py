@@ -8,8 +8,8 @@ if any of them are re-introduced.
 """
 
 import pytest
-from unittest.mock import Mock, AsyncMock
 
+from tests.support import spec_async_client, spec_client
 from trix.resources.facts import FactsResource
 from trix.resources.facts_async import AsyncFactsResource
 
@@ -46,7 +46,7 @@ class TestFactsResource:
 
     def test_list_facts_hits_knowledge_facts(self):
         """list() must call GET /knowledge/facts."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "data": [SPO_FACT],
             "total": 1,
@@ -63,7 +63,7 @@ class TestFactsResource:
 
     def test_list_facts_passes_filters(self):
         """list() forwards filters as query params."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {"data": [], "total": 0, "limit": 10, "offset": 0}
 
         resource = FactsResource(mock_client)
@@ -75,7 +75,7 @@ class TestFactsResource:
 
     def test_list_for_memory_hits_memory_facts(self):
         """list_for_memory() must call GET /memories/:id/facts."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = {
             "memory_id": "11111111-1111-1111-1111-111111111111",
             "facts": [SPO_FACT],
@@ -95,7 +95,7 @@ class TestFactsResource:
 
     def test_list_for_memory_rejects_invalid_id(self):
         """An invalid memory id is rejected before any request is issued."""
-        mock_client = Mock()
+        mock_client = spec_client()
         resource = FactsResource(mock_client)
         with pytest.raises(ValueError):
             resource.list_for_memory("../etc/passwd")
@@ -103,7 +103,7 @@ class TestFactsResource:
 
     def test_create_for_memory_posts_content_body(self):
         """create_for_memory() POSTs the content/importance body to /memories/:id/facts."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = SPO_FACT
 
         resource = FactsResource(mock_client)
@@ -134,7 +134,7 @@ class TestAsyncFactsResource:
 
     @pytest.mark.asyncio
     async def test_list_facts(self):
-        mock_client = AsyncMock()
+        mock_client = spec_async_client()
         mock_client._request.return_value = {
             "data": [SPO_FACT],
             "total": 1,
@@ -151,7 +151,7 @@ class TestAsyncFactsResource:
 
     @pytest.mark.asyncio
     async def test_create_for_memory(self):
-        mock_client = AsyncMock()
+        mock_client = spec_async_client()
         mock_client._request.return_value = SPO_FACT
 
         resource = AsyncFactsResource(mock_client)

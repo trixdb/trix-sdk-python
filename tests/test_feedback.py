@@ -1,7 +1,6 @@
 """Tests for FeedbackResource."""
 
-from unittest.mock import Mock
-
+from tests.support import spec_client
 from trix.resources.feedback import FeedbackResource
 from trix.types import FeedbackResult
 
@@ -16,7 +15,7 @@ class TestFeedbackSubmit:
 
     def test_submit_basic(self):
         """Test submitting detailed feedback on search results."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FEEDBACK_RESPONSE
 
         resource = FeedbackResource(mock_client)
@@ -38,7 +37,7 @@ class TestFeedbackSubmit:
 
     def test_submit_with_boost_and_relationships(self):
         """Test submitting feedback with boost amount and relationship flag."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FEEDBACK_RESPONSE
 
         resource = FeedbackResource(mock_client)
@@ -62,7 +61,7 @@ class TestFeedbackQuick:
 
     def test_quick_useful(self):
         """Test submitting quick positive feedback."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FEEDBACK_RESPONSE
 
         resource = FeedbackResource(mock_client)
@@ -77,7 +76,7 @@ class TestFeedbackQuick:
 
     def test_quick_with_source(self):
         """Test quick feedback with source memory ID."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FEEDBACK_RESPONSE
 
         resource = FeedbackResource(mock_client)
@@ -98,7 +97,7 @@ class TestFeedbackBatch:
 
     def test_batch_feedback(self):
         """Test submitting batch feedback with useful and not useful IDs."""
-        mock_client = Mock()
+        mock_client = spec_client()
         mock_client._request.return_value = FEEDBACK_RESPONSE
 
         resource = FeedbackResource(mock_client)

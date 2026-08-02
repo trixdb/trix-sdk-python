@@ -1,7 +1,26 @@
 """Pytest configuration and fixtures."""
 
 import pytest
-from trix import Trix, AsyncTrix
+
+from tests.support import spec_async_client, spec_client
+from trix import AsyncTrix, Trix
+
+
+@pytest.fixture
+def mock_trix():
+    """A spec'd sync client mock (issue #12).
+
+    Unlike a bare ``Mock()``, accessing an attribute the real ``Trix`` client
+    does not expose raises ``AttributeError`` instead of fabricating a child
+    mock — so tests catch calls to client methods that do not exist.
+    """
+    return spec_client()
+
+
+@pytest.fixture
+def mock_async_trix():
+    """A spec'd async client mock (issue #12) — see :func:`mock_trix`."""
+    return spec_async_client()
 
 
 @pytest.fixture
