@@ -10,7 +10,7 @@ import httpx
 from concurrent.futures import ThreadPoolExecutor
 
 from .base import BaseAsyncResource, BaseSyncResource
-from ..client_base import versioned_path
+from ..client_base import handle_response, versioned_path
 from ..exceptions import APIError, ConnectionError, TimeoutError
 from ..types.bot import (
     Bot,
@@ -137,6 +137,9 @@ class BotsResource(BaseSyncResource):
             json=data.model_dump(exclude_none=True),
             headers=headers,
         ) as response:
+            if not response.is_success:
+                response.read()
+                handle_response(response)
             for line in iter_sse_lines(response.iter_bytes(chunk_size=1024)):
                 parsed = parse_sse_line(line)
                 if parsed is not None:
@@ -339,6 +342,9 @@ class AsyncBotsResource(BaseAsyncResource):
             json=data.model_dump(exclude_none=True),
             headers=headers,
         ) as response:
+            if not response.is_success:
+                await response.aread()
+                handle_response(response)
             buffer = ""
             async for chunk in response.aiter_bytes(chunk_size=1024):
                 buffer += chunk.decode("utf-8", errors="replace")
