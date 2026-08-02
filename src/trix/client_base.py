@@ -4,6 +4,7 @@ This module contains shared types and utilities used by both sync and async clie
 """
 
 import logging
+import uuid
 from dataclasses import dataclass, field
 from typing import Any, Awaitable, Callable, Dict, Optional
 
@@ -56,6 +57,30 @@ def normalize_base_url(base_url: str) -> str:
     if trimmed.endswith(API_VERSION_PREFIX):
         trimmed = trimmed[: -len(API_VERSION_PREFIX)]
     return trimmed
+
+
+# Methods the server dedupes with an Idempotency-Key (trix-api
+# plugins/idempotency.js MUTATING_METHODS).
+IDEMPOTENT_METHODS = frozenset({"POST", "PUT", "PATCH", "DELETE"})
+
+
+def apply_idempotency_key(headers: Dict[str, str], method: str) -> None:
+    """Attach a stable ``Idempotency-Key`` for mutating methods, in place.
+
+    The client auto-retries 5xx / 429 on all methods. Without a key, a retried
+    POST/PUT/PATCH/DELETE can duplicate a write when the first attempt actually
+    succeeded server-side but the response was lost. Sending one key per logical
+    request lets the backend replay the first result instead of re-executing
+    (see ``trix-api`` ``plugins/idempotency.js``).
+
+    Must be called ONCE, before the retry loop, so every attempt reuses the same
+    key. A caller-supplied ``Idempotency-Key`` (any casing) is preserved.
+    """
+    if method.upper() not in IDEMPOTENT_METHODS:
+        return
+    if any(k.lower() == "idempotency-key" for k in headers):
+        return
+    headers["Idempotency-Key"] = uuid.uuid4().hex
 
 
 @dataclass

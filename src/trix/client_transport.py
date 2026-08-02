@@ -15,6 +15,7 @@ from .client_base import (
     RequestContext,
     ResponseContext,
     _safe_log_params,
+    apply_idempotency_key,
     check_api_version,
     handle_response,
     versioned_path,
@@ -57,6 +58,8 @@ class SyncTransportMixin:
         merged_headers = self._get_headers()
         if headers:
             merged_headers.update(headers)
+        # One stable Idempotency-Key per logical request so retries dedupe (#7).
+        apply_idempotency_key(merged_headers, method)
         request_context = RequestContext(
             method=method, path=path, params=params, json=json, headers=merged_headers
         )
