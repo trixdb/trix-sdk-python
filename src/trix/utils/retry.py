@@ -7,7 +7,9 @@ import time
 from functools import wraps
 from typing import Any, Callable, Optional, Set, Type, TypeVar, cast
 
-from ..exceptions import RateLimitError, ServerError
+import httpx
+
+from ..exceptions import APIError, ConnectionError, RateLimitError, ServerError, TimeoutError
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +74,29 @@ class RetryConfig:
         return delay
 
 
+def is_retryable(error: BaseException, config: RetryConfig) -> bool:
+    """Return True if ``error`` matches one of the config's retryable types.
+
+    Single source of truth for the retryable-exceptions policy, shared by the
+    transport retry loop and the ``retry_with_backoff`` decorator so a custom
+    ``RetryConfig(retryable_exceptions=...)`` actually governs both.
+    """
+    return isinstance(error, tuple(config.retryable_exceptions))
+
+
+def coerce_httpx_error(error: httpx.HTTPError) -> Exception:
+    """Map a raw ``httpx`` transport error onto the SDK's typed exception.
+
+    Lets the transport funnel timeouts/network/HTTP failures through the same
+    retryable-exceptions check as server-side errors.
+    """
+    if isinstance(error, httpx.TimeoutException):
+        return TimeoutError(f"Request timed out: {error}")
+    if isinstance(error, httpx.NetworkError):
+        return ConnectionError(f"Network error: {error}")
+    return APIError(f"HTTP error: {error}")
+
+
 def retry_with_backoff(
     config: Optional[RetryConfig] = None,
 ) -> Callable[[Callable[..., T]], Callable[..., T]]:
@@ -101,9 +126,7 @@ def retry_with_backoff(
                         last_exception = e
 
                         # Don't retry if it's not a retryable exception
-                        if not any(
-                            isinstance(e, exc_type) for exc_type in config.retryable_exceptions
-                        ):
+                        if not is_retryable(e, config):
                             raise
 
                         # Don't retry if we've exhausted attempts
@@ -143,9 +166,7 @@ def retry_with_backoff(
                         last_exception = e
 
                         # Don't retry if it's not a retryable exception
-                        if not any(
-                            isinstance(e, exc_type) for exc_type in config.retryable_exceptions
-                        ):
+                        if not is_retryable(e, config):
                             raise
 
                         # Don't retry if we've exhausted attempts
