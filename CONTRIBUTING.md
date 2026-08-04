@@ -15,8 +15,8 @@ Thank you for your interest in contributing to the Trix Python SDK! This documen
 
 2. Clone your fork locally:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/trix-python-sdk.git
-   cd trix-python-sdk
+   git clone https://github.com/YOUR_USERNAME/trix-sdk-python.git
+   cd trix-sdk-python
    ```
 
 3. Create a virtual environment:

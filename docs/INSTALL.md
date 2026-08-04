@@ -7,7 +7,7 @@
 Once published, install the latest stable version:
 
 ```bash
-pip install trix
+pip install trixdb
 ```
 
 ### From Source
@@ -15,8 +15,8 @@ pip install trix
 For the latest development version:
 
 ```bash
-git clone https://github.com/trix/trix-python-sdk.git
-cd trix-python-sdk
+git clone https://github.com/trixdb/trix-sdk-python.git
+cd trix-sdk-python
 pip install -e .
 ```
 
@@ -34,7 +34,7 @@ pip install -e .
 ### 1. Standard Installation
 
 ```bash
-pip install trix
+pip install trixdb
 ```
 
 ### 2. Development Installation
@@ -42,8 +42,8 @@ pip install trix
 For contributing or development:
 
 ```bash
-git clone https://github.com/trix/trix-python-sdk.git
-cd trix-python-sdk
+git clone https://github.com/trixdb/trix-sdk-python.git
+cd trix-sdk-python
 pip install -e ".[dev]"
 ```
 
@@ -71,7 +71,7 @@ source venv/bin/activate
 venv\Scripts\activate
 
 # Install Trix
-pip install trix
+pip install trixdb
 ```
 
 #### Using conda
@@ -84,7 +84,7 @@ conda create -n trix python=3.11
 conda activate trix
 
 # Install Trix
-pip install trix
+pip install trixdb
 ```
 
 ### 4. Using pipx (Isolated Installation)
@@ -125,7 +125,7 @@ pytest
 Standard pip installation should work:
 
 ```bash
-pip install trix
+pip install trixdb
 ```
 
 ### macOS
@@ -137,7 +137,7 @@ For best compatibility:
 pip install --upgrade pip
 
 # Install Trix
-pip install trix
+pip install trixdb
 ```
 
 ### Windows
@@ -149,7 +149,7 @@ Use PowerShell or Command Prompt:
 python -m pip install --upgrade pip
 
 # Install Trix
-pip install trix
+pip install trixdb
 ```
 
 ## Troubleshooting
@@ -160,7 +160,7 @@ pip install trix
 
 ```bash
 source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install trix
+pip install trixdb
 ```
 
 ### Issue: "ImportError: cannot import name..."
@@ -178,7 +178,7 @@ pip install --upgrade trix
 ```bash
 python -m venv fresh_env
 source fresh_env/bin/activate
-pip install trix
+pip install trixdb
 ```
 
 ### Issue: SSL/Certificate errors
@@ -210,7 +210,7 @@ pip install --upgrade trix
 ### Upgrade to Specific Version
 
 ```bash
-pip install trix==0.1.0
+pip install trixdb==0.1.0
 ```
 
 ### Check Current Version
@@ -238,8 +238,8 @@ For contributors:
 
 1. Fork and clone the repository:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/trix-python-sdk.git
-   cd trix-python-sdk
+   git clone https://github.com/YOUR_USERNAME/trix-sdk-python.git
+   cd trix-sdk-python
    ```
 
 2. Create virtual environment:
@@ -292,7 +292,7 @@ After installation:
 If you encounter installation issues:
 
 1. Check the [Troubleshooting](#troubleshooting) section above
-2. Open an issue: https://github.com/trix/trix-python-sdk/issues
+2. Open an issue: https://github.com/trixdb/trix-sdk-python/issues
 3. Email: support@trixdb.com
 
 ## System Requirements Summary

@@ -141,7 +141,7 @@ sed -i "/## \[Unreleased\]/a\\
 - " CHANGELOG.md
 
 # Update comparison links
-sed -i "s|\[Unreleased\]:.*|\[Unreleased\]: https://github.com/trix/trix-python-sdk/compare/v$NEW_VERSION...HEAD\n[$NEW_VERSION]: https://github.com/trix/trix-python-sdk/releases/tag/v$NEW_VERSION|" CHANGELOG.md
+sed -i "s|\[Unreleased\]:.*|\[Unreleased\]: https://github.com/trixdb/trix-sdk-python/compare/v$NEW_VERSION...HEAD\n[$NEW_VERSION]: https://github.com/trixdb/trix-sdk-python/releases/tag/v$NEW_VERSION|" CHANGELOG.md
 
 # Create git commit
 print_info "Creating git commit..."
@@ -159,7 +159,7 @@ git push origin "v$NEW_VERSION"
 
 print_success "Version bumped to $NEW_VERSION and tagged as v$NEW_VERSION"
 print_info "GitHub Actions will now build and publish the release automatically"
-print_info "Monitor the release at: https://github.com/trix/trix-python-sdk/actions"
+print_info "Monitor the release at: https://github.com/trixdb/trix-sdk-python/actions"
 
 echo ""
 print_info "Don't forget to update the CHANGELOG.md with actual changes for this release!"
