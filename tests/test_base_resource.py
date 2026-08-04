@@ -129,7 +129,7 @@ class TestBaseSyncResource:
         result = resource._request("GET", "/test")
 
         mock_client._request.assert_called_once_with(
-            "GET", "/test", params=None, json=None, timeout=None
+            "GET", "/test", params=None, json=None, timeout=None, headers=None
         )
         assert result == {"id": "test"}
 
@@ -142,7 +142,7 @@ class TestBaseSyncResource:
         resource._request("GET", "/test", params={"limit": 10})
 
         mock_client._request.assert_called_once_with(
-            "GET", "/test", params={"limit": 10}, json=None, timeout=None
+            "GET", "/test", params={"limit": 10}, json=None, timeout=None, headers=None
         )
 
     def test_request_with_json(self):
@@ -154,7 +154,7 @@ class TestBaseSyncResource:
         resource._request("POST", "/test", json={"name": "test"})
 
         mock_client._request.assert_called_once_with(
-            "POST", "/test", params=None, json={"name": "test"}, timeout=None
+            "POST", "/test", params=None, json={"name": "test"}, timeout=None, headers=None
         )
 
     def test_request_with_timeout(self):
@@ -166,7 +166,7 @@ class TestBaseSyncResource:
         resource._request("GET", "/test", timeout=30.0)
 
         mock_client._request.assert_called_once_with(
-            "GET", "/test", params=None, json=None, timeout=30.0
+            "GET", "/test", params=None, json=None, timeout=30.0, headers=None
         )
 
 
@@ -190,7 +190,7 @@ class TestBaseAsyncResource:
         result = await resource._request("GET", "/test")
 
         mock_client._request.assert_called_once_with(
-            "GET", "/test", params=None, json=None, timeout=None
+            "GET", "/test", params=None, json=None, timeout=None, headers=None
         )
         assert result == {"id": "test"}
 
@@ -204,7 +204,7 @@ class TestBaseAsyncResource:
         await resource._request("GET", "/test", params={"limit": 10})
 
         mock_client._request.assert_called_once_with(
-            "GET", "/test", params={"limit": 10}, json=None, timeout=None
+            "GET", "/test", params={"limit": 10}, json=None, timeout=None, headers=None
         )
 
     @pytest.mark.asyncio
@@ -217,7 +217,7 @@ class TestBaseAsyncResource:
         await resource._request("POST", "/test", json={"name": "test"})
 
         mock_client._request.assert_called_once_with(
-            "POST", "/test", params=None, json={"name": "test"}, timeout=None
+            "POST", "/test", params=None, json={"name": "test"}, timeout=None, headers=None
         )
 
     @pytest.mark.asyncio
@@ -230,5 +230,5 @@ class TestBaseAsyncResource:
         await resource._request("GET", "/test", timeout=30.0)
 
         mock_client._request.assert_called_once_with(
-            "GET", "/test", params=None, json=None, timeout=30.0
+            "GET", "/test", params=None, json=None, timeout=30.0, headers=None
         )
