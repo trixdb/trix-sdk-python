@@ -6,6 +6,7 @@ from .base import BaseAsyncResource
 from ..types import (
     Session,
     SessionsResponse,
+    SessionStats,
     SessionType,
     SessionStatus,
     RetentionPolicy,
@@ -193,6 +194,15 @@ class AsyncSessionsResource(BaseAsyncResource):
         """
         response = await self._request("GET", "/cli-sessions/active")
         return SessionsResponse.model_validate(response)
+
+    async def get_stats(self) -> SessionStats:
+        """Get aggregate statistics across your CLI sessions (async).
+
+        Returns:
+            Totals by status/type plus message and memory counts.
+        """
+        response = await self._request("GET", "/cli-sessions/stats")
+        return SessionStats.model_validate(response)
 
     async def pause(self, id: str) -> Session:
         """Pause an active session (async).

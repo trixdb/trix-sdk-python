@@ -59,7 +59,9 @@ class CalendarResource(BaseSyncResource):
             pii_level=pii_level,
             tags=tags,
         )
-        response = self._request("POST", "/calendar/sync", json=data.model_dump(exclude_none=True))
+        response = self._request(
+            "POST", "/calendar/sync-to-memories", json=data.model_dump(exclude_none=True)
+        )
         return CalendarSyncResult.model_validate(response)
 
     def list_connections(self) -> CalendarConnectionsResponse:
@@ -116,7 +118,7 @@ class AsyncCalendarResource(BaseAsyncResource):
             tags=tags,
         )
         response = await self._request(
-            "POST", "/calendar/sync", json=data.model_dump(exclude_none=True)
+            "POST", "/calendar/sync-to-memories", json=data.model_dump(exclude_none=True)
         )
         return CalendarSyncResult.model_validate(response)
 
