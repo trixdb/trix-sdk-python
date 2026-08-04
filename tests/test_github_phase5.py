@@ -50,7 +50,14 @@ REPO_STATS = {
             "size_kb": 12000,
         },
         "languages": [{"name": "Python", "bytes": 400000, "pct": 88.5}],
-        "contributors": [{"login": "alice", "avatar_url": "https://example.com/a.png", "profile_url": "https://github.com/alice", "contributions": 120}],
+        "contributors": [
+            {
+                "login": "alice",
+                "avatar_url": "https://example.com/a.png",
+                "profile_url": "https://github.com/alice",
+                "contributions": 120,
+            }
+        ],
         "readme": "# Acme API\nFast and reliable.",
         "open_pr_count": 2,
         "local_metrics": {
@@ -203,12 +210,14 @@ class TestAsyncPhase5:
         client = spec_client()
         client._request = Mock(return_value={"generated": 4, "repo": "acme/web"})
         from unittest.mock import AsyncMock
+
         client._request = AsyncMock(return_value={"generated": 4, "repo": "acme/web"})
         result = await AsyncGitHubResource(client).generate_code_improvements(PROJECT_ID)
         assert result.generated == 4
 
     async def test_async_get_code_improvements(self):
         from unittest.mock import AsyncMock
+
         client = spec_client()
         client._request = AsyncMock(return_value={"suggestions": [SUGGESTION]})
         result = await AsyncGitHubResource(client).get_code_improvements(PROJECT_ID)
@@ -216,6 +225,7 @@ class TestAsyncPhase5:
 
     async def test_async_get_repo_stats(self):
         from unittest.mock import AsyncMock
+
         client = spec_client()
         client._request = AsyncMock(return_value=REPO_STATS)
         result = await AsyncGitHubResource(client).get_repo_stats(PROJECT_ID)

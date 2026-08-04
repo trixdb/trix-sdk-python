@@ -152,9 +152,7 @@ class TestResolvePipeline:
                 "preset": {},
             }
             client = Trix(api_key="test_key")
-            result = client.agent.resolve_pipeline(
-                space_id="space_abc", pipeline="caller-preset"
-            )
+            result = client.agent.resolve_pipeline(space_id="space_abc", pipeline="caller-preset")
             assert result["source"] == "caller"
             params = mock_request.call_args[1]["params"]
             assert params["space_id"] == "space_abc"
@@ -228,9 +226,7 @@ class TestTriggerMegaSummary:
         with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = {"enqueued": True}
             client = Trix(api_key="test_key")
-            client.agent.trigger_mega_summary(
-                scope_id="acc_123", pipeline="mega-v2"
-            )
+            client.agent.trigger_mega_summary(scope_id="acc_123", pipeline="mega-v2")
             json_data = mock_request.call_args[1]["json"]
             assert json_data["pipeline"] == "mega-v2"
             client.close()

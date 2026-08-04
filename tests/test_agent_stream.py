@@ -30,11 +30,13 @@ class TestParseContentDelta:
 
 class TestParseMessageStop:
     def test_basic(self):
-        ev = parse_agent_event({
-            "type": "message_stop",
-            "stopReason": "end_turn",
-            "usage": {"input_tokens": 100, "output_tokens": 50},
-        })
+        ev = parse_agent_event(
+            {
+                "type": "message_stop",
+                "stopReason": "end_turn",
+                "usage": {"input_tokens": 100, "output_tokens": 50},
+            }
+        )
         assert isinstance(ev, MessageStopEvent)
         assert ev.stop_reason == "end_turn"
         assert ev.usage.output_tokens == 50
@@ -42,56 +44,66 @@ class TestParseMessageStop:
 
 class TestParseBudgetState:
     def test_basic(self):
-        ev = parse_agent_event({
-            "type": "budget_state",
-            "spent": {"tokens": 5000, "usd": 0.25},
-            "band": "ok",
-            "pct": 0.1,
-        })
+        ev = parse_agent_event(
+            {
+                "type": "budget_state",
+                "spent": {"tokens": 5000, "usd": 0.25},
+                "band": "ok",
+                "pct": 0.1,
+            }
+        )
         assert isinstance(ev, BudgetStateEvent)
         assert ev.band == "ok"
         assert ev.spent.tokens == 5000
 
     def test_warn_band(self):
-        ev = parse_agent_event({
-            "type": "budget_state",
-            "spent": {"tokens": 8000, "usd": 4.5},
-            "band": "warn",
-            "pct": 0.85,
-        })
+        ev = parse_agent_event(
+            {
+                "type": "budget_state",
+                "spent": {"tokens": 8000, "usd": 4.5},
+                "band": "warn",
+                "pct": 0.85,
+            }
+        )
         assert ev.band == "warn"
         assert ev.pct == pytest.approx(0.85)
 
 
 class TestParseToolResult:
     def test_basic(self):
-        ev = parse_agent_event({
-            "type": "tool_result",
-            "toolUseId": "t1",
-            "output": "file content",
-            "isError": False,
-        })
+        ev = parse_agent_event(
+            {
+                "type": "tool_result",
+                "toolUseId": "t1",
+                "output": "file content",
+                "isError": False,
+            }
+        )
         assert isinstance(ev, ToolResultEvent)
         assert ev.tool_use_id == "t1"
         assert ev.output == "file content"
         assert ev.is_error is False
 
     def test_error_result(self):
-        ev = parse_agent_event({
-            "type": "tool_result",
-            "toolUseId": "t2",
-            "output": "command not found",
-            "isError": True,
-        })
+        ev = parse_agent_event(
+            {
+                "type": "tool_result",
+                "toolUseId": "t2",
+                "output": "command not found",
+                "isError": True,
+            }
+        )
         assert ev.is_error is True
 
 
 class TestParseError:
     def test_basic(self):
-        ev = parse_agent_event({
-            "type": "error",
-            "error": {"code": "E001", "message": "something bad"},
-        })
+        ev = parse_agent_event(
+            {
+                "type": "error",
+                "error": {"code": "E001", "message": "something bad"},
+            }
+        )
         assert isinstance(ev, StreamErrorEvent)
         assert ev.error["message"] == "something bad"
 
@@ -128,13 +140,19 @@ class TestAllEventTypes:
         """Every event type in ALL_EVENT_TYPES has a parser entry."""
         # Minimal payloads per type to exercise the parser map.
         minimal = {
-            "message_start": {"message": {"id": "1", "model": "m"}, "usage": {"input_tokens": 0, "output_tokens": 0}},
+            "message_start": {
+                "message": {"id": "1", "model": "m"},
+                "usage": {"input_tokens": 0, "output_tokens": 0},
+            },
             "content_delta": {"delta": "x"},
             "thinking_delta": {"delta": "x"},
             "tool_use_start": {"toolUseId": "t", "name": "n"},
             "tool_use_delta": {"toolUseId": "t", "inputDelta": "x"},
             "tool_result": {"toolUseId": "t", "output": None},
-            "message_stop": {"stopReason": "end_turn", "usage": {"input_tokens": 0, "output_tokens": 0}},
+            "message_stop": {
+                "stopReason": "end_turn",
+                "usage": {"input_tokens": 0, "output_tokens": 0},
+            },
             "memory_retrieved": {"memoryIds": [], "latencyMs": 0, "timedOut": False},
             "memory_cited": {"memoryId": "m"},
             "memory_consolidated": {"newFacts": 0, "reinforced": 0, "weakened": 0},

@@ -1898,6 +1898,7 @@ class TechDebtResult(BaseModel):
 
     model_config = {"populate_by_name": True}
 
+
 # ── Custom Rules ───────────────────────────────────────────────────────────
 
 
@@ -1948,6 +1949,7 @@ class CustomRuleTestResult(BaseModel):
 
 # ── detect_conventions ────────────────────────────────────────────────────────
 
+
 class NamingStyle(BaseModel):
     name: str
     count: int
@@ -1994,6 +1996,7 @@ class ConventionsResult(BaseModel):
 
 # ── generate_tests ────────────────────────────────────────────────────────────
 
+
 class GenerateTestsResult(BaseModel):
     test_file_path: str = Field(alias="test_file_path", default="")
     test_code: str = Field(alias="test_code", default="")
@@ -2006,6 +2009,7 @@ class GenerateTestsResult(BaseModel):
 
 
 # ── post_review_findings ──────────────────────────────────────────────────────
+
 
 class PostReviewFindingsResult(BaseModel):
     review_url: Optional[str] = Field(alias="review_url", default=None)
@@ -2020,6 +2024,7 @@ class PostReviewFindingsResult(BaseModel):
 
 # ── create_fix_pr ─────────────────────────────────────────────────────────────
 
+
 class CreateFixPRResult(BaseModel):
     pr_url: str = Field(alias="pr_url", default="")
     pr_number: int = Field(alias="pr_number", default=0)
@@ -2031,6 +2036,7 @@ class CreateFixPRResult(BaseModel):
 
 
 # ── review_dependency_changes ─────────────────────────────────────────────────
+
 
 class DependencyVulnerability(BaseModel):
     package: str = ""
@@ -2057,6 +2063,7 @@ class ReviewDepsResult(BaseModel):
 
 
 # ── analyze_change_impact ─────────────────────────────────────────────────────
+
 
 class ChangeImpactFile(BaseModel):
     file_path: str = Field(alias="file_path", default="")
@@ -2087,6 +2094,7 @@ class ChangeImpactResult(BaseModel):
 
 # ── explain_code ──────────────────────────────────────────────────────────────
 
+
 class ExplainCodeResult(BaseModel):
     file_path: str = Field(alias="file_path", default="")
     function_name: str = Field(alias="function_name", default="")
@@ -2100,6 +2108,7 @@ class ExplainCodeResult(BaseModel):
 
 
 # ── suggest_refactoring ───────────────────────────────────────────────────────
+
 
 class RefactoringMetrics(BaseModel):
     cyclomatic: Optional[int] = None
@@ -2135,7 +2144,9 @@ class SuggestRefactoringResult(BaseModel):
     function_name: str = Field(alias="function_name", default="")
     language: str = ""
     ref: str = "HEAD"
-    original_metrics: RefactoringMetrics = Field(alias="original_metrics", default_factory=RefactoringMetrics)
+    original_metrics: RefactoringMetrics = Field(
+        alias="original_metrics", default_factory=RefactoringMetrics
+    )
     original_start_line: int = Field(alias="original_start_line", default=0)
     goals_applied: List[str] = Field(alias="goals_applied", default=[])
     suggestion: RefactoringSuggestion = Field(default_factory=RefactoringSuggestion)
@@ -2145,6 +2156,7 @@ class SuggestRefactoringResult(BaseModel):
 
 
 # ── build_ast_query ───────────────────────────────────────────────────────────
+
 
 class BuildAstQueryResult(BaseModel):
     description: str = ""
@@ -2161,6 +2173,7 @@ class BuildAstQueryResult(BaseModel):
 
 
 # ── architecture_review ───────────────────────────────────────────────────────
+
 
 class ArchitectureConcern(BaseModel):
     type: str = ""
