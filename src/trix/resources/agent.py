@@ -238,9 +238,7 @@ class AgentResource:
 
     # ==================== ADR-112 P10 — Ingestion-pipeline triggers ====================
 
-    def summarize_session(
-        self, session_id: str, pipeline: Optional[str] = None
-    ) -> Dict[str, Any]:
+    def summarize_session(self, session_id: str, pipeline: Optional[str] = None) -> Dict[str, Any]:
         """Enqueue a session_summary job for the given session.
 
         Returns the trigger response (`{session_id, enqueued, job_id, pipeline}`).
@@ -249,9 +247,7 @@ class AgentResource:
         data: Dict[str, Any] = {}
         if pipeline:
             data["pipeline"] = pipeline
-        return self._client._request(
-            "POST", f"/agent/sessions/{session_id}/summarize", json=data
-        )
+        return self._client._request("POST", f"/agent/sessions/{session_id}/summarize", json=data)
 
     def trigger_mega_summary(
         self,
@@ -288,9 +284,7 @@ class AgentResource:
 
     def set_default_pipeline(self, name: str) -> str:
         """Set the account default pipeline preset. Raises on unknown name."""
-        resp = self._client._request(
-            "POST", f"/pipeline-presets/{name}/set-default", json={}
-        )
+        resp = self._client._request("POST", f"/pipeline-presets/{name}/set-default", json={})
         return resp["name"] if isinstance(resp, dict) else name
 
     def clear_default_pipeline(self) -> None:
@@ -306,9 +300,7 @@ class AgentResource:
 
     def set_space_default_pipeline(self, space_id: str, name: str) -> str:
         """Set the space default pipeline preset. Raises on unknown name."""
-        resp = self._client._request(
-            "POST", f"/spaces/{space_id}/default-pipeline/{name}", json={}
-        )
+        resp = self._client._request("POST", f"/spaces/{space_id}/default-pipeline/{name}", json={})
         return resp["name"] if isinstance(resp, dict) else name
 
     def clear_space_default_pipeline(self, space_id: str) -> None:
@@ -340,9 +332,7 @@ class AgentResource:
             params["space_id"] = space_id
         if pipeline:
             params["pipeline"] = pipeline
-        resp = self._client._request(
-            "GET", "/pipeline-presets/_resolve", params=params or None
-        )
+        resp = self._client._request("GET", "/pipeline-presets/_resolve", params=params or None)
         if isinstance(resp, dict):
             return resp
         return {"name": None, "source": None, "preset": None}
@@ -514,9 +504,7 @@ class AsyncAgentResource:
 
     async def set_default_pipeline(self, name: str) -> str:
         """Set the account default pipeline preset. Raises on unknown name."""
-        resp = await self._client._request(
-            "POST", f"/pipeline-presets/{name}/set-default", json={}
-        )
+        resp = await self._client._request("POST", f"/pipeline-presets/{name}/set-default", json={})
         return resp["name"] if isinstance(resp, dict) else name
 
     async def clear_default_pipeline(self) -> None:

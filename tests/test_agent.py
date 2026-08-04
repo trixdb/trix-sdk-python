@@ -103,7 +103,8 @@ class TestCreateSession:
             mock_request.return_value = MOCK_AGENT_SESSION
             client = Trix(api_key="test_key")
             session = client.agent.create_session(
-                session_id="chat_123", space_id="space_abc",
+                session_id="chat_123",
+                space_id="space_abc",
                 metadata={"user_id": "user_456"},
             )
             assert session.space_id == "space_abc"
@@ -126,9 +127,7 @@ class TestCreateSession:
         with patch.object(AsyncTrix, "_request", new_callable=AsyncMock) as mock_req:
             mock_req.return_value = MOCK_AGENT_SESSION
             client = AsyncTrix(api_key="test_key")
-            session = await client.agent.create_session(
-                session_id="chat_123", space_id="space_abc"
-            )
+            session = await client.agent.create_session(session_id="chat_123", space_id="space_abc")
             assert isinstance(session, AgentSession)
             await client.close()
 
@@ -423,9 +422,7 @@ class TestGetContext:
         with patch.object(Trix, "_request") as mock_request:
             mock_request.return_value = MOCK_AGENT_CONTEXT
             client = Trix(api_key="test_key")
-            client.agent.get_context(
-                query="Tell me about Python", session_id="chat_123", limit=5
-            )
+            client.agent.get_context(query="Tell me about Python", session_id="chat_123", limit=5)
             json_data = mock_request.call_args[1]["json"]
             assert json_data["session_id"] == "chat_123"
             assert json_data["limit"] == 5

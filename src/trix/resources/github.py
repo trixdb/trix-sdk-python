@@ -1197,9 +1197,7 @@ class GitHubResource(BaseSyncResource):
         body: Dict[str, Any] = {"preset_name": preset_name}
         if conditions is not None:
             body["conditions"] = conditions
-        return self._client.put(
-            f"/v1/projects/{project_id}/github/quality-profile", json=body
-        )
+        return self._client.put(f"/v1/projects/{project_id}/github/quality-profile", json=body)
 
     def update_finding_status(
         self,
@@ -1234,9 +1232,7 @@ class GitHubResource(BaseSyncResource):
         query: Dict[str, Any] = {"from": "code_ownership", "days": days, "limit": limit}
         if file_paths:
             query["where"] = {"file_paths": file_paths}
-        return self._client.post(
-            f"/v1/projects/{project_id}/github/query", json=query
-        )
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
     def get_refactor_candidates(
         self,
@@ -1248,9 +1244,7 @@ class GitHubResource(BaseSyncResource):
         query: Dict[str, Any] = {"from": "refactor_candidates", "limit": limit}
         if language:
             query["language"] = language
-        return self._client.post(
-            f"/v1/projects/{project_id}/github/query", json=query
-        )
+        return self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
 
     def deep_pr_review(
         self,
@@ -1293,7 +1287,9 @@ class GitHubResource(BaseSyncResource):
         }
         if repo_full_name:
             body["repoFullName"] = repo_full_name
-        return self._client.post(f"/v1/projects/{project_id}/github/orchestrate-pr-review", json=body)
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/orchestrate-pr-review", json=body
+        )
 
     def generate_pr_description(
         self,
@@ -1322,7 +1318,9 @@ class GitHubResource(BaseSyncResource):
             body["commitMessages"] = commit_messages
         if pr_title:
             body["prTitle"] = pr_title
-        return self._client.post(f"/v1/projects/{project_id}/github/generate-pr-description", json=body)
+        return self._client.post(
+            f"/v1/projects/{project_id}/github/generate-pr-description", json=body
+        )
 
     def generate_ci_workflow(
         self,
@@ -1390,7 +1388,11 @@ class GitHubResource(BaseSyncResource):
         """
         return self._client.post(
             f"/v1/projects/{project_id}/github/query",
-            json={"from": "change_risk", "file_paths": file_paths, "include_actions": include_actions},
+            json={
+                "from": "change_risk",
+                "file_paths": file_paths,
+                "include_actions": include_actions,
+            },
         )
 
     def get_module_complexity(
@@ -1768,6 +1770,7 @@ class GitHubResource(BaseSyncResource):
         Returns: {succeeded, failed, total}
         """
         import concurrent.futures
+
         results = {"succeeded": 0, "failed": 0, "total": len(findings)}
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
             futures = {
@@ -1953,7 +1956,10 @@ class GitHubResource(BaseSyncResource):
         Returns: { results[], count } — each result has design_score, breaking_change_risk, issues[]
         """
         query: Dict[str, Any] = {
-            "from": "api_surface", "mode": mode, "min_callers": min_callers, "limit": limit
+            "from": "api_surface",
+            "mode": mode,
+            "min_callers": min_callers,
+            "limit": limit,
         }
         if language:
             query["language"] = language
@@ -2018,7 +2024,10 @@ class GitHubResource(BaseSyncResource):
         Returns: functions with outlier_dimensions[], z_scores, severity (triple/double/single)
         """
         query: Dict[str, Any] = {
-            "from": "function_outliers", "mode": mode, "threshold": threshold, "limit": limit
+            "from": "function_outliers",
+            "mode": mode,
+            "threshold": threshold,
+            "limit": limit,
         }
         if language:
             query["language"] = language
@@ -2039,9 +2048,7 @@ class GitHubResource(BaseSyncResource):
         Returns: function_name, file_path, risk, suggested_action
         (safe_to_remove | deprecate | audit_before_removing)
         """
-        query: Dict[str, Any] = {
-            "from": "dead_exports", "mode": mode, "limit": limit
-        }
+        query: Dict[str, Any] = {"from": "dead_exports", "mode": mode, "limit": limit}
         if language:
             query["language"] = language
         if risk:
@@ -2064,7 +2071,10 @@ class GitHubResource(BaseSyncResource):
         Returns: avg_cc, avg_mi, avg_hotspot, high_cc_count, low_mi_count, debt_score
         """
         query: Dict[str, Any] = {
-            "from": "contributor_quality", "mode": mode, "min_files": min_files, "limit": limit
+            "from": "contributor_quality",
+            "mode": mode,
+            "min_files": min_files,
+            "limit": limit,
         }
         if author:
             query["author"] = author
@@ -2084,9 +2094,7 @@ class GitHubResource(BaseSyncResource):
                      'god' (params≥5+LOC≥40+CC≥8)
         Returns: function_name, kind, score, reason per violation
         """
-        query: Dict[str, Any] = {
-            "from": "abstraction_quality", "mode": mode, "limit": limit
-        }
+        query: Dict[str, Any] = {"from": "abstraction_quality", "mode": mode, "limit": limit}
         if kind:
             query["kind"] = kind
         if language:

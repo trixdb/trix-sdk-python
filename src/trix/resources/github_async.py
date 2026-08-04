@@ -478,7 +478,9 @@ class AsyncGitHubResource(BaseAsyncResource):
         )
         return QualityGate.model_validate(response)
 
-    async def query_code(self, project_id: str, query: "Dict[str, Any] | CqlQuery") -> Dict[str, Any]:
+    async def query_code(
+        self, project_id: str, query: "Dict[str, Any] | CqlQuery"
+    ) -> Dict[str, Any]:
         """Execute a CQL query over code metrics (async).
 
         Accepts either a raw dict or a typed CqlQuery instance.
@@ -1089,10 +1091,16 @@ class AsyncGitHubResource(BaseAsyncResource):
         include_inline_smells: bool = True,
     ) -> Dict[str, Any]:
         """One-call CQL PR review using stored metrics (pr_impact + smells + MI)."""
-        body: Dict[str, Any] = {"prNumber": pr_number, "limitFiles": limit_files, "includeInlineSmells": include_inline_smells}
+        body: Dict[str, Any] = {
+            "prNumber": pr_number,
+            "limitFiles": limit_files,
+            "includeInlineSmells": include_inline_smells,
+        }
         if repo_full_name:
             body["repoFullName"] = repo_full_name
-        return await self._client.post(f"/v1/projects/{project_id}/github/deep-pr-review", json=body)
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/deep-pr-review", json=body
+        )
 
     async def orchestrate_pr_review(
         self,
@@ -1103,10 +1111,16 @@ class AsyncGitHubResource(BaseAsyncResource):
         include_inline_smells: bool = True,
     ) -> Dict[str, Any]:
         """Most comprehensive one-call PR review — 4 CQL signals in parallel."""
-        body: Dict[str, Any] = {"prNumber": pr_number, "limitFiles": limit_files, "includeInlineSmells": include_inline_smells}
+        body: Dict[str, Any] = {
+            "prNumber": pr_number,
+            "limitFiles": limit_files,
+            "includeInlineSmells": include_inline_smells,
+        }
         if repo_full_name:
             body["repoFullName"] = repo_full_name
-        return await self._client.post(f"/v1/projects/{project_id}/github/orchestrate-pr-review", json=body)
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/orchestrate-pr-review", json=body
+        )
 
     async def generate_pr_description(
         self,
@@ -1131,7 +1145,9 @@ class AsyncGitHubResource(BaseAsyncResource):
             body["commitMessages"] = commit_messages
         if pr_title:
             body["prTitle"] = pr_title
-        return await self._client.post(f"/v1/projects/{project_id}/github/generate-pr-description", json=body)
+        return await self._client.post(
+            f"/v1/projects/{project_id}/github/generate-pr-description", json=body
+        )
 
     async def generate_ci_workflow(
         self,
@@ -1145,7 +1161,13 @@ class AsyncGitHubResource(BaseAsyncResource):
         """Generate GitHub Actions CI workflow YAML files for Trix quality gates."""
         return await self._client.post(
             f"/v1/projects/{project_id}/github/generate-ci-workflow",
-            json={"type": workflow_type, "gate": gate, "mainBranch": main_branch, "postInlineComments": post_inline_comments, "blockOnFail": block_on_fail},
+            json={
+                "type": workflow_type,
+                "gate": gate,
+                "mainBranch": main_branch,
+                "postInlineComments": post_inline_comments,
+                "blockOnFail": block_on_fail,
+            },
         )
 
     async def get_test_coverage_gap(
@@ -1158,7 +1180,12 @@ class AsyncGitHubResource(BaseAsyncResource):
         limit: int = 25,
     ) -> Dict[str, Any]:
         """Risk-weighted test coverage gap — gap_risk = (1-covered) × CC × (1 + hotspot/10)."""
-        query: Dict[str, Any] = {"from": "test_coverage_gap", "mode": mode, "min_cc": min_cc, "limit": limit}
+        query: Dict[str, Any] = {
+            "from": "test_coverage_gap",
+            "mode": mode,
+            "min_cc": min_cc,
+            "limit": limit,
+        }
         if language:
             query["language"] = language
         if file_contains:
@@ -1174,7 +1201,11 @@ class AsyncGitHubResource(BaseAsyncResource):
         """Pre-change blast radius risk assessment — CC + MI + hotspot + debt + coverage gap."""
         return await self._client.post(
             f"/v1/projects/{project_id}/github/query",
-            json={"from": "change_risk", "file_paths": file_paths, "include_actions": include_actions},
+            json={
+                "from": "change_risk",
+                "file_paths": file_paths,
+                "include_actions": include_actions,
+            },
         )
 
     async def get_module_complexity(
@@ -1188,7 +1219,13 @@ class AsyncGitHubResource(BaseAsyncResource):
         limit: int = 20,
     ) -> Dict[str, Any]:
         """Directory-level complexity aggregation — SonarQube-style module quality view."""
-        query: Dict[str, Any] = {"from": "module_complexity", "mode": mode, "depth": depth, "sort_by": sort_by, "limit": limit}
+        query: Dict[str, Any] = {
+            "from": "module_complexity",
+            "mode": mode,
+            "depth": depth,
+            "sort_by": sort_by,
+            "limit": limit,
+        }
         if module:
             query["module"] = module
         if language:
@@ -1214,7 +1251,12 @@ class AsyncGitHubResource(BaseAsyncResource):
         mode: 'files' (ranked) | 'summary' (buckets + top dims + worst_5)
         min_score: 1-6, default 3
         """
-        query: Dict[str, Any] = {"from": "toxic_files", "mode": mode, "min_score": min_score, "limit": limit}
+        query: Dict[str, Any] = {
+            "from": "toxic_files",
+            "mode": mode,
+            "min_score": min_score,
+            "limit": limit,
+        }
         if language:
             query["language"] = language
         if cc_threshold is not None:
@@ -1307,9 +1349,7 @@ class AsyncGitHubResource(BaseAsyncResource):
         }
         if min_grade:
             query["min_grade"] = min_grade
-        return await self._client.post(
-            f"/v1/projects/{project_id}/github/query-code", json=query
-        )
+        return await self._client.post(f"/v1/projects/{project_id}/github/query-code", json=query)
 
     async def pre_pr_checklist(
         self,
@@ -1381,7 +1421,12 @@ class AsyncGitHubResource(BaseAsyncResource):
         trend_score = smell_delta × 3 + suggestion_delta.
         mode: 'regressing' | 'improving' | 'all' | 'summary'
         """
-        query: Dict[str, Any] = {"from": "smell_trend", "mode": mode, "min_delta": min_delta, "limit": limit}
+        query: Dict[str, Any] = {
+            "from": "smell_trend",
+            "mode": mode,
+            "min_delta": min_delta,
+            "limit": limit,
+        }
         if language:
             query["language"] = language
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
@@ -1418,7 +1463,12 @@ class AsyncGitHubResource(BaseAsyncResource):
         smell_score = severity-weighted smells per file (critical×4, high×3, medium×2, low×1).
         mode: 'modules' | 'summary'. depth: 1-5 directory grouping depth.
         """
-        query: Dict[str, Any] = {"from": "module_smell_heat", "mode": mode, "depth": depth, "limit": limit}
+        query: Dict[str, Any] = {
+            "from": "module_smell_heat",
+            "mode": mode,
+            "depth": depth,
+            "limit": limit,
+        }
         if language:
             query["language"] = language
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
@@ -1436,7 +1486,12 @@ class AsyncGitHubResource(BaseAsyncResource):
         Signals: smell_density(30%) + coupling fan-in(25%) + hotspot(20%) + CC(15%) + no_test(10%).
         mode: 'files' | 'summary'
         """
-        query: Dict[str, Any] = {"from": "refactor_priority", "mode": mode, "min_score": min_score, "limit": limit}
+        query: Dict[str, Any] = {
+            "from": "refactor_priority",
+            "mode": mode,
+            "min_score": min_score,
+            "limit": limit,
+        }
         if language:
             query["language"] = language
         return await self._client.post(f"/v1/projects/{project_id}/github/query", json=query)
@@ -1490,6 +1545,7 @@ class AsyncGitHubResource(BaseAsyncResource):
         Returns: {succeeded, failed, total}
         """
         import asyncio
+
         results = {"succeeded": 0, "failed": 0, "total": len(findings)}
         tasks = [
             self.update_finding_status(
@@ -1658,7 +1714,10 @@ class AsyncGitHubResource(BaseAsyncResource):
         Returns: { results[], count } — each result has design_score, breaking_change_risk, issues[]
         """
         query: Dict[str, Any] = {
-            "from": "api_surface", "mode": mode, "min_callers": min_callers, "limit": limit
+            "from": "api_surface",
+            "mode": mode,
+            "min_callers": min_callers,
+            "limit": limit,
         }
         if language:
             query["language"] = language
@@ -1723,7 +1782,10 @@ class AsyncGitHubResource(BaseAsyncResource):
         Returns: functions with outlier_dimensions[], z_scores, severity (triple/double/single)
         """
         query: Dict[str, Any] = {
-            "from": "function_outliers", "mode": mode, "threshold": threshold, "limit": limit
+            "from": "function_outliers",
+            "mode": mode,
+            "threshold": threshold,
+            "limit": limit,
         }
         if language:
             query["language"] = language
@@ -1743,9 +1805,7 @@ class AsyncGitHubResource(BaseAsyncResource):
         risk: filter by tier — 'high' (CC>5 or LOC>40), 'medium', 'low'
         Returns: function_name, file_path, risk, suggested_action
         """
-        query: Dict[str, Any] = {
-            "from": "dead_exports", "mode": mode, "limit": limit
-        }
+        query: Dict[str, Any] = {"from": "dead_exports", "mode": mode, "limit": limit}
         if language:
             query["language"] = language
         if risk:
@@ -1766,7 +1826,10 @@ class AsyncGitHubResource(BaseAsyncResource):
         Returns: avg_cc, avg_mi, avg_hotspot, high_cc_count, low_mi_count, debt_score
         """
         query: Dict[str, Any] = {
-            "from": "contributor_quality", "mode": mode, "min_files": min_files, "limit": limit
+            "from": "contributor_quality",
+            "mode": mode,
+            "min_files": min_files,
+            "limit": limit,
         }
         if author:
             query["author"] = author
@@ -1781,9 +1844,7 @@ class AsyncGitHubResource(BaseAsyncResource):
         limit: int = 50,
     ) -> Any:
         """Detect abstraction quality violations (leaky, thin, god patterns)."""
-        query: Dict[str, Any] = {
-            "from": "abstraction_quality", "mode": mode, "limit": limit
-        }
+        query: Dict[str, Any] = {"from": "abstraction_quality", "mode": mode, "limit": limit}
         if kind:
             query["kind"] = kind
         if language:
