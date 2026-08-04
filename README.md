@@ -2,8 +2,8 @@
 
 Official Python SDK for [Trix](https://trixdb.com) - A powerful memory and knowledge management API.
 
-[![PyPI version](https://badge.fury.io/py/trix.svg)](https://badge.fury.io/py/trix)
-[![Python Support](https://img.shields.io/pypi/pyversions/trix.svg)](https://pypi.org/project/trix/)
+[![PyPI version](https://badge.fury.io/py/trixdb.svg)](https://badge.fury.io/py/trixdb)
+[![Python Support](https://img.shields.io/pypi/pyversions/trixdb.svg)](https://pypi.org/project/trixdb/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Features
@@ -19,14 +19,18 @@ Official Python SDK for [Trix](https://trixdb.com) - A powerful memory and knowl
 ## Installation
 
 ```bash
-pip install trix
+pip install trixdb
 ```
 
 For development:
 
 ```bash
-pip install trix[dev]
+pip install trixdb[dev]
 ```
+
+> **Package name vs. import name:** the distribution is published as **`trixdb`**
+> on PyPI (`pip install trixdb`), but the import package is **`trix`**
+> (`from trix import Trix`). This is intentional.
 
 ## Quick Start
 
@@ -811,8 +815,8 @@ print(memory.metadata)    # Dict[str, Any]
 
 ```bash
 # Clone repository
-git clone https://github.com/trix/trix-python-sdk.git
-cd trix-python-sdk
+git clone https://github.com/trixdb/trix-sdk-python.git
+cd trix-sdk-python
 
 # Create virtual environment
 python -m venv venv
@@ -872,7 +876,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Support
 
 - Documentation: [https://docs.trixdb.com](https://docs.trixdb.com)
-- Issues: [https://github.com/trix/trix-python-sdk/issues](https://github.com/trix/trix-python-sdk/issues)
+- Issues: [https://github.com/trixdb/trix-sdk-python/issues](https://github.com/trixdb/trix-sdk-python/issues)
 - Email: support@trixdb.com
 
 ## Changelog

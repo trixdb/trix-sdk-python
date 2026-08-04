@@ -49,8 +49,8 @@ telemetry = [
 [project.urls]
 Homepage = "https://trixdb.com"
 Documentation = "https://docs.trixdb.com"
-Repository = "https://github.com/trix/trix-python-sdk"
-Issues = "https://github.com/trix/trix-python-sdk/issues"
+Repository = "https://github.com/trixdb/trix-sdk-python"
+Issues = "https://github.com/trixdb/trix-sdk-python/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

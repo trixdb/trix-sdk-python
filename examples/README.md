@@ -117,7 +117,7 @@ Before running any example:
 
 1. **Install the SDK**:
    ```bash
-   pip install trix
+   pip install trixdb
    ```
 
 2. **Get an API Key**:
@@ -253,7 +253,7 @@ if __name__ == "__main__":
 - **Documentation**: See `../README.md`
 - **API Reference**: https://docs.trixdb.com
 - **Contributing**: See `../CONTRIBUTING.md`
-- **Issues**: https://github.com/trix/trix-python-sdk/issues
+- **Issues**: https://github.com/trixdb/trix-sdk-python/issues
 
 ## Need Help?
 
