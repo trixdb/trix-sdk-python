@@ -6,6 +6,7 @@ from .base import BaseSyncResource
 from ..types import (
     Session,
     SessionsResponse,
+    SessionStats,
     SessionType,
     SessionStatus,
     RetentionPolicy,
@@ -249,6 +250,19 @@ class SessionsResource(BaseSyncResource):
         """
         response = self._request("GET", "/cli-sessions/active")
         return SessionsResponse.model_validate(response)
+
+    def get_stats(self) -> SessionStats:
+        """Get aggregate statistics across your CLI sessions.
+
+        Returns:
+            Totals by status/type plus message and memory counts.
+
+        Example:
+            >>> stats = client.sessions.get_stats()
+            >>> print(stats.total, stats.active, stats.by_type)
+        """
+        response = self._request("GET", "/cli-sessions/stats")
+        return SessionStats.model_validate(response)
 
     def pause(self, id: str) -> Session:
         """Pause an active session.
