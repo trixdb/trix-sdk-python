@@ -153,6 +153,34 @@ class MemoriesResource(
         response = self._client._request("GET", "/memories", params=params)
         return MemoryList.model_validate(response)
 
+    def query(
+        self,
+        mql: str,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> "MemoryList | Dict[str, Any]":
+        """Query memories with MQL (Memory Query Language).
+
+        MQL is one expressive string — boolean logic, ranges, ``in``/``between``,
+        wildcards, full-text (``content:``), graph (``entity:``/``related:``), geo
+        (``near:``/``bbox:``), ``order by``, and aggregation
+        (``group by ... count avg ...``) — compiled to parameterised SQL server-side.
+
+        Args:
+            mql: The MQL query string.
+            limit: Maximum number of results (ignored for aggregation).
+            offset: Offset for pagination.
+
+        Returns:
+            A :class:`MemoryList` for a normal query, or the raw
+            ``{"aggregate", "group_by", "metrics"}`` dict for an aggregation.
+        """
+        params: Dict[str, Any] = {"mql": mql, "limit": limit, "offset": offset}
+        response = self._client._request("GET", "/memories", params=params)
+        if isinstance(response, dict) and "aggregate" in response:
+            return response
+        return MemoryList.model_validate(response)
+
     def iter(
         self,
         q: Optional[str] = None,
@@ -401,6 +429,24 @@ class AsyncMemoriesResource(
             session_id,
         )
         response = await self._client._request("GET", "/memories", params=params)
+        return MemoryList.model_validate(response)
+
+    async def query(
+        self,
+        mql: str,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> "MemoryList | Dict[str, Any]":
+        """Query memories with MQL (Memory Query Language) (async).
+
+        See the sync :meth:`query` for the full MQL surface. Returns a
+        :class:`MemoryList` for a normal query, or the raw
+        ``{"aggregate", "group_by", "metrics"}`` dict for an aggregation.
+        """
+        params: Dict[str, Any] = {"mql": mql, "limit": limit, "offset": offset}
+        response = await self._client._request("GET", "/memories", params=params)
+        if isinstance(response, dict) and "aggregate" in response:
+            return response
         return MemoryList.model_validate(response)
 
     async def iter(

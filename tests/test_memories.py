@@ -140,6 +140,39 @@ class TestMemoriesList:
             client.close()
 
 
+class TestMemoriesQuery:
+    """Tests for memories.query() (MQL)."""
+
+    def test_query_sends_mql_and_returns_list(self, mock_memory_list_data):
+        """A normal MQL query passes ?mql= and returns a MemoryList."""
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = mock_memory_list_data
+            client = Trix(api_key="test_key")
+
+            result = client.memories.query("type:fact quality>0.8", limit=25, offset=5)
+
+            assert isinstance(result, MemoryList)
+            call_args = mock_request.call_args
+            assert call_args[0] == ("GET", "/memories")
+            params = call_args[1]["params"]
+            assert params["mql"] == "type:fact quality>0.8"
+            assert params["limit"] == 25
+            assert params["offset"] == 5
+            client.close()
+
+    def test_query_returns_aggregate_shape_raw(self):
+        """An aggregation response is returned as-is, not coerced to MemoryList."""
+        agg = {"aggregate": [{"group": "fact", "count": 3}], "group_by": "type", "metrics": ["count"]}
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = agg
+            client = Trix(api_key="test_key")
+
+            result = client.memories.query("group by type count")
+
+            assert result == agg
+            client.close()
+
+
 class TestMemoriesGet:
     """Tests for memories.get()."""
 
