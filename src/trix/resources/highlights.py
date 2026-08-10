@@ -3,10 +3,9 @@
 from typing import Any, Dict, List, Optional
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
-
 from ..types import (
-    ExtractionType,
     ExtractedHighlights,
+    ExtractionType,
     Highlight,
     HighlightCreate,
     HighlightLinkResult,

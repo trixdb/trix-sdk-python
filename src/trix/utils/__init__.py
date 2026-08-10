@@ -1,20 +1,10 @@
 """Utility modules for Trix SDK."""
 
-from .pagination import AsyncPaginator, SyncPaginator
-from .retry import RetryConfig, retry_with_backoff
-from .security import (
-    validate_id,
-    validate_base_url,
-    validate_webhook_url,
-    redact_sensitive_data,
-    get_env_credential,
-    mask_credential,
-)
 from .logging import (
     LogConfig,
     LogFormat,
-    LogLevel,
     LoggerAdapter,
+    LogLevel,
     create_logger_adapter,
     get_logger,
     get_request_id,
@@ -45,15 +35,25 @@ from .metrics_impl import (
     MetricValue,
     SimpleMetricsCollector,
 )
+from .pagination import AsyncPaginator, SyncPaginator
+from .retry import RetryConfig, retry_with_backoff
+from .security import (
+    get_env_credential,
+    mask_credential,
+    redact_sensitive_data,
+    validate_base_url,
+    validate_id,
+    validate_webhook_url,
+)
 from .telemetry import (
-    TelemetryConfig,
-    SpanStatusCode,
-    SpanKind,
     RequestSpan,
+    SpanKind,
+    SpanStatusCode,
+    TelemetryConfig,
     configure_telemetry,
+    create_request_span,
     get_telemetry_config,
     is_telemetry_enabled,
-    create_request_span,
     traced,
     with_tracing,
     with_tracing_async,

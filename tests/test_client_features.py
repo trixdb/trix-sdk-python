@@ -1,14 +1,14 @@
 """Tests for new Trix client features: connection pooling, timeouts, interceptors."""
 
-import pytest
 import httpx
+import pytest
 
 from trix import (
-    Trix,
     AsyncTrix,
     PoolConfig,
     RequestContext,
     ResponseContext,
+    Trix,
 )
 
 

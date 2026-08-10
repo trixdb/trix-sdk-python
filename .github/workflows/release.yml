@@ -41,11 +41,11 @@ jobs:
 
       - name: Run type checking
         run: mypy src/trix
-        continue-on-error: true  # TODO: fix 195 pre-existing mypy errors
+        continue-on-error: true  # TODO: fix 335 pre-existing mypy errors
 
       - name: Run tests
         run: pytest tests/ -v --cov=trix --cov-report=xml
-        continue-on-error: true  # TODO: fix 22 pre-existing test failures
+        continue-on-error: true  # tests currently pass (1075 passed / 5 xfailed); flag no longer masks failures, can be dropped to make blocking
 
       - name: Run security scan
         run: pip-audit

@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types.crew import (
     Crew,
     CrewCreate,
@@ -10,6 +9,7 @@ from ..types.crew import (
     CrewUpdate,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class CrewsResource(BaseSyncResource):

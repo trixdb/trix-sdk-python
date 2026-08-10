@@ -1,16 +1,17 @@
 """Tests for sessions resource."""
 
-import pytest
 from unittest.mock import patch
 
-from trix import Trix, AsyncTrix
+import pytest
+
+from trix import AsyncTrix, Trix
 from trix.types import (
+    RetentionPolicy,
     Session,
     SessionsResponse,
     SessionStats,
-    SessionType,
     SessionStatus,
-    RetentionPolicy,
+    SessionType,
 )
 
 

@@ -5,7 +5,7 @@ This example demonstrates how to use sessions for managing conversation
 and project contexts with lifecycle management.
 """
 
-from trix import Trix, SessionType, SessionStatus, RetentionPolicy
+from trix import RetentionPolicy, SessionStatus, SessionType, Trix
 
 
 def main():

@@ -8,6 +8,8 @@ For new code, you can import directly from the specific modules:
 """
 
 # Re-export from base module
+# Re-export from async client
+from .client_async import AsyncTrix
 from .client_base import (
     AsyncErrorInterceptor,
     AsyncRequestInterceptor,
@@ -22,9 +24,6 @@ from .client_base import (
 
 # Re-export from sync client
 from .client_sync import Trix
-
-# Re-export from async client
-from .client_async import AsyncTrix
 
 __all__ = [
     # Client classes

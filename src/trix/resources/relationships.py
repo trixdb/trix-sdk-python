@@ -4,8 +4,8 @@ from typing import Any, Dict, List, Optional
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
-    RelatedMemoriesResult,
     ReinforceGroupResult,
+    RelatedMemoriesResult,
     Relationship,
     RelationshipCreate,
     RelationshipList,

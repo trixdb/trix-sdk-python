@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseSyncResource
 from ..types.note import (
     Note,
     NoteBlock,
@@ -20,6 +19,7 @@ from ..types.note import (
     NoteUpdate,
 )
 from ..utils.security import validate_id
+from .base import BaseSyncResource
 
 
 class NotesResource(BaseSyncResource):

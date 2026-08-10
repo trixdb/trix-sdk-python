@@ -2,8 +2,8 @@
 
 from trix.types import (
     BulkResult,
-    Pagination,
     PaginatedResponse,
+    Pagination,
 )
 
 

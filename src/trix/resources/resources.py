@@ -10,7 +10,7 @@ from ..types import (
     ResourceUpdate,
 )
 from ..utils.security import validate_id
-from .base import BaseSyncResource, BaseAsyncResource
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class ResourcesResource(BaseSyncResource):

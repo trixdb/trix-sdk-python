@@ -26,7 +26,8 @@ Async Example:
 # Version constants - must be defined before importing submodules to avoid circular imports.
 # The version is single-sourced from the installed distribution metadata, which setuptools
 # populates from ``[project] version`` in pyproject.toml — the one authoritative source.
-from importlib.metadata import PackageNotFoundError, version as _dist_version
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _dist_version
 
 try:
     __version__ = _dist_version("trixdb")
@@ -37,6 +38,8 @@ MIN_API_VERSION = "v1"
 MAX_API_VERSION = "v1"
 
 # ruff: noqa: E402
+from ._type_exports import *  # noqa: F401, F403
+from ._type_exports import TYPE_NAMES
 from .client import (
     AsyncTrix,
     ErrorInterceptor,
@@ -46,46 +49,6 @@ from .client import (
     ResponseContext,
     ResponseInterceptor,
     Trix,
-)
-from .protocols import AsyncClientProtocol, ClientProtocol, SyncClientProtocol
-from .utils.pagination import AsyncPaginator, SyncPaginator
-from .utils.retry import RetryConfig
-from .utils.security import (
-    validate_id,
-    validate_base_url,
-    validate_webhook_url,
-    redact_sensitive_data,
-    get_env_credential,
-    mask_credential,
-)
-from .utils.logging import (
-    LogConfig,
-    LogFormat,
-    LogLevel,
-    get_logger,
-    setup_logging,
-    request_context,
-)
-from .utils.metrics import (
-    InMemoryCollector,
-    MetricsCollector,
-    RequestMetrics,
-    get_metrics_collector,
-    set_metrics_collector,
-    timed_request,
-)
-from .utils.telemetry import (
-    TelemetryConfig,
-    SpanStatusCode,
-    SpanKind,
-    RequestSpan,
-    configure_telemetry,
-    get_telemetry_config,
-    is_telemetry_enabled,
-    create_request_span,
-    traced,
-    with_tracing,
-    with_tracing_async,
 )
 from .exceptions import (
     APIError,
@@ -101,8 +64,46 @@ from .exceptions import (
     TrixError,
     ValidationError,
 )
-from ._type_exports import *  # noqa: F401, F403
-from ._type_exports import TYPE_NAMES
+from .protocols import AsyncClientProtocol, ClientProtocol, SyncClientProtocol
+from .utils.logging import (
+    LogConfig,
+    LogFormat,
+    LogLevel,
+    get_logger,
+    request_context,
+    setup_logging,
+)
+from .utils.metrics import (
+    InMemoryCollector,
+    MetricsCollector,
+    RequestMetrics,
+    get_metrics_collector,
+    set_metrics_collector,
+    timed_request,
+)
+from .utils.pagination import AsyncPaginator, SyncPaginator
+from .utils.retry import RetryConfig
+from .utils.security import (
+    get_env_credential,
+    mask_credential,
+    redact_sensitive_data,
+    validate_base_url,
+    validate_id,
+    validate_webhook_url,
+)
+from .utils.telemetry import (
+    RequestSpan,
+    SpanKind,
+    SpanStatusCode,
+    TelemetryConfig,
+    configure_telemetry,
+    create_request_span,
+    get_telemetry_config,
+    is_telemetry_enabled,
+    traced,
+    with_tracing,
+    with_tracing_async,
+)
 
 __all__ = [
     # Clients

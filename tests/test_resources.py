@@ -1,7 +1,9 @@
 """Tests for Resources API"""
 
-import pytest
 from unittest.mock import patch
+
+import pytest
+
 from trix import Trix
 from trix.types import Resource, ResourceList
 

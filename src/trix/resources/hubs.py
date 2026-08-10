@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types.hub import (
     AddConversationMemberParams,
     AddHubMemberParams,
@@ -14,6 +13,7 @@ from ..types.hub import (
     UpdateHubMemberParams,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class HubsResource(BaseSyncResource):

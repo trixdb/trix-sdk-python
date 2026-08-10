@@ -67,9 +67,26 @@ target-version = ["py39"]
 line-length = 100
 target-version = "py39"
 
+[tool.ruff.lint]
+# Pin an explicit ruleset. Without `select`, ruff applies its full default
+# rule set, which grows every release (0.16.2 ships 413 rules) and flagged
+# 4362 errors here (mostly FA100/UP006), breaking the release quality gate.
+# Mirrors trix-sdk-python-examples, which is green with this same selection.
+select = ["E", "F", "I", "W"]
+# black owns formatting/line length (both tools are set to 100). black does
+# not wrap long docstrings/strings, so E501 would conflict with the formatter
+# on lines it deliberately leaves long; defer line-length enforcement to black.
+ignore = ["E501"]
+
 [tool.ruff.lint.per-file-ignores]
+# Intentional re-export shims: star imports (F401/F403) keep the public type
+# surface in lockstep with trix.types; a couple import after module code (E402).
 "src/trix/types/__init__.py" = ["F401", "E402"]
 "src/trix/resources/__init__.py" = ["F401"]
+"src/trix/_type_exports.py" = ["F403"]
+"src/trix/resources/github_types.py" = ["E402"]
+# github resource consumes its return-type models from a github_types star import.
+"src/trix/resources/github.py" = ["F405"]
 
 [tool.mypy]
 python_version = "3.9"

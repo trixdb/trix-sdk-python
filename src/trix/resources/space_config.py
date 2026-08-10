@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types.space_config import (
     SpaceConfigAuditResponse,
     SpaceConfigPatch,
@@ -10,6 +9,7 @@ from ..types.space_config import (
     SpaceConfigValidation,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class SpaceConfigResource(BaseSyncResource):

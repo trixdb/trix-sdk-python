@@ -1,17 +1,17 @@
 """Personas resource for Trix SDK."""
 
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types.persona import (
     Persona,
+    PersonaAddSpace,
     PersonaCreate,
     PersonaList,
-    PersonaUpdate,
-    PersonaAddSpace,
     PersonaSpace,
+    PersonaUpdate,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class PersonasResource(BaseSyncResource):

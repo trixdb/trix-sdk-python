@@ -11,7 +11,6 @@ import httpx
 
 from . import __api_version__, __version__
 from .auth import Auth
-from .types import PingResult
 from .client_base import (
     ErrorInterceptor,
     PoolConfig,
@@ -24,38 +23,39 @@ from .client_base import (
 from .client_transport_async import AsyncTransportMixin
 from .resources.agent import AsyncAgentResource
 from .resources.bots import AsyncBotsResource
-from .resources.habits_async import AsyncHabitsResource
+from .resources.calendar import AsyncCalendarResource
 from .resources.clusters_async import AsyncClustersResource
+from .resources.crews import AsyncCrewsResource
 from .resources.enrichments import AsyncEnrichmentsResource
 from .resources.entities_async import AsyncEntitiesResource
 from .resources.facts_async import AsyncFactsResource
 from .resources.feedback import AsyncFeedbackResource
+from .resources.files import AsyncFilesResource
+from .resources.github_async import AsyncGitHubResource
 from .resources.goals_async import AsyncGoalsResource
 from .resources.graph import AsyncGraphResource
+from .resources.habits_async import AsyncHabitsResource
 from .resources.highlights import AsyncHighlightsResource
+from .resources.hubs import AsyncHubsResource
+from .resources.hubs_roles import AsyncHubRolesResource
+from .resources.invites import AsyncInvitesResource
+from .resources.knowledge import AsyncKnowledgeResource
 from .resources.memories import AsyncMemoriesResource
+from .resources.notes_async import AsyncNotesResource
+from .resources.personas import AsyncPersonasResource
+from .resources.presets_async import AsyncPresetsResource
 from .resources.relationships import AsyncRelationshipsResource
 from .resources.resources import AsyncResourcesResource
 from .resources.search import AsyncSearchResource
 from .resources.sessions_async import AsyncSessionsResource
-from .resources.spaces import AsyncSpacesResource
-from .resources.personas import AsyncPersonasResource
+from .resources.skills import AsyncSkillsResource
 from .resources.space_config import AsyncSpaceConfigResource
+from .resources.spaces import AsyncSpacesResource
 from .resources.tasks_async import AsyncTasksResource
+from .resources.templates import AsyncTemplatesResource
 from .resources.webhooks import AsyncWebhooksResource
 from .resources.workflows_async import AsyncWorkflowsResource
-from .resources.crews import AsyncCrewsResource
-from .resources.hubs import AsyncHubsResource
-from .resources.hubs_roles import AsyncHubRolesResource
-from .resources.files import AsyncFilesResource
-from .resources.invites import AsyncInvitesResource
-from .resources.notes_async import AsyncNotesResource
-from .resources.presets_async import AsyncPresetsResource
-from .resources.calendar import AsyncCalendarResource
-from .resources.github_async import AsyncGitHubResource
-from .resources.skills import AsyncSkillsResource
-from .resources.templates import AsyncTemplatesResource
-from .resources.knowledge import AsyncKnowledgeResource
+from .types import PingResult
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url, validate_id
 

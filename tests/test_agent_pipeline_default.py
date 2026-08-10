@@ -1,10 +1,10 @@
 """Tests for agent pipeline management — account, space, resolve, triggers."""
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from unittest.mock import patch, AsyncMock
 
-from trix import Trix, AsyncTrix
-
+from trix import AsyncTrix, Trix
 
 # ---------------------------------------------------------------------------
 # Account-level default pipeline

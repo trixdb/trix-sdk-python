@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types.hub import (
     ConvRoleOverride,
     ConvRoleOverrideList,
@@ -12,6 +11,7 @@ from ..types.hub import (
     UpdateRoleParams,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class HubRolesMixin:

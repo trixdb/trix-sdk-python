@@ -2,9 +2,9 @@
 
 from typing import Optional
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types import Space, SpaceCreate, SpaceList, SpaceUpdate
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class SpacesResource(BaseSyncResource):

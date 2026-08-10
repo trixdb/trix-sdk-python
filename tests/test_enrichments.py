@@ -1,9 +1,10 @@
 """Tests for enrichments resource."""
 
-import pytest
 from unittest.mock import patch
 
-from trix import Trix, AsyncTrix, EnrichmentOperation, EnrichmentResult, EnrichmentStatus
+import pytest
+
+from trix import AsyncTrix, EnrichmentOperation, EnrichmentResult, EnrichmentStatus, Trix
 from trix.types import Enrichment
 
 

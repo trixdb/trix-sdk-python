@@ -2,6 +2,7 @@
 
 import pytest
 from httpx import Response
+
 from trix.types import GraphExpansionResult
 
 

@@ -21,6 +21,56 @@ T = TypeVar("T")
 # =============================================================================
 # Enums
 # =============================================================================
+# =============================================================================
+# Extended type exports (task, bot, workflow, note, template, hub, etc.)
+# =============================================================================
+from ._exports_extended import *  # noqa: E402, F401, F403
+from ._exports_extended import __all__ as _extended_all  # noqa: E402
+
+# =============================================================================
+# Knowledge domain exports (goal, fact, entity, enrichment, topic, etc.)
+# =============================================================================
+from ._exports_knowledge import *  # noqa: E402, F401, F403
+from ._exports_knowledge import __all__ as _knowledge_all  # noqa: E402
+
+# =============================================================================
+# Agent & Session Models
+# =============================================================================
+from .agent import (  # noqa: E402
+    AgentContext,
+    AgentSession,
+    SessionList,  # noqa: F401
+    SessionMemory,
+    SessionMemoryList,
+    SessionMessage,  # noqa: F401
+)
+
+# =============================================================================
+# Base Models
+# =============================================================================
+from .base import (
+    BaseResponse,
+    BulkResult,
+    PaginatedResponse,
+    Pagination,
+    PingResult,
+)  # noqa: E402, F401
+
+# =============================================================================
+# Cluster Models
+# =============================================================================
+from .cluster import (  # noqa: E402
+    Cluster,
+    ClusterCreate,
+    ClusterList,
+    ClusterMembership,  # noqa: F401
+    ClusterQuality,
+    ClusterStats,
+    ClusterTopic,
+    ClusterTopics,  # noqa: F401
+    ClusterUpdate,
+    IncrementalClusterResult,  # noqa: F401
+)
 from .enums import (  # noqa: E402
     ClusterScale,  # noqa: F401
     Direction,  # noqa: F401
@@ -44,15 +94,38 @@ from .enums import (  # noqa: E402
 )
 
 # =============================================================================
-# Base Models
+# Feedback, Highlight, Transcript Models
 # =============================================================================
-from .base import (
-    BaseResponse,
-    BulkResult,
-    PaginatedResponse,
-    Pagination,
-    PingResult,
-)  # noqa: E402, F401
+from .feedback import FeedbackResponse, FeedbackResult, FeedbackSubmit  # noqa: E402, F401
+
+# =============================================================================
+# Graph Models
+# =============================================================================
+from .graph import (  # noqa: E402
+    GraphContext,
+    GraphExpansionResult,
+    GraphExpansionScoring,  # noqa: F401
+    GraphExpansionStats,
+    GraphNeighbor,
+    GraphNeighbors,
+    GraphNode,  # noqa: F401
+    GraphStats,
+    GraphTraversal,
+    HybridScoringWeights,
+    ShortestPath,  # noqa: F401
+)
+from .highlight import (  # noqa: E402
+    ExtractedHighlights,
+    Highlight,
+    HighlightCreate,
+    HighlightLinkResult,  # noqa: F401
+    HighlightList,
+    HighlightSearchResult,
+    HighlightTypeInfo,  # noqa: F401
+    HighlightTypesResult,
+    HighlightUpdate,
+    HighlightWithScore,  # noqa: F401
+)
 
 # =============================================================================
 # Memory Models
@@ -65,6 +138,15 @@ from .memory import (  # noqa: E402
     MemoryOptions,
     MemoryStats,
     MemoryUpdate,  # noqa: F401
+)
+from .persona import (  # noqa: E402
+    Persona,
+    PersonaAddSpace,
+    PersonaCreate,
+    PersonaGoal,  # noqa: F401
+    PersonaList,
+    PersonaSpace,
+    PersonaUpdate,  # noqa: F401
 )
 
 # =============================================================================
@@ -83,53 +165,6 @@ from .relationship import (  # noqa: E402
 )
 
 # =============================================================================
-# Cluster Models
-# =============================================================================
-from .cluster import (  # noqa: E402
-    Cluster,
-    ClusterCreate,
-    ClusterList,
-    ClusterMembership,  # noqa: F401
-    ClusterQuality,
-    ClusterStats,
-    ClusterTopic,
-    ClusterTopics,  # noqa: F401
-    ClusterUpdate,
-    IncrementalClusterResult,  # noqa: F401
-)
-
-# =============================================================================
-# Space & Persona Models
-# =============================================================================
-from .space import Space, SpaceCreate, SpaceList, SpaceUpdate  # noqa: E402, F401
-from .persona import (  # noqa: E402
-    Persona,
-    PersonaAddSpace,
-    PersonaCreate,
-    PersonaGoal,  # noqa: F401
-    PersonaList,
-    PersonaSpace,
-    PersonaUpdate,  # noqa: F401
-)
-
-# =============================================================================
-# Graph Models
-# =============================================================================
-from .graph import (  # noqa: E402
-    GraphContext,
-    GraphExpansionResult,
-    GraphExpansionScoring,  # noqa: F401
-    GraphExpansionStats,
-    GraphNeighbor,
-    GraphNeighbors,
-    GraphNode,  # noqa: F401
-    GraphStats,
-    GraphTraversal,
-    HybridScoringWeights,
-    ShortestPath,  # noqa: F401
-)
-
-# =============================================================================
 # Search Models
 # =============================================================================
 from .search import (  # noqa: E402
@@ -138,6 +173,28 @@ from .search import (  # noqa: E402
     SearchConfig,  # noqa: F401
     SearchResult,
     SearchResults,  # noqa: F401
+)
+from .session import (  # noqa: E402
+    CompleteSessionParams,
+    CreateSessionParams,
+    Session,  # noqa: F401
+    SessionsResponse,
+    SessionStats,
+    UpdateSessionParams,  # noqa: F401
+)
+
+# =============================================================================
+# Space & Persona Models
+# =============================================================================
+from .space import Space, SpaceCreate, SpaceList, SpaceUpdate  # noqa: E402, F401
+from .transcript import (  # noqa: E402
+    ContentSafetyLabel,
+    TimestampRange,
+    Transcript,  # noqa: F401
+    TranscriptChapter,
+    TranscriptEntity,
+    TranscriptSegment,
+    WordTimestamp,  # noqa: F401
 )
 
 # =============================================================================
@@ -158,64 +215,6 @@ from .webhook import (  # noqa: E402
     WebhookStats,
     WebhookUpdate,  # noqa: F401
 )
-
-# =============================================================================
-# Agent & Session Models
-# =============================================================================
-from .agent import (  # noqa: E402
-    AgentContext,
-    AgentSession,
-    SessionList,  # noqa: F401
-    SessionMemory,
-    SessionMemoryList,
-    SessionMessage,  # noqa: F401
-)
-from .session import (  # noqa: E402
-    CompleteSessionParams,
-    CreateSessionParams,
-    Session,  # noqa: F401
-    SessionsResponse,
-    SessionStats,
-    UpdateSessionParams,  # noqa: F401
-)
-
-# =============================================================================
-# Feedback, Highlight, Transcript Models
-# =============================================================================
-from .feedback import FeedbackResponse, FeedbackResult, FeedbackSubmit  # noqa: E402, F401
-from .highlight import (  # noqa: E402
-    ExtractedHighlights,
-    Highlight,
-    HighlightCreate,
-    HighlightLinkResult,  # noqa: F401
-    HighlightList,
-    HighlightSearchResult,
-    HighlightTypeInfo,  # noqa: F401
-    HighlightTypesResult,
-    HighlightUpdate,
-    HighlightWithScore,  # noqa: F401
-)
-from .transcript import (  # noqa: E402
-    ContentSafetyLabel,
-    TimestampRange,
-    Transcript,  # noqa: F401
-    TranscriptChapter,
-    TranscriptEntity,
-    TranscriptSegment,
-    WordTimestamp,  # noqa: F401
-)
-
-# =============================================================================
-# Knowledge domain exports (goal, fact, entity, enrichment, topic, etc.)
-# =============================================================================
-from ._exports_knowledge import *  # noqa: E402, F401, F403
-from ._exports_knowledge import __all__ as _knowledge_all  # noqa: E402
-
-# =============================================================================
-# Extended type exports (task, bot, workflow, note, template, hub, etc.)
-# =============================================================================
-from ._exports_extended import *  # noqa: E402, F401, F403
-from ._exports_extended import __all__ as _extended_all  # noqa: E402
 
 # Core __all__ — types defined directly in this file
 _core_all = [

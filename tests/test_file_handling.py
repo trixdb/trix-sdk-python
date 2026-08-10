@@ -5,7 +5,6 @@ import json
 import tempfile
 from pathlib import Path
 
-
 from trix.utils.file_handling import (
     FileHandle,
     build_multipart_data,

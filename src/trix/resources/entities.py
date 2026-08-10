@@ -9,14 +9,14 @@ exposed here.
 
 from typing import Any, Dict, Optional
 
-from .base import BaseSyncResource
 from ..types import (
     Entity,
+    EntityFactsResult,
     EntityList,
     EntityMergeResult,
-    EntityFactsResult,
 )
 from ..utils.security import validate_id
+from .base import BaseSyncResource
 
 
 def _build_entity_params(

@@ -1,9 +1,10 @@
 """Tests for memories resource."""
 
-import pytest
 from unittest.mock import patch
 
-from trix import Trix, AsyncTrix, Memory, MemoryList, MemoryType, MemoryCreate
+import pytest
+
+from trix import AsyncTrix, Memory, MemoryCreate, MemoryList, MemoryType, Trix
 
 
 @pytest.fixture

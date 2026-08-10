@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseSyncResource
 from ..types.goal import (
     Goal,
     GoalContributor,
@@ -20,6 +19,7 @@ from ..types.goal import (
     ProgressHistoryList,
 )
 from ..utils.security import validate_id
+from .base import BaseSyncResource
 
 
 class GoalsResource(BaseSyncResource):

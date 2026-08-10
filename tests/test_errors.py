@@ -1,22 +1,23 @@
 """Tests for error handling."""
 
-import pytest
 from unittest.mock import Mock
+
 import httpx
+import pytest
 
 from trix import Trix
 from trix.exceptions import (
-    TrixError,
     APIError,
     APIVersionMismatchError,
     AuthenticationError,
-    PermissionError,
+    ConnectionError,
     NotFoundError,
-    ValidationError,
+    PermissionError,
     RateLimitError,
     ServerError,
-    ConnectionError,
     TimeoutError,
+    TrixError,
+    ValidationError,
 )
 
 

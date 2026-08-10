@@ -9,8 +9,6 @@ from typing import Callable, Dict, List, Optional, Type
 
 import httpx
 
-from .types import PingResult
-
 from . import __api_version__, __version__
 from .auth import Auth
 from .client_base import (
@@ -42,23 +40,24 @@ from .resources import (
     WebhooksResource,
 )
 from .resources.bots import BotsResource
+from .resources.calendar import CalendarResource
+from .resources.crews import CrewsResource
+from .resources.files import FilesResource
+from .resources.github import GitHubResource
 from .resources.goals import GoalsResource
 from .resources.habits import HabitsResource
-from .resources.personas import PersonasResource
-from .resources.space_config import SpaceConfigResource
-from .resources.workflows import WorkflowsResource
-from .resources.invites import InvitesResource
-from .resources.notes import NotesResource
-from .resources.skills import SkillsResource
-from .resources.templates import TemplatesResource
-from .resources.crews import CrewsResource
 from .resources.hubs import HubsResource
 from .resources.hubs_roles import HubRolesResource
-from .resources.files import FilesResource
-from .resources.presets import PresetsResource
-from .resources.calendar import CalendarResource
-from .resources.github import GitHubResource
+from .resources.invites import InvitesResource
 from .resources.knowledge import KnowledgeResource
+from .resources.notes import NotesResource
+from .resources.personas import PersonasResource
+from .resources.presets import PresetsResource
+from .resources.skills import SkillsResource
+from .resources.space_config import SpaceConfigResource
+from .resources.templates import TemplatesResource
+from .resources.workflows import WorkflowsResource
+from .types import PingResult
 from .utils.retry import RetryConfig
 from .utils.security import get_env_credential, validate_base_url, validate_id
 

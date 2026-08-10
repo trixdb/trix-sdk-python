@@ -8,14 +8,14 @@ the API (they 404) and have been removed.
 
 from typing import Optional
 
-from .base import BaseAsyncResource
 from ..types import (
     Entity,
+    EntityFactsResult,
     EntityList,
     EntityMergeResult,
-    EntityFactsResult,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource
 from .entities import _build_entity_params
 
 
