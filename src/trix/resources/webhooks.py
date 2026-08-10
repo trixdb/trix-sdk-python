@@ -1,6 +1,6 @@
 """Webhooks resource for Trix SDK."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
@@ -16,6 +16,7 @@ from ..types import (
     WebhookUpdate,
 )
 from ..utils.security import validate_id, validate_webhook_url
+from ._webhook_signing import unwrap_webhook, verify_webhook_signature
 
 
 class WebhooksResource:
@@ -322,6 +323,65 @@ class WebhooksResource:
         response = self._client._request("DELETE", "/webhooks/bulk", json=data)
         return dict(response)
 
+    def verify_signature(
+        self,
+        payload: Union[str, bytes],
+        signature_header: str,
+        secret: str,
+        *,
+        tolerance_seconds: int = 300,
+    ) -> bool:
+        """Verify the signature of an inbound webhook delivery.
+
+        Recomputes the HMAC-SHA256 signature over the *raw* request body (pass
+        the body exactly as received — never re-serialized JSON) and compares it
+        in constant time, rejecting deliveries whose timestamp is more than
+        ``tolerance_seconds`` from now (replay protection).
+
+        Args:
+            payload: Raw request body as received (``str`` or ``bytes``).
+            signature_header: The ``X-Webhook-Signature`` header value.
+            secret: The webhook's signing secret.
+            tolerance_seconds: Max allowed clock skew in seconds (default 300).
+
+        Returns:
+            ``True`` if valid and fresh, ``False`` otherwise (missing/malformed
+            header, wrong secret, tampered body, or expired timestamp).
+
+        Example:
+            >>> ok = client.webhooks.verify_signature(
+            ...     raw_body, request.headers["X-Webhook-Signature"], "whsec_..."
+            ... )
+        """
+        return verify_webhook_signature(
+            payload, signature_header, secret, tolerance_seconds=tolerance_seconds
+        )
+
+    def unwrap(
+        self,
+        payload: Union[str, bytes],
+        signature_header: str,
+        secret: str,
+        *,
+        tolerance_seconds: int = 300,
+    ) -> Dict[str, Any]:
+        """Verify an inbound webhook and return its decoded JSON body.
+
+        Like :meth:`verify_signature`, but raises
+        :class:`~trix.exceptions.WebhookVerificationError` on failure instead of
+        returning ``False``, and returns the parsed event ``dict`` on success.
+
+        Example:
+            >>> event = client.webhooks.unwrap(
+            ...     raw_body, request.headers["X-Webhook-Signature"], "whsec_..."
+            ... )
+            >>> event["event"]
+            'memory.created'
+        """
+        return unwrap_webhook(
+            payload, signature_header, secret, tolerance_seconds=tolerance_seconds
+        )
+
 
 class AsyncWebhooksResource:
     """Async resource for managing webhooks."""
@@ -461,3 +521,36 @@ class AsyncWebhooksResource:
         data = {"ids": ids}
         response = await self._client._request("DELETE", "/webhooks/bulk", json=data)
         return dict(response)
+
+    def verify_signature(
+        self,
+        payload: Union[str, bytes],
+        signature_header: str,
+        secret: str,
+        *,
+        tolerance_seconds: int = 300,
+    ) -> bool:
+        """Verify an inbound webhook signature.
+
+        Synchronous (no ``await``) — verification is a local CPU operation. See
+        :meth:`WebhooksResource.verify_signature` for full semantics.
+        """
+        return verify_webhook_signature(
+            payload, signature_header, secret, tolerance_seconds=tolerance_seconds
+        )
+
+    def unwrap(
+        self,
+        payload: Union[str, bytes],
+        signature_header: str,
+        secret: str,
+        *,
+        tolerance_seconds: int = 300,
+    ) -> Dict[str, Any]:
+        """Verify and JSON-decode an inbound webhook.
+
+        Synchronous (no ``await``). See :meth:`WebhooksResource.unwrap`.
+        """
+        return unwrap_webhook(
+            payload, signature_header, secret, tolerance_seconds=tolerance_seconds
+        )

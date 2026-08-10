@@ -102,3 +102,14 @@ class APIVersionMismatchError(TrixError):
         self.api_version = api_version
         self.min_supported = min_supported
         self.max_supported = max_supported
+
+
+class WebhookVerificationError(TrixError):
+    """Raised when an inbound webhook signature fails verification.
+
+    Signals a missing, malformed, expired, or mismatched
+    ``X-Webhook-Signature`` header (or a body that is not a JSON object) when
+    unwrapping a received webhook. See :meth:`trix.resources.webhooks.WebhooksResource.unwrap`.
+    """
+
+    pass

@@ -63,6 +63,7 @@ from .exceptions import (
     TimeoutError,
     TrixError,
     ValidationError,
+    WebhookVerificationError,
 )
 from .protocols import AsyncClientProtocol, ClientProtocol, SyncClientProtocol
 from .utils.logging import (
@@ -170,6 +171,7 @@ __all__ = [
     "ServerError",
     "ConnectionError",
     "TimeoutError",
+    "WebhookVerificationError",
     # Types (from _type_exports)
     *TYPE_NAMES,
 ]
