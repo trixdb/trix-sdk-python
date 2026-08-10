@@ -89,7 +89,7 @@ async def main():
         )
 
         # List memories with pagination
-        async for memory in await client.memories.iter(limit=50):
+        async for memory in client.memories.iter(page_size=50):
             print(f"Memory: {memory.content}")
 
 asyncio.run(main())
@@ -728,7 +728,7 @@ for memory in client.memories.iter(page_size=100, max_items=1000):
     print(memory.content)
 
 # Async iteration
-async for memory in await client.memories.iter(page_size=100):
+async for memory in client.memories.iter(page_size=100):
     print(memory.content)
 
 # Manual pagination
