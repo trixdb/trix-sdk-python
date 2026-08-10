@@ -1,7 +1,11 @@
 """Tests for ClustersResource."""
 
-from tests.support import spec_client
+import pytest
+
+from tests.support import spec_async_client, spec_client
 from trix.resources.clusters import ClustersResource
+from trix.resources.clusters_async import AsyncClustersResource
+from trix.types import Cluster
 
 CLUSTER_RESPONSE = {
     "id": "cluster_123",
@@ -236,3 +240,22 @@ class TestClustersExpand:
         assert call_args[1]["params"]["threshold"] == 0.7
         assert len(result) == 2
         assert result[0]["memory_id"] == "mem_789"
+
+
+class TestAsyncClustersIter:
+    """Async iter() yields typed Cluster models across cursor-paged results."""
+
+    @pytest.mark.asyncio
+    async def test_async_iter_yields_typed_clusters_across_cursor_pages(self):
+        """`async for` over iter() follows the cursor and yields Cluster models."""
+        page1 = {"data": [CLUSTER_RESPONSE], "cursor": "next_page_cursor"}
+        page2 = {"data": [{**CLUSTER_RESPONSE, "id": "cluster_456"}], "cursor": None}
+        mock_client = spec_async_client()
+        mock_client._request.side_effect = [page1, page2]
+
+        resource = AsyncClustersResource(mock_client)
+        items = [c async for c in resource.iter()]
+
+        assert all(isinstance(c, Cluster) for c in items)
+        assert [c.id for c in items] == ["cluster_123", "cluster_456"]
+        assert mock_client._request.call_count == 2

@@ -260,3 +260,65 @@ class TestAsyncMemories:
             async with AsyncTrix(api_key="test_key") as client:
                 await client.memories.delete("mem_123")
                 mock_request.assert_called_with("DELETE", "/memories/mem_123")
+
+
+def _mem_page(ids, limit, offset):
+    """Build a MemoryList-shaped page for the given memory ids."""
+    data = [
+        {
+            "id": mid,
+            "content": f"content {mid}",
+            "type": "text",
+            "created_at": "2025-01-01T00:00:00Z",
+            "updated_at": "2025-01-01T00:00:00Z",
+        }
+        for mid in ids
+    ]
+    return {"data": data, "total": 3, "limit": limit, "offset": offset}
+
+
+class TestMemoriesIter:
+    """Auto-pagination via iter() yields typed Memory objects (sync + async)."""
+
+    def test_iter_yields_typed_memory(self, mock_memory_list_data):
+        """Sync iter() yields Memory models, not dicts."""
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = mock_memory_list_data
+            client = Trix(api_key="test_key")
+            items = list(client.memories.iter())
+            client.close()
+
+        assert len(items) == 1
+        assert all(isinstance(m, Memory) for m in items)
+        assert items[0].id == "mem_123"
+
+    @pytest.mark.asyncio
+    async def test_async_iter_yields_typed_memory(self, mock_memory_list_data):
+        """`async for` over iter() yields Memory models (the fixed bug)."""
+        with patch.object(AsyncTrix, "_request") as mock_request:
+            mock_request.return_value = mock_memory_list_data
+            async with AsyncTrix(api_key="test_key") as client:
+                # Used directly with `async for` (no pre-await), like the sync path.
+                items = [m async for m in client.memories.iter()]
+
+        assert len(items) == 1
+        item = items[0]
+        assert isinstance(item, Memory)  # typed model, not a raw dict
+        assert not isinstance(item, dict)
+        assert item.id == "mem_123"  # attribute access works on the model
+
+    @pytest.mark.asyncio
+    async def test_async_iter_paginates_and_stays_typed(self):
+        """Async iter() advances across pages and yields typed models throughout."""
+        pages = [
+            _mem_page(["mem_1", "mem_2"], limit=2, offset=0),  # full page -> continue
+            _mem_page(["mem_3"], limit=2, offset=2),  # short page -> stop
+        ]
+        with patch.object(AsyncTrix, "_request") as mock_request:
+            mock_request.side_effect = pages
+            async with AsyncTrix(api_key="test_key") as client:
+                items = [m async for m in client.memories.iter(page_size=2)]
+
+        assert all(isinstance(m, Memory) for m in items)
+        assert [m.id for m in items] == ["mem_1", "mem_2", "mem_3"]
+        assert mock_request.call_count == 2

@@ -4,7 +4,7 @@ This module provides the main MemoriesResource and AsyncMemoriesResource classes
 that combine all operation mixins into complete resource classes.
 """
 
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, AsyncIterator, Dict, Iterator, List, Optional
 
 from ...protocols import AsyncClientProtocol, SyncClientProtocol
 from ...types import (
@@ -410,19 +410,26 @@ class AsyncMemoriesResource(
         space_id: Optional[str] = None,
         page_size: int = 100,
         max_items: Optional[int] = None,
-    ) -> AsyncPaginator:
-        """Get async iterator for all memories with automatic pagination.
+    ) -> AsyncIterator[Memory]:
+        """Async-iterate through all memories with automatic pagination.
 
-        Returns:
-            Async paginator that yields Memory objects
+        Use directly with ``async for`` (no need to await the call first)::
+
+            async for memory in client.memories.iter():
+                print(memory.content)
+
+        Yields:
+            Memory objects (typed, matching the sync ``iter``)
         """
         params = build_iter_params(q, mode, tags, space_id)
-        return AsyncPaginator(
+        paginator = AsyncPaginator(
             self.list,
             initial_params=params,
             limit=page_size,
             max_items=max_items,
         )
+        async for item in paginator:
+            yield Memory.model_validate(item)
 
     async def get(self, id: str) -> Memory:
         """Get a memory by ID (async)."""

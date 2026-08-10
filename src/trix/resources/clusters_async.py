@@ -1,6 +1,6 @@
 """Async clusters resource for Trix SDK."""
 
-from typing import TYPE_CHECKING, Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, AsyncIterator, Dict, List, Optional
 
 from ..protocols import AsyncClientProtocol
 from ..types import (
@@ -71,20 +71,31 @@ class AsyncClustersResource:
         sort: Optional[str] = None,
         page_size: int = 100,
         max_items: Optional[int] = None,
-    ) -> AsyncPaginator:
-        """Get async iterator for all clusters with automatic pagination."""
+    ) -> AsyncIterator[Cluster]:
+        """Async-iterate through all clusters with automatic pagination.
+
+        Use directly with ``async for`` (no need to await the call first)::
+
+            async for cluster in client.clusters.iter():
+                print(cluster.name)
+
+        Yields:
+            Cluster objects (typed, matching the sync ``iter``)
+        """
         params: Dict[str, Any] = {}
         if q:
             params["q"] = q
         if sort:
             params["sort"] = sort
 
-        return AsyncPaginator(
+        paginator = AsyncPaginator(
             self.list,
             initial_params=params,
             limit=page_size,
             max_items=max_items,
         )
+        async for item in paginator:
+            yield Cluster.model_validate(item)
 
     async def get(self, id: str, include_memories: bool = False) -> Cluster:
         """Get a cluster by ID (async)."""
