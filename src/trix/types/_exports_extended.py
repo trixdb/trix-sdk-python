@@ -7,6 +7,147 @@ Separated to keep the main __init__.py within the 300-line guideline.
 # =============================================================================
 # Task Models
 # =============================================================================
+# =============================================================================
+# Bot Models
+# =============================================================================
+from .bot import (
+    Bot,
+    BotAction,
+    BotAddSpace,
+    BotCreate,
+    BotList,
+    BotRun,
+    BotRunBatchRequest,
+    BotRunBatchResult,
+    BotRunList,
+    BotRunRequest,
+    BotSpace,
+    BotTool,
+    BotTrigger,
+    BotTriggerCreate,
+    BotUpdate,
+)
+
+# =============================================================================
+# Bot Run Step Models
+# =============================================================================
+from .bot_run_step import (
+    BotRunStep,
+    BotRunStreamRequest,
+)
+
+# =============================================================================
+# Calendar Models (ADR-075)
+# =============================================================================
+from .calendar import (
+    Calendar,
+    CalendarConnection,
+    CalendarConnectionsResponse,
+    CalendarEvent,
+    CalendarEventsResponse,
+    CalendarEventTime,
+    CalendarListResponse,
+    CalendarSyncResult,
+    SyncCalendarParams,
+)
+
+# =============================================================================
+# Crew Models
+# =============================================================================
+from .crew import (
+    Crew,
+    CrewCreate,
+    CrewList,
+    CrewMember,
+    CrewUpdate,
+)
+
+# =============================================================================
+# File Models (ADR-068)
+# =============================================================================
+from .file import (
+    ChatFile,
+    FileDownloadInfo,
+    FileListResult,
+    FileQuota,
+    FileUploadBase64,
+)
+
+# =============================================================================
+# Hub Models
+# =============================================================================
+from .hub import (
+    AddConversationMemberParams,
+    AddHubMemberParams,
+    ConversationMember,
+    ConversationMemberList,
+    ConvRoleOverride,
+    ConvRoleOverrideList,
+    CreateRoleParams,
+    HubCustomRole,
+    HubCustomRoleList,
+    HubMember,
+    HubMemberList,
+    UpdateConversationMemberParams,
+    UpdateHubMemberParams,
+    UpdateRoleParams,
+)
+
+# =============================================================================
+# Invite Models
+# =============================================================================
+from .invite import (
+    Invite,
+    InviteAccept,
+    InviteAcceptResult,
+    InviteCreate,
+    InviteCreateResult,
+    InviteList,
+    InviteRevokeResult,
+)
+
+# =============================================================================
+# Note Models
+# =============================================================================
+from .note import (
+    Note,
+    NoteBlock,
+    NoteBlockCreate,
+    NoteBlockUpdate,
+    NoteCollaborator,
+    NoteCollaboratorCreate,
+    NoteCreate,
+    NoteLink,
+    NoteLinkCreate,
+    NoteList,
+    NoteMemoryLink,
+    NoteMemoryLinkCreate,
+    NoteMemoryList,
+    NoteUpdate,
+)
+
+# =============================================================================
+# Skill Models
+# =============================================================================
+from .skill import (
+    BotSkillAttachment,
+    Skill,
+    SkillCreate,
+    SkillList,
+    SkillUpdate,
+)
+
+# =============================================================================
+# Space Config Models
+# =============================================================================
+from .space_config import (
+    SpaceConfigAuditEvent,
+    SpaceConfigAuditResponse,
+    SpaceConfigCategory,
+    SpaceConfigPatch,
+    SpaceConfigResponse,
+    SpaceConfigValidation,
+)
 from .task import (
     AssigneeType,
     BulkDeleteResult,
@@ -31,24 +172,16 @@ from .task import (
 )
 
 # =============================================================================
-# Bot Models
+# Template Models
 # =============================================================================
-from .bot import (
-    Bot,
-    BotAction,
-    BotAddSpace,
-    BotCreate,
-    BotList,
-    BotRun,
-    BotRunList,
-    BotRunBatchRequest,
-    BotRunBatchResult,
-    BotRunRequest,
-    BotSpace,
-    BotTool,
-    BotTrigger,
-    BotTriggerCreate,
-    BotUpdate,
+from .template import (
+    Template,
+    TemplateCreate,
+    TemplateInstallResult,
+    TemplateList,
+    TemplateReview,
+    TemplateReviewCreate,
+    TemplateUpdate,
 )
 
 # =============================================================================
@@ -64,140 +197,6 @@ from .workflow import (
     WorkflowRunList,
     WorkflowTrigger,
     WorkflowUpdate,
-)
-
-# =============================================================================
-# Note Models
-# =============================================================================
-from .note import (
-    Note,
-    NoteBlock,
-    NoteBlockCreate,
-    NoteBlockUpdate,
-    NoteCollaborator,
-    NoteCollaboratorCreate,
-    NoteCreate,
-    NoteLink,
-    NoteLinkCreate,
-    NoteList,
-    NoteMemoryLink,
-    NoteMemoryLinkCreate,
-    NoteMemoryList,
-    NoteUpdate,
-)
-
-# =============================================================================
-# Template Models
-# =============================================================================
-from .template import (
-    Template,
-    TemplateCreate,
-    TemplateInstallResult,
-    TemplateList,
-    TemplateReview,
-    TemplateReviewCreate,
-    TemplateUpdate,
-)
-
-# =============================================================================
-# Hub Models
-# =============================================================================
-from .hub import (
-    AddConversationMemberParams,
-    AddHubMemberParams,
-    ConversationMember,
-    ConversationMemberList,
-    ConvRoleOverride,
-    ConvRoleOverrideList,
-    CreateRoleParams,
-    HubCustomRole,
-    HubCustomRoleList,
-    HubMember,
-    HubMemberList,
-    UpdateConversationMemberParams,
-    UpdateHubMemberParams,
-    UpdateRoleParams,
-)
-
-# =============================================================================
-# Crew Models
-# =============================================================================
-from .crew import (
-    Crew,
-    CrewCreate,
-    CrewList,
-    CrewMember,
-    CrewUpdate,
-)
-
-# =============================================================================
-# Bot Run Step Models
-# =============================================================================
-from .bot_run_step import (
-    BotRunStep,
-    BotRunStreamRequest,
-)
-
-# =============================================================================
-# Space Config Models
-# =============================================================================
-from .space_config import (
-    SpaceConfigAuditEvent,
-    SpaceConfigAuditResponse,
-    SpaceConfigCategory,
-    SpaceConfigPatch,
-    SpaceConfigResponse,
-    SpaceConfigValidation,
-)
-
-# =============================================================================
-# Invite Models
-# =============================================================================
-from .invite import (
-    Invite,
-    InviteAccept,
-    InviteAcceptResult,
-    InviteCreate,
-    InviteCreateResult,
-    InviteList,
-    InviteRevokeResult,
-)
-
-# =============================================================================
-# Skill Models
-# =============================================================================
-from .skill import (
-    BotSkillAttachment,
-    Skill,
-    SkillCreate,
-    SkillList,
-    SkillUpdate,
-)
-
-# =============================================================================
-# File Models (ADR-068)
-# =============================================================================
-from .file import (
-    ChatFile,
-    FileDownloadInfo,
-    FileListResult,
-    FileQuota,
-    FileUploadBase64,
-)
-
-# =============================================================================
-# Calendar Models (ADR-075)
-# =============================================================================
-from .calendar import (
-    Calendar,
-    CalendarConnection,
-    CalendarConnectionsResponse,
-    CalendarEvent,
-    CalendarEventTime,
-    CalendarEventsResponse,
-    CalendarListResponse,
-    CalendarSyncResult,
-    SyncCalendarParams,
 )
 
 __all__ = [

@@ -1,9 +1,10 @@
 """Tests for personas resource."""
 
-import pytest
 from unittest.mock import patch
 
-from trix import Trix, AsyncTrix
+import pytest
+
+from trix import AsyncTrix, Trix
 from trix.types import Persona, PersonaList, PersonaSpace
 
 

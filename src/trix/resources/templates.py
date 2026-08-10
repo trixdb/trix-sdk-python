@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types.template import (
     Template,
     TemplateCreate,
@@ -13,6 +12,7 @@ from ..types.template import (
     TemplateUpdate,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class TemplatesResource(BaseSyncResource):

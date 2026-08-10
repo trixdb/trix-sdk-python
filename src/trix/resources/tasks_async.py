@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource
 from ..types.task import (
     BulkDeleteResult,
     BulkTaskCreate,
@@ -17,6 +16,7 @@ from ..types.task import (
     TaskUpdate,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource
 
 
 class AsyncTasksResource(BaseAsyncResource):

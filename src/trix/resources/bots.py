@@ -3,33 +3,32 @@
 import asyncio
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any, AsyncIterator, Dict, Iterator, List, Optional
 
 import httpx
 
-from concurrent.futures import ThreadPoolExecutor
-
-from .base import BaseAsyncResource, BaseSyncResource
 from ..client_base import handle_response, versioned_path
 from ..exceptions import APIError, ConnectionError, TimeoutError
 from ..types.bot import (
     Bot,
+    BotAddSpace,
     BotCreate,
     BotList,
     BotRun,
-    BotRunList,
-    BotRunRequest,
     BotRunBatchRequest,
     BotRunBatchResult,
-    BotUpdate,
-    BotAddSpace,
+    BotRunList,
+    BotRunRequest,
     BotSpace,
     BotTrigger,
     BotTriggerCreate,
+    BotUpdate,
 )
 from ..types.bot_run_step import BotRunStep, BotRunStreamRequest
 from ..utils.security import validate_id
 from ..utils.sse import iter_sse_lines, parse_sse_line
+from .base import BaseAsyncResource, BaseSyncResource
 
 logger = logging.getLogger(__name__)
 

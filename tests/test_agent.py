@@ -1,18 +1,18 @@
 """Tests for agent resource — session lifecycle, memory, context, errors."""
 
-import pytest
-from unittest.mock import patch, AsyncMock
+from unittest.mock import AsyncMock, patch
 
-from trix import Trix, AsyncTrix
+import pytest
+
+from trix import AsyncTrix, Trix
 from trix.types import (
+    AgentContext,
     AgentSession,
+    SessionList,
     SessionMemory,
     SessionMemoryList,
     SessionMessage,
-    SessionList,
-    AgentContext,
 )
-
 
 # ---------------------------------------------------------------------------
 # Mock response data

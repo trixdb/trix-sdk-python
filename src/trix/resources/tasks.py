@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .tasks_bulk import TasksBulkMixin
 from ..types.task import (
     SubtaskCreate,
     Task,
@@ -11,6 +10,7 @@ from ..types.task import (
     TaskUpdate,
 )
 from ..utils.security import validate_id
+from .tasks_bulk import TasksBulkMixin
 
 
 class TasksResource(TasksBulkMixin):

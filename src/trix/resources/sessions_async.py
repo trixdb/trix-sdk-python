@@ -2,19 +2,19 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource
 from ..types import (
+    CompleteSessionParams,
+    CreateSessionParams,
+    RetentionPolicy,
     Session,
     SessionsResponse,
     SessionStats,
-    SessionType,
     SessionStatus,
-    RetentionPolicy,
-    CreateSessionParams,
+    SessionType,
     UpdateSessionParams,
-    CompleteSessionParams,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource
 
 
 class AsyncSessionsResource(BaseAsyncResource):

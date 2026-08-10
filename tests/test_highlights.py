@@ -1,9 +1,10 @@
 """Tests for highlights resource."""
 
-import pytest
 from unittest.mock import patch
 
-from trix import Trix, AsyncTrix, Highlight, HighlightList
+import pytest
+
+from trix import AsyncTrix, Highlight, HighlightList, Trix
 
 
 @pytest.fixture

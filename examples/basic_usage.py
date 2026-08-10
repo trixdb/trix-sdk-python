@@ -1,6 +1,6 @@
 """Basic usage examples for Trix SDK."""
 
-from trix import Trix, MemoryType, RelationshipType, SearchMode
+from trix import MemoryType, RelationshipType, SearchMode, Trix
 
 # Initialize client
 client = Trix(api_key="your_api_key")

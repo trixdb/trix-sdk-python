@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, Optional
 
-from .base import BaseAsyncResource
 from ..types.preset import (
     AgentPreset,
     AgentPresetCreate,
@@ -10,6 +9,7 @@ from ..types.preset import (
     AgentPresetUpdate,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource
 
 
 class AsyncPresetsResource(BaseAsyncResource):

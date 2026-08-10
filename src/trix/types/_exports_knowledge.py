@@ -7,6 +7,35 @@ Re-exported from types.__init__ for backward compatibility.
 # =============================================================================
 # Goal Models
 # =============================================================================
+# =============================================================================
+# Enrichment Models
+# =============================================================================
+from .enrichment import (
+    Enrichment,
+    EnrichmentList,
+    EnrichmentResult,
+)
+
+# =============================================================================
+# Entity Models
+# =============================================================================
+from .entity import (
+    Entity,
+    EntityFactsResult,
+    EntityList,
+    EntityMergeResult,
+)
+
+# =============================================================================
+# Fact Models
+# =============================================================================
+from .fact import (
+    Fact,
+    FactList,
+    FactSource,
+    MemoryFactCreate,
+    MemoryFactsResult,
+)
 from .goal import (
     Goal,
     GoalContributor,
@@ -24,42 +53,19 @@ from .goal import (
 )
 
 # =============================================================================
-# Fact Models
+# Image Models
 # =============================================================================
-from .fact import (
-    Fact,
-    FactList,
-    FactSource,
-    MemoryFactCreate,
-    MemoryFactsResult,
-)
-
-# =============================================================================
-# Entity Models
-# =============================================================================
-from .entity import (
-    Entity,
-    EntityFactsResult,
-    EntityList,
-    EntityMergeResult,
-)
-
-# =============================================================================
-# Enrichment Models
-# =============================================================================
-from .enrichment import (
-    Enrichment,
-    EnrichmentList,
-    EnrichmentResult,
-)
-
-# =============================================================================
-# Topic Models
-# =============================================================================
-from .topic import (
-    Topic,
-    TopicList,
-    TopicSearchResult,
+from .image import (
+    AutoTagResult,
+    BatchAutoTagResult,
+    DuplicateCheckResult,
+    ImageCluster,
+    ImageClusterResult,
+    ImageTag,
+    QuerySuggestion,
+    QuerySuggestionsResult,
+    VisualSearchResult,
+    VisualSearchResults,
 )
 
 # =============================================================================
@@ -77,19 +83,12 @@ from .resource import (
 )
 
 # =============================================================================
-# Image Models
+# Topic Models
 # =============================================================================
-from .image import (
-    AutoTagResult,
-    BatchAutoTagResult,
-    DuplicateCheckResult,
-    ImageCluster,
-    ImageClusterResult,
-    ImageTag,
-    QuerySuggestion,
-    QuerySuggestionsResult,
-    VisualSearchResult,
-    VisualSearchResults,
+from .topic import (
+    Topic,
+    TopicList,
+    TopicSearchResult,
 )
 
 __all__ = [

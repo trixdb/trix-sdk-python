@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseSyncResource
 from ..types.habit import (
     CheckIn,
     CheckInResult,
@@ -15,6 +14,7 @@ from ..types.habit import (
     HabitUpdate,
 )
 from ..utils.security import validate_id
+from .base import BaseSyncResource
 
 
 class HabitsResource(BaseSyncResource):

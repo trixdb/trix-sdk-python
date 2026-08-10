@@ -9,7 +9,6 @@ only the real surface is exposed here.
 
 from typing import Any, Dict, Optional
 
-from .base import BaseSyncResource
 from ..types import (
     Fact,
     FactList,
@@ -17,6 +16,7 @@ from ..types import (
     MemoryFactsResult,
 )
 from ..utils.security import validate_id
+from .base import BaseSyncResource
 
 
 def _build_fact_params(

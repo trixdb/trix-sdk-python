@@ -1,14 +1,15 @@
 """Error handling examples for Trix SDK."""
 
 import time
+
 from trix import (
-    Trix,
-    TrixError,
     AuthenticationError,
     NotFoundError,
-    ValidationError,
     RateLimitError,
     ServerError,
+    Trix,
+    TrixError,
+    ValidationError,
 )
 
 

@@ -1,17 +1,18 @@
 """TDD-style tests for security utilities."""
 
 import pytest
+
 from trix.utils.security import (
-    validate_id,
-    validate_base_url,
-    validate_webhook_url,
-    redact_sensitive_data,
     get_env_credential,
     mask_credential,
+    redact_sensitive_data,
+    validate_base_url,
+    validate_id,
     validate_limit,
     validate_offset,
-    validate_threshold,
     validate_positive_int,
+    validate_threshold,
+    validate_webhook_url,
 )
 
 

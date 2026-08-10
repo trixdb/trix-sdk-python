@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource
 from ..types.workflow import (
     TriggerCreate,
     TriggerUpdate,
@@ -15,6 +14,7 @@ from ..types.workflow import (
     WorkflowUpdate,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource
 
 
 class AsyncWorkflowsResource(BaseAsyncResource):

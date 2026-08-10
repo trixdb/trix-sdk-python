@@ -3,7 +3,6 @@
 from typing import Any, Dict, Optional
 from urllib.parse import quote
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types.invite import (
     InviteAccept,
     InviteAcceptResult,
@@ -13,6 +12,7 @@ from ..types.invite import (
     InviteRevokeResult,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class InvitesResource(BaseSyncResource):

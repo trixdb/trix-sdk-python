@@ -8,7 +8,6 @@ endpoints that do not exist on the API (they 404) and have been removed.
 
 from typing import Any, Dict, Optional
 
-from .base import BaseAsyncResource
 from ..types import (
     Fact,
     FactList,
@@ -16,6 +15,7 @@ from ..types import (
     MemoryFactsResult,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource
 from .facts import _build_fact_params
 
 

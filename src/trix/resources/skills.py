@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types.skill import (
     BotSkillAttachment,
     Skill,
@@ -11,6 +10,7 @@ from ..types.skill import (
     SkillUpdate,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class SkillsResource(BaseSyncResource):

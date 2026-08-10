@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseSyncResource
 from ..types.task import (
     BulkDeleteResult,
     BulkTaskCreate,
@@ -13,6 +12,7 @@ from ..types.task import (
     TaskHandoffResult,
 )
 from ..utils.security import validate_id
+from .base import BaseSyncResource
 
 
 class TasksBulkMixin(BaseSyncResource):

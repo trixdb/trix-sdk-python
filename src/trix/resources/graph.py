@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource, validate_ids
 from ..types import (
     Direction,
     GraphContext,
@@ -14,6 +13,7 @@ from ..types import (
     ShortestPath,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource, validate_ids
 
 
 def _build_traverse_data(

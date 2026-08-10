@@ -1,7 +1,8 @@
 """Tests for Trix client."""
 
 import pytest
-from trix import Trix, AsyncTrix
+
+from trix import AsyncTrix, Trix
 
 
 def test_client_initialization_with_api_key():

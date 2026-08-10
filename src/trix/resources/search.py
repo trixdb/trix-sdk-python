@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource, validate_ids
 from ..types import (
     EmbedAllResponse,
     EmbeddingResponse,
@@ -10,6 +9,7 @@ from ..types import (
     SearchResults,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource, validate_ids
 
 
 def _build_similar_params(limit: int, threshold: Optional[float]) -> Dict[str, Any]:

@@ -45,7 +45,6 @@ from ..types import (
     Relationship,
     RelationshipType,
 )
-
 from .mock_resources import (
     MockAsyncClustersResource,
     MockAsyncEntitiesResource,

@@ -1,47 +1,47 @@
 """Resource modules for Trix SDK."""
 
 from .agent import AgentResource
+from .bots import AsyncBotsResource, BotsResource  # noqa: F401
+from .calendar import AsyncCalendarResource, CalendarResource
 from .clusters import ClustersResource
 from .clusters_async import AsyncClustersResource  # noqa: F401
-from .enrichments import EnrichmentsResource, AsyncEnrichmentsResource
+from .crews import AsyncCrewsResource, CrewsResource
+from .enrichments import AsyncEnrichmentsResource, EnrichmentsResource
 from .entities import EntitiesResource
 from .entities_async import AsyncEntitiesResource
 from .facts import FactsResource
 from .facts_async import AsyncFactsResource
 from .feedback import FeedbackResource
+from .files import AsyncFilesResource, FilesResource
 from .goals import GoalsResource
 from .goals_async import AsyncGoalsResource
 from .graph import GraphResource
+from .habits import HabitsResource
+from .habits_async import AsyncHabitsResource
 from .highlights import HighlightsResource
-from .memories import MemoriesResource, AsyncMemoriesResource
+from .hubs import AsyncHubsResource, HubsResource
+from .hubs_roles import AsyncHubRolesResource, HubRolesResource
+from .invites import AsyncInvitesResource, InvitesResource
+from .knowledge import AsyncKnowledgeResource, KnowledgeResource
+from .memories import AsyncMemoriesResource, MemoriesResource
+from .notes import NotesResource
+from .notes_async import AsyncNotesResource
+from .presets import PresetsResource
+from .presets_async import AsyncPresetsResource
 from .relationships import RelationshipsResource
-from .resources import ResourcesResource, AsyncResourcesResource
+from .resources import AsyncResourcesResource, ResourcesResource
 from .search import SearchResource
 from .sessions import SessionsResource
 from .sessions_async import AsyncSessionsResource
+from .skills import AsyncSkillsResource, SkillsResource
+from .space_config import AsyncSpaceConfigResource, SpaceConfigResource
 from .spaces import SpacesResource
 from .tasks import TasksResource
 from .tasks_async import AsyncTasksResource
-from .habits import HabitsResource
-from .habits_async import AsyncHabitsResource
+from .templates import AsyncTemplatesResource, TemplatesResource
 from .webhooks import WebhooksResource
-from .bots import BotsResource, AsyncBotsResource  # noqa: F401
-from .space_config import SpaceConfigResource, AsyncSpaceConfigResource
 from .workflows import WorkflowsResource
 from .workflows_async import AsyncWorkflowsResource
-from .invites import InvitesResource, AsyncInvitesResource
-from .notes import NotesResource
-from .notes_async import AsyncNotesResource
-from .skills import SkillsResource, AsyncSkillsResource
-from .templates import TemplatesResource, AsyncTemplatesResource
-from .crews import CrewsResource, AsyncCrewsResource
-from .hubs import HubsResource, AsyncHubsResource
-from .hubs_roles import HubRolesResource, AsyncHubRolesResource
-from .files import FilesResource, AsyncFilesResource
-from .presets import PresetsResource
-from .presets_async import AsyncPresetsResource
-from .calendar import CalendarResource, AsyncCalendarResource
-from .knowledge import KnowledgeResource, AsyncKnowledgeResource
 
 __all__ = [
     "AgentResource",

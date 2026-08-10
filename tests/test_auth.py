@@ -1,6 +1,7 @@
 """TDD tests for Auth class."""
 
 import pytest
+
 from trix.auth import Auth
 
 

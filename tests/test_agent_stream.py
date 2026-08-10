@@ -4,7 +4,6 @@ import pytest
 
 from trix.types.agent_stream import (
     ALL_EVENT_TYPES,
-    AgentStreamEvent,
     BudgetStateEvent,
     ContentDeltaEvent,
     MessageStopEvent,

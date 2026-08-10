@@ -1,14 +1,15 @@
 """Tests for relationships resource."""
 
-import pytest
 from unittest.mock import patch
 
+import pytest
+
 from trix import (
-    Trix,
     AsyncTrix,
     Relationship,
     RelationshipList,
     RelationshipType,
+    Trix,
 )
 
 

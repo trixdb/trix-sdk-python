@@ -1,16 +1,17 @@
 """Tests for base resource utilities."""
 
-import pytest
 from typing import Any, Dict, Optional
-from unittest.mock import Mock, AsyncMock
+from unittest.mock import AsyncMock, Mock
+
+import pytest
 
 from trix.resources.base import (
-    BaseSyncResource,
-    BaseAsyncResource,
-    validate_params,
-    validate_bulk_array,
-    find_duplicate_ids,
     DEFAULT_BULK_LIMIT,
+    BaseAsyncResource,
+    BaseSyncResource,
+    find_duplicate_ids,
+    validate_bulk_array,
+    validate_params,
 )
 
 

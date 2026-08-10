@@ -4,12 +4,11 @@ import json
 import logging
 from io import StringIO
 
-
 from trix.utils.logging import (
     LogConfig,
     LogFormat,
-    LogLevel,
     LoggerAdapter,
+    LogLevel,
     clear_request_id,
     create_logger_adapter,
     generate_request_id,

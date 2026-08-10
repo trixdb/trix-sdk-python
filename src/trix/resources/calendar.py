@@ -2,7 +2,6 @@
 
 from typing import Any, Dict, List, Optional
 
-from .base import BaseAsyncResource, BaseSyncResource
 from ..types.calendar import (
     CalendarConnectionsResponse,
     CalendarEventsResponse,
@@ -11,6 +10,7 @@ from ..types.calendar import (
     SyncCalendarParams,
 )
 from ..utils.security import validate_id
+from .base import BaseAsyncResource, BaseSyncResource
 
 
 class CalendarResource(BaseSyncResource):

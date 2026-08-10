@@ -6,10 +6,10 @@ from ..protocols import AsyncClientProtocol, SyncClientProtocol
 from ..types import (
     AgentContext,
     AgentSession,
+    SessionList,
     SessionMemory,
     SessionMemoryList,
     SessionMessage,
-    SessionList,
 )
 from ..utils.security import validate_id, validate_limit, validate_offset
 

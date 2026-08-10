@@ -13,21 +13,22 @@ TDD Workflow:
 3. REFACTOR: Clean up code while keeping tests green
 """
 
-import pytest
 from datetime import datetime
 from unittest.mock import patch
 
+import pytest
+
 from trix import Trix
 from trix.types import (
-    OriginType,
-    SourceType,
-    ResourceRelationshipType,
     Memory,
     MemoryCreate,
+    MemoryResource,
     MemoryUpdate,
+    OriginType,
     Resource,
     ResourceCreate,
-    MemoryResource,
+    ResourceRelationshipType,
+    SourceType,
 )
 
 
