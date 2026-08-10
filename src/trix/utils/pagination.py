@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import Any, AsyncIterator, Callable, Dict, Iterator, Optional, TypeVar
+from typing import Any, AsyncIterator, Callable, Dict, Iterator, Optional, Tuple, TypeVar
 
 T = TypeVar("T")
 
@@ -27,6 +27,22 @@ def _get_item_id(item: Any) -> str:
     elif hasattr(item, "_id") and isinstance(item._id, str):
         return item._id
     return json.dumps(item, sort_keys=True, default=str)
+
+
+def _extract_page(response: Any) -> Tuple[Any, Optional[str]]:
+    """Split a page response into ``(items, cursor)`` without dropping typing.
+
+    A blanket ``model_dump()`` would degrade a typed list response (e.g.
+    ``MemoryList``) into a plain dict, so the paginator would then yield dicts
+    instead of models. Reading ``.data`` off the model preserves the typed
+    items; the wrapping ``iter()`` still re-validates each defensively.
+    """
+    if isinstance(response, dict):
+        items = response["data"] if "data" in response else response
+        return items, response.get("cursor")
+    if hasattr(response, "data"):  # typed list model: MemoryList, ClusterList, ...
+        return list(response.data), getattr(response, "cursor", None)
+    return response, None
 
 
 class SyncPaginator:
@@ -73,23 +89,16 @@ class SyncPaginator:
                 current_limit = min(self._limit, remaining)
                 self._params["limit"] = current_limit
 
-            # Fetch page
+            # Fetch page. Advance by cursor when the API returned one, else by
+            # offset. Send neither on the first page (offset 0, no cursor) so
+            # cursor-based endpoints that don't accept ``offset`` work too.
             if cursor is not None:
                 self._params["cursor"] = cursor
-            else:
+            elif offset:
                 self._params["offset"] = offset
 
             response = self._fetch_func(**self._params)
-
-            # Convert pydantic model to dict if needed
-            if hasattr(response, "model_dump"):
-                response = response.model_dump()
-
-            # Handle different response formats
-            if isinstance(response, dict) and "data" in response:
-                items = response["data"]
-            else:
-                items = response
+            items, next_cursor = _extract_page(response)
 
             if not items:
                 break
@@ -122,8 +131,8 @@ class SyncPaginator:
                 consecutive_dup_pages = 0
 
             # Check for next page
-            if isinstance(response, dict) and "cursor" in response and response["cursor"]:
-                cursor = response["cursor"]
+            if next_cursor:
+                cursor = next_cursor
             elif len(items) < self._limit:
                 # No more pages
                 break
@@ -157,8 +166,16 @@ class AsyncPaginator:
         self._max_items = max_items
         self._items_fetched = 0
 
-    async def __aiter__(self) -> AsyncIterator[Any]:
-        """Async iterate through all pages."""
+    def __aiter__(self) -> AsyncIterator[Any]:
+        """Return an async iterator over all pages.
+
+        Yields the same (typed) items the sync paginator does; the wrapping
+        ``iter()`` re-validates each into its response model.
+        """
+        return self._paginate()
+
+    async def _paginate(self) -> AsyncIterator[Any]:
+        """Async-iterate through all pages, preserving typed items."""
         offset = self._params.get("offset", 0)
         cursor = self._params.get("cursor")
         seen_ids: set[str] = set()
@@ -175,23 +192,16 @@ class AsyncPaginator:
                 current_limit = min(self._limit, remaining)
                 self._params["limit"] = current_limit
 
-            # Fetch page
+            # Fetch page. Advance by cursor when the API returned one, else by
+            # offset. Send neither on the first page (offset 0, no cursor) so
+            # cursor-based endpoints that don't accept ``offset`` work too.
             if cursor is not None:
                 self._params["cursor"] = cursor
-            else:
+            elif offset:
                 self._params["offset"] = offset
 
             response = await self._fetch_func(**self._params)
-
-            # Convert pydantic model to dict if needed
-            if hasattr(response, "model_dump"):
-                response = response.model_dump()
-
-            # Handle different response formats
-            if isinstance(response, dict) and "data" in response:
-                items = response["data"]
-            else:
-                items = response
+            items, next_cursor = _extract_page(response)
 
             if not items:
                 break
@@ -224,8 +234,8 @@ class AsyncPaginator:
                 consecutive_dup_pages = 0
 
             # Check for next page
-            if isinstance(response, dict) and "cursor" in response and response["cursor"]:
-                cursor = response["cursor"]
+            if next_cursor:
+                cursor = next_cursor
             elif len(items) < self._limit:
                 # No more pages
                 break
