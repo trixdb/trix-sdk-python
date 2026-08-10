@@ -4,7 +4,7 @@ Official Python SDK for [Trix](https://trixdb.com) - A powerful memory and knowl
 
 [![PyPI version](https://badge.fury.io/py/trixdb.svg)](https://badge.fury.io/py/trixdb)
 [![Python Support](https://img.shields.io/pypi/pyversions/trixdb.svg)](https://pypi.org/project/trixdb/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Features
 
@@ -871,7 +871,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## Support
 
