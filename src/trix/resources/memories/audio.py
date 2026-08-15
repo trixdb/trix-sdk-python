@@ -6,6 +6,7 @@ Provides audio upload, transcription, and streaming operations.
 from pathlib import Path
 from typing import Any, AsyncIterator, BinaryIO, Dict, Iterator, List, Optional, Union
 
+from ...protocols import AsyncClientProtocol, SyncClientProtocol
 from ...types import Memory, Transcript
 from ...utils.file_handling import build_multipart_data, prepare_file_upload
 from ...utils.security import validate_id
@@ -15,7 +16,7 @@ from .base import build_transcribe_body
 class AudioOperationsMixin:
     """Mixin providing audio operations for sync memories resource."""
 
-    _client: Any  # Type hint for the client
+    _client: SyncClientProtocol  # provided by the host resource
 
     def stream_audio(self, id: str) -> bytes:
         """Get audio content for an audio memory."""
@@ -97,7 +98,7 @@ class AudioOperationsMixin:
 class AsyncAudioOperationsMixin:
     """Mixin providing audio operations for async memories resource."""
 
-    _client: Any  # Type hint for the client
+    _client: AsyncClientProtocol  # provided by the host resource
 
     async def stream_audio(self, id: str) -> bytes:
         """Get audio content for an audio memory (async)."""

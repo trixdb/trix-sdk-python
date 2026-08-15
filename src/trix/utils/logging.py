@@ -285,7 +285,7 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]
         """Process log message to add extra context."""
         # Merge extra from adapter with extra from call
         call_extra = kwargs.get("extra", {})
-        merged_extra = {**self.extra, **call_extra}
+        merged_extra = {**(self.extra or {}), **call_extra}
         kwargs["extra"] = merged_extra
         return msg, kwargs
 
@@ -303,7 +303,7 @@ class LoggerAdapter(logging.LoggerAdapter):  # type: ignore[type-arg]
             >>> client_logger = adapter.with_context(client_id="client_123")
             >>> client_logger.info("Request started")  # Includes client_id
         """
-        merged = {**self.extra, **context}
+        merged = {**(self.extra or {}), **context}
         return LoggerAdapter(self.logger, merged)
 
 

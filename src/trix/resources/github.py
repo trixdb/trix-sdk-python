@@ -460,7 +460,9 @@ class GitHubResource(BaseSyncResource):
     def get_weekly_activity(self, project_id: str) -> List[WeeklyActivityDay]:
         """Get daily commit/PR/issue counts for the last 52 weeks (heatmap data)."""
         validate_id(project_id, "project")
-        response = self._request("GET", f"/projects/{project_id}/github/activity/weekly")
+        # This endpoint returns a JSON array; _request is typed for object
+        # responses, so treat the payload as Any and guard defensively.
+        response: Any = self._request("GET", f"/projects/{project_id}/github/activity/weekly")
         return [
             WeeklyActivityDay.model_validate(d)
             for d in (response if isinstance(response, list) else [])
@@ -1068,7 +1070,7 @@ class GitHubResource(BaseSyncResource):
         )
 
     def create_fix_pr(
-        self, project_id: str, repo_full_name: str, fixes: list, **kwargs: Any
+        self, project_id: str, repo_full_name: str, fixes: List[Dict[str, Any]], **kwargs: Any
     ) -> CreateFixPRResult:
         """Create a PR that auto-applies line-range fixes to repository files."""
         return self._client.post(

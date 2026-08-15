@@ -1,6 +1,6 @@
 """Calendar resource for Trix SDK (ADR-075)."""
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 from ..types.calendar import (
     CalendarConnectionsResponse,
@@ -46,7 +46,7 @@ class CalendarResource(BaseSyncResource):
         days_past: int = 30,
         days_future: int = 90,
         space_id: Optional[str] = None,
-        pii_level: str = "minimal",
+        pii_level: Literal["full", "minimal", "none"] = "minimal",
         tags: Optional[List[str]] = None,
     ) -> CalendarSyncResult:
         """Sync calendar events to memories."""
@@ -104,7 +104,7 @@ class AsyncCalendarResource(BaseAsyncResource):
         days_past: int = 30,
         days_future: int = 90,
         space_id: Optional[str] = None,
-        pii_level: str = "minimal",
+        pii_level: Literal["full", "minimal", "none"] = "minimal",
         tags: Optional[List[str]] = None,
     ) -> CalendarSyncResult:
         """Sync calendar events to memories (async)."""

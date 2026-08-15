@@ -458,7 +458,9 @@ class AsyncGitHubResource(BaseAsyncResource):
     async def get_weekly_activity(self, project_id: str) -> List[WeeklyActivityDay]:
         """Get daily commit/PR/issue counts for the last 52 weeks (heatmap data) (async)."""
         validate_id(project_id, "project")
-        response = await self._request("GET", f"/projects/{project_id}/github/activity/weekly")
+        # This endpoint returns a JSON array; _request is typed for object
+        # responses, so treat the payload as Any and guard defensively.
+        response: Any = await self._request("GET", f"/projects/{project_id}/github/activity/weekly")
         return [
             WeeklyActivityDay.model_validate(d)
             for d in (response if isinstance(response, list) else [])

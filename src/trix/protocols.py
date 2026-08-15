@@ -10,11 +10,22 @@ from typing import (
     Protocol,
     Tuple,
     Type,
+    TypeVar,
     Union,
+    overload,
     runtime_checkable,
 )
 
 from pydantic import BaseModel
+
+# Bound to the model type a verb helper validates its response into, so callers
+# that pass ``response_model=SomeModel`` get ``SomeModel`` back (not ``Any``).
+M = TypeVar("M", bound=BaseModel)
+
+# Shared parameter aliases keep the overloaded verb signatures readable.
+_P = Optional[Dict[str, Any]]
+_J = Optional[Dict[str, Any]]
+_RM = Optional[Type[BaseModel]]
 
 
 @runtime_checkable
@@ -36,7 +47,7 @@ class SyncClientProtocol(Protocol):
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
         headers: Optional[Dict[str, str]] = None,
-    ) -> Any:
+    ) -> Dict[str, Any]:
         """Make an HTTP request and return parsed response."""
         ...
 
@@ -73,57 +84,68 @@ class SyncClientProtocol(Protocol):
         """Make a multipart/form-data HTTP request."""
         ...
 
+    @overload
+    def get(self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]) -> M: ...
+    @overload
     def get(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    def get(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a GET request, optionally validating into a pydantic model."""
         ...
 
+    @overload
     def post(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]
+    ) -> M: ...
+    @overload
+    def post(
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    def post(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a POST request, optionally validating into a pydantic model."""
         ...
 
+    @overload
+    def put(self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]) -> M: ...
+    @overload
     def put(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    def put(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a PUT request, optionally validating into a pydantic model."""
         ...
 
+    @overload
     def patch(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]
+    ) -> M: ...
+    @overload
+    def patch(
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    def patch(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a PATCH request, optionally validating into a pydantic model."""
         ...
 
+    @overload
     def delete(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]
+    ) -> M: ...
+    @overload
+    def delete(
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    def delete(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a DELETE request, optionally validating into a pydantic model."""
         ...
@@ -148,7 +170,7 @@ class AsyncClientProtocol(Protocol):
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
         headers: Optional[Dict[str, str]] = None,
-    ) -> Any:
+    ) -> Dict[str, Any]:
         """Make an async HTTP request and return parsed response."""
         ...
 
@@ -185,57 +207,72 @@ class AsyncClientProtocol(Protocol):
         """Make an async multipart/form-data HTTP request."""
         ...
 
+    @overload
     async def get(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]
+    ) -> M: ...
+    @overload
+    async def get(
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    async def get(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a GET request, optionally validating into a pydantic model."""
         ...
 
+    @overload
     async def post(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]
+    ) -> M: ...
+    @overload
+    async def post(
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    async def post(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a POST request, optionally validating into a pydantic model."""
         ...
 
+    @overload
     async def put(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]
+    ) -> M: ...
+    @overload
+    async def put(
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    async def put(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a PUT request, optionally validating into a pydantic model."""
         ...
 
+    @overload
     async def patch(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]
+    ) -> M: ...
+    @overload
+    async def patch(
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    async def patch(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a PATCH request, optionally validating into a pydantic model."""
         ...
 
+    @overload
     async def delete(
-        self,
-        path: str,
-        *,
-        params: Optional[Dict[str, Any]] = None,
-        json: Optional[Dict[str, Any]] = None,
-        response_model: Optional[Type[BaseModel]] = None,
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: Type[M]
+    ) -> M: ...
+    @overload
+    async def delete(
+        self, path: str, *, params: _P = ..., json: _J = ..., response_model: None = ...
+    ) -> Dict[str, Any]: ...
+    async def delete(
+        self, path: str, *, params: _P = None, json: _J = None, response_model: _RM = None
     ) -> Any:
         """Issue a DELETE request, optionally validating into a pydantic model."""
         ...

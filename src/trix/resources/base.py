@@ -152,7 +152,7 @@ class BaseSyncResource(BaseResource):
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
         headers: Optional[Dict[str, str]] = None,
-    ) -> Any:
+    ) -> Dict[str, Any]:
         """Make an HTTP request through the client.
 
         Args:
@@ -204,7 +204,7 @@ class BaseAsyncResource(BaseResource):
         json: Optional[Dict[str, Any]] = None,
         timeout: Optional[float] = None,
         headers: Optional[Dict[str, str]] = None,
-    ) -> Any:
+    ) -> Dict[str, Any]:
         """Make an async HTTP request through the client.
 
         Args:
