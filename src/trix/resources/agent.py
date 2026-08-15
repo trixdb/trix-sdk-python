@@ -285,7 +285,7 @@ class AgentResource:
     def set_default_pipeline(self, name: str) -> str:
         """Set the account default pipeline preset. Raises on unknown name."""
         resp = self._client._request("POST", f"/pipeline-presets/{name}/set-default", json={})
-        return resp["name"] if isinstance(resp, dict) else name
+        return str(resp["name"]) if isinstance(resp, dict) else name
 
     def clear_default_pipeline(self) -> None:
         """Clear the account default pipeline preset."""
@@ -301,7 +301,7 @@ class AgentResource:
     def set_space_default_pipeline(self, space_id: str, name: str) -> str:
         """Set the space default pipeline preset. Raises on unknown name."""
         resp = self._client._request("POST", f"/spaces/{space_id}/default-pipeline/{name}", json={})
-        return resp["name"] if isinstance(resp, dict) else name
+        return str(resp["name"]) if isinstance(resp, dict) else name
 
     def clear_space_default_pipeline(self, space_id: str) -> None:
         """Clear the space default pipeline preset."""
@@ -505,7 +505,7 @@ class AsyncAgentResource:
     async def set_default_pipeline(self, name: str) -> str:
         """Set the account default pipeline preset. Raises on unknown name."""
         resp = await self._client._request("POST", f"/pipeline-presets/{name}/set-default", json={})
-        return resp["name"] if isinstance(resp, dict) else name
+        return str(resp["name"]) if isinstance(resp, dict) else name
 
     async def clear_default_pipeline(self) -> None:
         """Clear the account default pipeline preset."""
@@ -523,7 +523,7 @@ class AsyncAgentResource:
         resp = await self._client._request(
             "POST", f"/spaces/{space_id}/default-pipeline/{name}", json={}
         )
-        return resp["name"] if isinstance(resp, dict) else name
+        return str(resp["name"]) if isinstance(resp, dict) else name
 
     async def clear_space_default_pipeline(self, space_id: str) -> None:
         """Clear the space default pipeline preset (async)."""

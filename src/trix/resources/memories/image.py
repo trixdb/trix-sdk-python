@@ -6,6 +6,7 @@ Provides image upload, visual search, and image processing operations.
 from pathlib import Path
 from typing import Any, BinaryIO, Dict, List, Optional, Union
 
+from ...protocols import AsyncClientProtocol, SyncClientProtocol
 from ...types import (
     AutoTagResult,
     BatchAutoTagResult,
@@ -22,7 +23,7 @@ from ...utils.security import validate_id
 class ImageOperationsMixin:
     """Mixin providing image operations for sync memories resource."""
 
-    _client: Any  # Type hint for the client
+    _client: SyncClientProtocol  # provided by the host resource
 
     def create_with_image(
         self,
@@ -212,7 +213,7 @@ class ImageOperationsMixin:
 class AsyncImageOperationsMixin:
     """Mixin providing image operations for async memories resource."""
 
-    _client: Any  # Type hint for the client
+    _client: AsyncClientProtocol  # provided by the host resource
 
     async def create_with_image(
         self,

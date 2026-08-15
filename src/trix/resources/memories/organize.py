@@ -6,11 +6,13 @@ and runs tagging, enrichment, linking, and clustering in one request.
 
 from typing import Any, Dict, List, Optional
 
+from ...protocols import AsyncClientProtocol, SyncClientProtocol
+
 
 class OrganizeOperationsMixin:
     """Mixin providing organize operations for sync memories resource."""
 
-    _client: Any  # Type hint for the client
+    _client: SyncClientProtocol  # provided by the host resource
 
     def store_and_organize(
         self,
@@ -51,7 +53,7 @@ class OrganizeOperationsMixin:
 class AsyncOrganizeOperationsMixin:
     """Mixin providing organize operations for async memories resource."""
 
-    _client: Any  # Type hint for the client
+    _client: AsyncClientProtocol  # provided by the host resource
 
     async def store_and_organize(
         self,

@@ -6,7 +6,7 @@ Used as a mixin by the Trix class.
 
 import logging
 import time
-from typing import Any, BinaryIO, Dict, Iterator, Optional, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, BinaryIO, Dict, Iterator, Optional, Tuple, Type, Union
 
 import httpx
 from pydantic import BaseModel
@@ -29,17 +29,28 @@ logger = logging.getLogger(__name__)
 class SyncTransportMixin:
     """Mixin providing synchronous HTTP transport methods.
 
-    Requires the host class to provide:
-    - _client: httpx.Client
-    - _timeout: float
-    - _retry_config: RetryConfig
-    - _get_headers() -> Dict[str, str]
-    - _run_request_interceptors(ctx) -> RequestContext
-    - _run_response_interceptors(ctx) -> ResponseContext
-    - _run_error_interceptors(error, request) -> Exception
+    Requires the host class to provide the attributes/methods declared under
+    ``TYPE_CHECKING`` below (supplied by the concrete ``Trix`` client).
     """
 
     MAX_RESPONSE_SIZE = 50 * 1024 * 1024  # 50MB
+
+    if TYPE_CHECKING:
+        # Provided by the host class this mixin is combined into (the ``Trix``
+        # client). Declared for the type checker only; no runtime effect.
+        _client: httpx.Client
+        _timeout: float
+        _retry_config: RetryConfig
+
+        def _get_headers(self) -> Dict[str, str]: ...
+
+        def _run_request_interceptors(self, context: RequestContext) -> RequestContext: ...
+
+        def _run_response_interceptors(self, context: ResponseContext) -> ResponseContext: ...
+
+        def _run_error_interceptors(
+            self, error: Exception, request: RequestContext
+        ) -> Exception: ...
 
     def _request(
         self,

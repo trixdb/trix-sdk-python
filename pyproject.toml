@@ -99,6 +99,16 @@ disallow_untyped_defs = true
 module = "opentelemetry.*"
 ignore_missing_imports = true
 
+# These modules are backward-compatible re-export facades. trix.types aggregates
+# names from many submodules and builds __all__ by concatenating imported list
+# variables (which mypy cannot evaluate statically); trix.utils.security and
+# trix.utils.telemetry re-import a few names from sibling modules. Treat their
+# imported names as re-exported so `from trix.<mod> import X` type-checks under
+# strict no_implicit_reexport.
+[[tool.mypy.overrides]]
+module = ["trix.types", "trix.utils.security", "trix.utils.telemetry"]
+implicit_reexport = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"

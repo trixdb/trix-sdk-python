@@ -10,7 +10,7 @@ AgentStreamEvent. Consumers iterate these as:
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Literal, Optional, Union
+from typing import Any, Dict, List, Literal, Optional, Type, Union, cast
 
 from pydantic import BaseModel, Field
 
@@ -221,7 +221,7 @@ ALL_EVENT_TYPES = [
 def parse_agent_event(data: Dict[str, Any]) -> AgentStreamEvent:
     """Parse a raw SSE JSON dict into a typed AgentStreamEvent."""
     event_type = data.get("type", "")
-    _type_map = {
+    _type_map: Dict[str, Type[BaseModel]] = {
         "message_start": MessageStartEvent,
         "content_delta": ContentDeltaEvent,
         "thinking_delta": ThinkingDeltaEvent,
@@ -247,4 +247,4 @@ def parse_agent_event(data: Dict[str, Any]) -> AgentStreamEvent:
     cls = _type_map.get(event_type)
     if cls is None:
         raise ValueError(f"Unknown agent stream event type: {event_type}")
-    return cls.model_validate(data)
+    return cast(AgentStreamEvent, cls.model_validate(data))

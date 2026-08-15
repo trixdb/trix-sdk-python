@@ -6,12 +6,20 @@ from ..types.persona import (
     Persona,
     PersonaAddSpace,
     PersonaCreate,
+    PersonaGoal,
     PersonaList,
     PersonaSpace,
     PersonaUpdate,
 )
 from ..utils.security import validate_id
 from .base import BaseAsyncResource, BaseSyncResource
+
+
+def _coerce_goals(goals: Optional[List[Dict[str, Any]]]) -> Optional[List[PersonaGoal]]:
+    """Coerce raw goal dicts into typed PersonaGoal models for model construction."""
+    if goals is None:
+        return None
+    return [PersonaGoal.model_validate(g) for g in goals]
 
 
 class PersonasResource(BaseSyncResource):
@@ -46,7 +54,7 @@ class PersonasResource(BaseSyncResource):
             avatar_url=avatar_url,
             purpose=purpose,
             system_prompt=system_prompt,
-            goals=goals,
+            goals=_coerce_goals(goals),
             settings=settings,
             is_default=is_default,
             can_create_spaces=can_create_spaces,
@@ -98,7 +106,7 @@ class PersonasResource(BaseSyncResource):
             avatar_url=avatar_url,
             purpose=purpose,
             system_prompt=system_prompt,
-            goals=goals,
+            goals=_coerce_goals(goals),
             settings=settings,
             is_default=is_default,
             can_create_spaces=can_create_spaces,
@@ -159,7 +167,7 @@ class AsyncPersonasResource(BaseAsyncResource):
             avatar_url=avatar_url,
             purpose=purpose,
             system_prompt=system_prompt,
-            goals=goals,
+            goals=_coerce_goals(goals),
             settings=settings,
             is_default=is_default,
             can_create_spaces=can_create_spaces,
@@ -211,7 +219,7 @@ class AsyncPersonasResource(BaseAsyncResource):
             avatar_url=avatar_url,
             purpose=purpose,
             system_prompt=system_prompt,
-            goals=goals,
+            goals=_coerce_goals(goals),
             settings=settings,
             is_default=is_default,
             can_create_spaces=can_create_spaces,
