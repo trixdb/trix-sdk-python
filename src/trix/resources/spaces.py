@@ -1,6 +1,6 @@
 """Spaces resource for Trix SDK."""
 
-from typing import Optional
+from typing import List, Optional
 
 from ..types import Space, SpaceCreate, SpaceList, SpaceUpdate
 from ..utils.security import validate_id
@@ -27,7 +27,11 @@ class SpacesResource(BaseSyncResource):
     """
 
     def create(
-        self, name: str, slug: Optional[str] = None, description: Optional[str] = None
+        self,
+        name: str,
+        slug: Optional[str] = None,
+        description: Optional[str] = None,
+        tags: Optional[List[str]] = None,
     ) -> Space:
         """Create a new space.
 
@@ -35,6 +39,7 @@ class SpacesResource(BaseSyncResource):
             name: Space name
             slug: Optional URL-friendly identifier (auto-generated if not provided)
             description: Optional description
+            tags: Optional list of tags
 
         Returns:
             Created space object
@@ -43,10 +48,11 @@ class SpacesResource(BaseSyncResource):
             >>> space = client.spaces.create(
             ...     name="Personal",
             ...     slug="personal",
-            ...     description="Personal memories"
+            ...     description="Personal memories",
+            ...     tags=["personal", "notes"]
             ... )
         """
-        data = SpaceCreate(name=name, slug=slug, description=description)
+        data = SpaceCreate(name=name, slug=slug, description=description, tags=tags)
         response = self._request("POST", "/spaces", json=data.model_dump(exclude_none=True))
         return Space.model_validate(response)
 
@@ -109,6 +115,7 @@ class SpacesResource(BaseSyncResource):
         name: Optional[str] = None,
         slug: Optional[str] = None,
         description: Optional[str] = None,
+        tags: Optional[List[str]] = None,
     ) -> Space:
         """Update a space.
 
@@ -117,6 +124,7 @@ class SpacesResource(BaseSyncResource):
             name: New name
             slug: New slug (URL-friendly identifier)
             description: New description
+            tags: New list of tags
 
         Returns:
             Updated space object
@@ -133,7 +141,7 @@ class SpacesResource(BaseSyncResource):
             ... )
         """
         validate_id(id, "space")
-        data = SpaceUpdate(name=name, slug=slug, description=description)
+        data = SpaceUpdate(name=name, slug=slug, description=description, tags=tags)
         response = self._request("PATCH", f"/spaces/{id}", json=data.model_dump(exclude_none=True))
         return Space.model_validate(response)
 
@@ -168,7 +176,11 @@ class AsyncSpacesResource(BaseAsyncResource):
     """
 
     async def create(
-        self, name: str, slug: Optional[str] = None, description: Optional[str] = None
+        self,
+        name: str,
+        slug: Optional[str] = None,
+        description: Optional[str] = None,
+        tags: Optional[List[str]] = None,
     ) -> Space:
         """Create a new space (async).
 
@@ -176,11 +188,12 @@ class AsyncSpacesResource(BaseAsyncResource):
             name: Space name
             slug: Optional URL-friendly identifier (auto-generated if not provided)
             description: Optional description
+            tags: Optional list of tags
 
         Returns:
             Created space object
         """
-        data = SpaceCreate(name=name, slug=slug, description=description)
+        data = SpaceCreate(name=name, slug=slug, description=description, tags=tags)
         response = await self._request("POST", "/spaces", json=data.model_dump(exclude_none=True))
         return Space.model_validate(response)
 
@@ -230,6 +243,7 @@ class AsyncSpacesResource(BaseAsyncResource):
         name: Optional[str] = None,
         slug: Optional[str] = None,
         description: Optional[str] = None,
+        tags: Optional[List[str]] = None,
     ) -> Space:
         """Update a space (async).
 
@@ -238,12 +252,13 @@ class AsyncSpacesResource(BaseAsyncResource):
             name: New name
             slug: New slug (URL-friendly identifier)
             description: New description
+            tags: New list of tags
 
         Returns:
             Updated space object
         """
         validate_id(id, "space")
-        data = SpaceUpdate(name=name, slug=slug, description=description)
+        data = SpaceUpdate(name=name, slug=slug, description=description, tags=tags)
         response = await self._request(
             "PATCH", f"/spaces/{id}", json=data.model_dump(exclude_none=True)
         )
