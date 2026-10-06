@@ -117,6 +117,67 @@ class TestCreateWithCustomSlug:
             await client.close()
 
 
+class TestSpaceTags:
+    """Tests for the tags field on spaces (parity with trix-api #1242)."""
+
+    def test_space_read_includes_tags(self, mock_space_data):
+        """Space model surfaces tags from list/get responses."""
+        tagged_data = mock_space_data.copy()
+        tagged_data["tags"] = ["work", "engineering"]
+
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = tagged_data
+            client = Trix(api_key="test_key")
+
+            space = client.spaces.get("space_123")
+
+            assert space.tags == ["work", "engineering"]
+            client.close()
+
+    def test_create_sends_tags(self, mock_space_data):
+        """Creating a space forwards tags in the request body."""
+        tagged_data = mock_space_data.copy()
+        tagged_data["tags"] = ["personal"]
+
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = tagged_data
+            client = Trix(api_key="test_key")
+
+            space = client.spaces.create(name="Test Space", tags=["personal"])
+
+            assert space.tags == ["personal"]
+            json_data = mock_request.call_args[1]["json"]
+            assert json_data["tags"] == ["personal"]
+            client.close()
+
+    def test_update_sends_tags(self, mock_space_data):
+        """Updating a space forwards tags in the PATCH body."""
+        tagged_data = mock_space_data.copy()
+        tagged_data["tags"] = ["archived"]
+
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = tagged_data
+            client = Trix(api_key="test_key")
+
+            client.spaces.update("space_123", tags=["archived"])
+
+            call_args = mock_request.call_args
+            assert call_args[0][0] == "PATCH"
+            assert call_args[1]["json"]["tags"] == ["archived"]
+            client.close()
+
+    def test_create_omits_tags_when_none(self, mock_space_data):
+        """Tags are not sent when not provided."""
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = mock_space_data
+            client = Trix(api_key="test_key")
+
+            client.spaces.create(name="Test Space")
+
+            assert "tags" not in mock_request.call_args[1]["json"]
+            client.close()
+
+
 class TestGetBySlug:
     """Tests for get_by_slug method."""
 

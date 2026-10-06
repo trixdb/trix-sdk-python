@@ -15,6 +15,7 @@ class Space(BaseResponse):
     name: str
     slug: str
     description: Optional[str] = None
+    tags: Optional[List[str]] = None
     created_at: datetime
     updated_at: datetime
 
@@ -25,6 +26,7 @@ class SpaceCreate(BaseModel):
     name: str
     slug: Optional[str] = None
     description: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 
 class SpaceUpdate(BaseModel):
@@ -33,6 +35,7 @@ class SpaceUpdate(BaseModel):
     name: Optional[str] = None
     slug: Optional[str] = None
     description: Optional[str] = None
+    tags: Optional[List[str]] = None
 
 
 class SpaceList(BaseResponse):
