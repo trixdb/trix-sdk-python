@@ -81,13 +81,28 @@ class MemoryUpdate(BaseModel):
     protection_level: Optional[str] = None
 
 
+class ListPagination(BaseModel):
+    """Pagination block of the API's canonical ``{data, pagination}`` list envelope."""
+
+    limit: int
+    has_more: bool
+    next_cursor: Optional[str] = None
+    total: Optional[int] = None
+
+
 class MemoryList(BaseResponse):
-    """List of memories with pagination."""
+    """List of memories with pagination.
+
+    The API returns ``{data, pagination: {limit, has_more, next_cursor, total?}}``.
+    The flat ``total``/``limit``/``offset`` fields are kept (optional) for older
+    response shapes.
+    """
 
     data: List[Memory]
-    total: int
-    limit: int
-    offset: int
+    pagination: Optional[ListPagination] = None
+    total: Optional[int] = None
+    limit: Optional[int] = None
+    offset: Optional[int] = None
 
 
 class MemoryConfig(BaseResponse):
