@@ -161,6 +161,26 @@ class TestMemoriesQuery:
             assert params["offset"] == 5
             client.close()
 
+    def test_query_parses_canonical_list_envelope(self, mock_memory_data):
+        """The live API's {data, pagination} envelope (no top-level total/limit/offset)."""
+        envelope = {
+            "data": [mock_memory_data],
+            "pagination": {"limit": 20, "has_more": True, "next_cursor": "abc", "total": 7},
+        }
+        with patch.object(Trix, "_request") as mock_request:
+            mock_request.return_value = envelope
+            client = Trix(api_key="test_key")
+
+            result = client.memories.query("type:fact")
+
+            assert isinstance(result, MemoryList)
+            assert len(result.data) == 1
+            assert result.pagination is not None
+            assert result.pagination.has_more is True
+            assert result.pagination.next_cursor == "abc"
+            assert result.pagination.total == 7
+            client.close()
+
     def test_query_returns_aggregate_shape_raw(self):
         """An aggregation response is returned as-is, not coerced to MemoryList."""
         agg = {
