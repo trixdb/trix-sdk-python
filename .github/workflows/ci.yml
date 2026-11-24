@@ -43,10 +43,26 @@ jobs:
 
   test:
     name: Test (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
+    # The runner image is pinned per Python version: ubuntu-latest is now
+    # Ubuntu 26.04, whose setup-python manifest no longer ships Python 3.9 x64
+    # ("version '3.9' with architecture 'x64' was not found"). The SDK still
+    # supports 3.9 (requires-python = ">=3.9"), so we keep testing it on
+    # ubuntu-22.04, which still provides it, and run the rest on ubuntu-latest.
+    runs-on: ${{ matrix.os }}
     strategy:
+      # Don't let one version's failure cancel the others — we want to see
+      # every version's result, not just the first to break.
+      fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        include:
+          - python-version: '3.9'
+            os: ubuntu-22.04
+          - python-version: '3.10'
+            os: ubuntu-latest
+          - python-version: '3.11'
+            os: ubuntu-latest
+          - python-version: '3.12'
+            os: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5

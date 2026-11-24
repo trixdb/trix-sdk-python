@@ -8,10 +8,23 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # ubuntu-latest (now Ubuntu 26.04) no longer provides Python 3.9 x64 via
+    # setup-python, and the SDK still supports 3.9 (requires-python ">=3.9"),
+    # so pin 3.9 to ubuntu-22.04 and keep the rest on ubuntu-latest. (Mirrors
+    # the test job in ci.yml.)
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        include:
+          - python-version: '3.9'
+            os: ubuntu-22.04
+          - python-version: '3.10'
+            os: ubuntu-latest
+          - python-version: '3.11'
+            os: ubuntu-latest
+          - python-version: '3.12'
+            os: ubuntu-latest
 
     steps:
     - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3
